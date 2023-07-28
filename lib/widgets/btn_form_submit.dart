@@ -18,15 +18,16 @@ class ButtonFormSubmit extends StatelessWidget {
         onPressed: () {
           onClick();
         },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+        ),
         child: Text(
           text,
-          style: AppStyles.robotoBold().copyWith(fontSize: 18, color: Colors.black),
-        ),
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22), // <-- Radius
-          ),
-          primary: Theme.of(context).colorScheme.secondary,
+          style: AppStyles.robotoBold().copyWith(fontSize: 18, color: Colors.white),
         ),
       ),
     );

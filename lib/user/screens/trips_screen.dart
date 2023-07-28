@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:exam_list/member/widgets/trips_listing.dart';
+import 'package:exam_list/user/widgets/trips_listing.dart';
 import 'package:exam_list/providers/download_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/utils/extras_utils.dart';

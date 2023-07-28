@@ -72,4 +72,25 @@ class AppStyles {
       ),
     );
   }
+
+  static InputDecoration inputDecorationWithoutIcon(String hintText,
+      {double paddingVertical = 4, String? prefixText}) {
+    var outLineBorder = OutlineInputBorder(
+      borderSide: const BorderSide(color: appRed, width: 2.0),
+      borderRadius: BorderRadius.circular(10.0),
+    );
+    return InputDecoration(
+      hintText: hintText,
+      prefixText: prefixText,
+      labelText: null,
+      hintStyle: inputHintStyle(),
+      enabledBorder: outLineBorder,
+      errorBorder: outLineBorder,
+      disabledBorder: outLineBorder,
+      focusedBorder: outLineBorder,
+      focusedErrorBorder: outLineBorder,
+      contentPadding: const EdgeInsets.symmetric(vertical: 4,horizontal: 16),
+    );
+  }
+
 }

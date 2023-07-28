@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
-import 'package:exam_list/member/screens/change_password_screen.dart';
-import 'package:exam_list/member/screens/member_profile_screen.dart';
-import 'package:exam_list/member/screens/member_feedback_screen.dart';
+import 'package:exam_list/user/screens/change_password_screen.dart';
+import 'package:exam_list/user/screens/member_profile_screen.dart';
+import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/preferences_data.dart';

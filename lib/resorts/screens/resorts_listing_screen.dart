@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/member/extras/booking_sheet.dart';
+import 'package:exam_list/user/extras/booking_sheet.dart';
 import 'package:exam_list/providers/resorts_provider.dart';
 import 'package:exam_list/resorts/widgets/resort_list_book_item.dart';
 import 'package:exam_list/resorts/widgets/resort_list_item.dart';

@@ -1,6 +1,6 @@
 import 'package:exam_list/home/screens/home_screen.dart';
-import 'package:exam_list/member/screens/member_login_screen.dart';
 import 'package:exam_list/options/screens/splash_screen.dart';
+import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +23,7 @@ class LaunchScreen extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           if (snapshot.data == 0) {
-            return const MemberLoginScreen();
+            return const UserLoginScreen();
           } else {
             return const HomeScreen();
           }

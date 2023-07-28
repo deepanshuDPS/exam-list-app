@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:exam_list/member/extras/view_image.dart';
+import 'package:exam_list/user/extras/view_image.dart';
 import 'package:exam_list/responseModels/login/documents_response.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/extras_utils.dart';

@@ -1,3 +1,4 @@
+import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exam_list/containers/base_image_container.dart';
@@ -5,7 +6,6 @@ import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/home/widgets/card_bg.dart';
 import 'package:exam_list/home/widgets/home_top_view.dart';
 import 'package:exam_list/home/widgets/option_item.dart';
-import 'package:exam_list/member/screens/member_login_screen.dart';
 import 'package:exam_list/options/screens/downloads_screen.dart';
 import 'package:exam_list/providers/download_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
@@ -322,7 +322,7 @@ class _HomeScreenState extends BaseState<HomeScreen> {
                           InkWell(
                             onTap: () {
                               Navigator.of(context)
-                                  .pushNamed(MemberLoginScreen.routeName);
+                                  .pushNamed(UserLoginScreen.routeName);
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/member/screens/trips_screen.dart';
+import 'package:exam_list/user/screens/trips_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:provider/provider.dart';

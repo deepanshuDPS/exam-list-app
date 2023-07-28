@@ -1,9 +1,9 @@
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
-import 'package:exam_list/member/screens/member_account_screen.dart';
-import 'package:exam_list/member/screens/member_feedback_screen.dart';
-import 'package:exam_list/member/screens/member_listing_screen.dart';
-import 'package:exam_list/member/screens/my_trips_screen.dart';
+import 'package:exam_list/user/screens/member_account_screen.dart';
+import 'package:exam_list/user/screens/member_feedback_screen.dart';
+import 'package:exam_list/user/screens/member_listing_screen.dart';
+import 'package:exam_list/user/screens/my_trips_screen.dart';
 import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 

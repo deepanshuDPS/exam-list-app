@@ -1,11 +1,11 @@
 import 'package:exam_list/options/screens/launch_screen.dart';
+import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
-import 'package:exam_list/member/screens/member_account_screen.dart';
-import 'package:exam_list/member/screens/member_profile_screen.dart';
-import 'package:exam_list/member/screens/member_feedback_screen.dart';
-import 'package:exam_list/member/screens/member_login_screen.dart';
+import 'package:exam_list/user/screens/member_account_screen.dart';
+import 'package:exam_list/user/screens/member_profile_screen.dart';
+import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/options/screens/voucher_screen.dart';
@@ -20,9 +20,9 @@ import 'package:exam_list/search/search_screen.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:provider/provider.dart';
 
-import 'member/screens/change_password_screen.dart';
-import 'member/screens/member_listing_screen.dart';
-import 'member/screens/my_trips_screen.dart';
+import 'user/screens/change_password_screen.dart';
+import 'user/screens/member_listing_screen.dart';
+import 'user/screens/my_trips_screen.dart';
 import 'options/screens/downloads_screen.dart';
 import 'options/screens/get_in_touch_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/': (ctx) => const LaunchScreen(),
             MemberAccountScreen.routeName: (ctx) => const MemberAccountScreen(),
-            MemberLoginScreen.routeName: (ctx) => const MemberLoginScreen(),
+            UserLoginScreen.routeName: (ctx) => const UserLoginScreen(),
             PaymentScreen.routeName: (ctx) => const PaymentScreen(),
             GetInTouchScreen.routeName: (ctx) => const GetInTouchScreen(),
             SearchScreen.routeName: (ctx) => const SearchScreen(),
