@@ -35,6 +35,7 @@ class UserProvider with ChangeNotifier {
   RequestData memberRequestData = RequestData();
   RequestData myUpTripsRequestData = RequestData();
   RequestData myCompTripsRequestData = RequestData();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /**
    * 0-> Login Screen
@@ -42,7 +43,6 @@ class UserProvider with ChangeNotifier {
    * 2-> Home Screen
    */
   Future<int> initializeApp() async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
     // await Firebase.initializeApp();
     // // set crashlytics
     // Function originalOnError = FlutterError.onError;
@@ -68,6 +68,39 @@ class UserProvider with ChangeNotifier {
       return 2;
     }
     return 0;
+  }
+
+  void verifyMobileNumber(
+      String mobileNumber,
+      Function isVerificationCompleted,
+      PhoneCodeSent codeSent,
+      PhoneCodeAutoRetrievalTimeout phoneCodeAutoRetrievalTimeout) async {
+    await _auth.signOut();
+    await _auth.verifyPhoneNumber(
+      phoneNumber: mobileNumber,
+      verificationCompleted: (credential) {
+        print("verified");
+        isVerificationCompleted("Mobile no. verified", credential);
+      },
+      verificationFailed: (authException) {
+        // error in verification of phone no.
+        isVerificationCompleted(authException);
+      },
+      codeSent: codeSent,
+      codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout,
+    );
+  }
+
+  Future<UserCredential> loginMobile(PhoneAuthCredential phoneAuthCredential) {
+    return _auth.signInWithCredential(phoneAuthCredential);
+  }
+
+  Future<UserCredential> authenticateOTP(String smsCode, String verificationId) {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    return _auth.signInWithCredential(credential);
   }
 
   void notifyWithRequest(RequestData data, bool isLoading) {

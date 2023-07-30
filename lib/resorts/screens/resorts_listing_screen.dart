@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/user/extras/booking_sheet.dart';
+import 'package:exam_list/user/extras/otp_sheet.dart';
 import 'package:exam_list/providers/resorts_provider.dart';
 import 'package:exam_list/resorts/widgets/resort_list_book_item.dart';
 import 'package:exam_list/resorts/widgets/resort_list_item.dart';
@@ -71,36 +71,7 @@ class _ResortsListingScreenState extends BaseState<ResortsListingScreen> {
               }
               var itemList = resorts.resortsList;
 
-              return ListView.builder(
-                  padding: const EdgeInsets.only(top: 16),
-                  itemCount: resorts.resortsList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _isForBook
-                        ? ResortListBookItem(
-                            data: itemList[index],
-                            booking: (resortName) {
-                              _bodyData?.putIfAbsent(
-                                  'resort', () => resortName);
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (BuildContext context) {
-                                  return BookingSheet(
-                                      bodyData: _bodyData!, isOffer: false);
-                                },
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(10),
-                                  ),
-                                ),
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                              );
-                            })
-                        : ResortListItem(
-                            data: itemList[index],
-                            dId: _dId,
-                          );
-                  });
+              return Container();
             }),
       ),
     );

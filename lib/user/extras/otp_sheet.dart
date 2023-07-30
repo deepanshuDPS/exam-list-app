@@ -1,45 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/colors.dart';
-import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
-import 'package:provider/provider.dart';
 
-class BookingSheet extends StatefulWidget {
-  final bool isOffer;
-  final Map<String, String?> bodyData;
+class OTPSheet extends StatefulWidget {
+  final Function confirmOTP;
 
-  const BookingSheet({Key? key, required this.bodyData, required this.isOffer})
+  const OTPSheet(
+      {Key? key, required this.confirmOTP})
       : super(key: key);
 
   @override
-  State<BookingSheet> createState() => _BookingSheetState();
+  State<OTPSheet> createState() => _OTPSheetState();
 }
 
-class _BookingSheetState extends State<BookingSheet> {
-  final _number = TextEditingController();
+class _OTPSheetState extends State<OTPSheet> {
+  final _otpController = TextEditingController();
   final _globalFormKey = GlobalKey<FormState>();
 
   void onSubmitClick() {
-    var enteredText = _number.text.trim();
-    if (enteredText.isNotEmpty) {
-      widget.bodyData.putIfAbsent('contact', () => enteredText);
-    }
+    var enteredOTP = _otpController.text.trim();
     FocusScope.of(context).requestFocus(FocusNode());
-    showProgressDialog(context);
-    Provider.of<UserProvider>(context, listen: false)
-        .bookingOfferOrHoliday(widget.bodyData, widget.isOffer)
-        .then((value) {
-      Navigator.of(context).pop();
-      Fluttertoast.showToast(
-          msg: value is String ? value : value['errorMessage']);
-      if (value is String) {
-        Navigator.of(context).pop();
-      }
-    });
+    widget.confirmOTP(enteredOTP);
+    // showProgressDialog(context);
+    // Provider.of<UserProvider>(context, listen: false)
+    //     .bookingOfferOrHoliday(widget.bodyData, widget.isOffer)
+    //     .then((value) {
+    //   Navigator.of(context).pop();
+    //   Fluttertoast.showToast(
+    //       msg: value is String ? value : value['errorMessage']);
+    //   if (value is String) {
+    //     Navigator.of(context).pop();
+    //   }
+    // });
   }
 
   @override
@@ -94,7 +88,7 @@ class _BookingSheetState extends State<BookingSheet> {
                 height: 8,
               ),
               const Text(
-                'Please enter your number below and we call you back for booking.',
+                'Please enter OTP for Login',
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -108,19 +102,18 @@ class _BookingSheetState extends State<BookingSheet> {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _number,
+                      controller: _otpController,
                       validator: (input) =>
-                          (input?.length ?? 0) < 10 && input != ''
-                              ? "Please Enter Valid Contact No."
+                          (input?.length ?? 0) < 6 && input != ''
+                              ? "Please Enter Valid OTP."
                               : null,
-                      maxLength: 12,
+                      maxLength: 6,
                       style: AppStyles.inputTextStyle(),
                       keyboardType: TextInputType.phone,
                       // onSaved: (input) => loginRequestModel.email = input,
                       obscureText: false,
                       decoration: AppStyles.inputDecoration(
-                              widget.bodyData['contact'] ?? 'Contact No.',
-                              Icons.phone_android)
+                              'Enter OTP', Icons.phone_android)
                           .copyWith(counterText: ""),
                     ),
                     const SizedBox(

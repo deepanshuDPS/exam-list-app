@@ -4,7 +4,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/user/extras/booking_sheet.dart';
+import 'package:exam_list/user/extras/otp_sheet.dart';
 import 'package:exam_list/user/widgets/docs_listing.dart';
 import 'package:exam_list/user/widgets/holidays_listing.dart';
 import 'package:exam_list/user/widgets/fee_listing.dart';
@@ -116,87 +116,87 @@ class _MemberListingScreenState extends BaseState<MemberListingScreen> {
                   }
                 }
               }
-
-              return ListView.builder(
-                  padding: const EdgeInsets.only(top: 16),
-                  itemCount: itemList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _pageType == 0
-                        ? OffersListing(
-                            offerData: user.offersList[index],
-                            availableClick: (mobile) {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (BuildContext context) {
-                                  return BookingSheet(bodyData: {
-                                    'offer_detail':
-                                        user.offersList[index].offer,
-                                    'contact': mobile
-                                  }, isOffer: true);
-                                },
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(10),
-                                  ),
-                                ),
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                              );
-                            })
-                        : _pageType == 1
-                            ? HolidaysListing(
-                                holidayData: user.holidaysList[index],
-                                availableClick: () {
-                                  popUp(context);
-                                })
-                            : _pageType == 2
-                                ? DocsListing(
-                                    docData: user.docsList[index],
-                                    downloadDoc: (url) {
-                                      showProgressDialog(context,
-                                          loadingText: 'Downloading...');
-                                      dProvider
-                                          .downloadFile(url)
-                                          .then((value) async {
-                                        Navigator.of(context).pop();
-                                        Fluttertoast.showToast(
-                                            msg: value != null
-                                                ? 'Download Success'
-                                                : 'Download Failed!!!');
-                                        if (value != null) {
-                                          setState(() {
-                                            docsList![index].setFilePath(
-                                                dProvider.checkFile(value));
-                                          });
-                                          await OpenFilex.open(value);
-                                        }
-                                      });
-                                    })
-                                : FeeListing(
-                                    feeData: receiptsList![index],
-                                    isMember: _pageType == 3,
-                                    downloadReceipt: (url) {
-                                      showProgressDialog(context,
-                                          loadingText: 'Downloading...');
-                                      dProvider
-                                          .downloadFile(url,type: 'rec')
-                                          .then((value) async {
-                                        Navigator.of(context).pop();
-                                        Fluttertoast.showToast(
-                                            msg: value != null
-                                                ? 'Download Success'
-                                                : 'Download Failed!!!');
-                                        if (value != null) {
-                                          setState(() {
-                                            receiptsList![index].setFilePath(
-                                                dProvider.checkFile(value));
-                                          });
-                                          await OpenFilex.open(value);
-                                        }
-                                      });
-                                    },
-                                  );
-                  });
+              return Container();
+              // return ListView.builder(
+              //     padding: const EdgeInsets.only(top: 16),
+              //     itemCount: itemList.length,
+              //     itemBuilder: (BuildContext context, int index) {
+              //       return _pageType == 0
+              //           ? OffersListing(
+              //               offerData: user.offersList[index],
+              //               availableClick: (mobile) {
+              //                 showModalBottomSheet(
+              //                   context: context,
+              //                   isScrollControlled: true,
+              //                   builder: (BuildContext context) {
+              //                     return OTPSheet(bodyData: {
+              //                       'offer_detail':
+              //                           user.offersList[index].offer,
+              //                       'contact': mobile
+              //                     }, isOffer: true);
+              //                   },
+              //                   shape: const RoundedRectangleBorder(
+              //                     borderRadius: BorderRadius.vertical(
+              //                       top: Radius.circular(10),
+              //                     ),
+              //                   ),
+              //                   clipBehavior: Clip.antiAliasWithSaveLayer,
+              //                 );
+              //               })
+              //           : _pageType == 1
+              //               ? HolidaysListing(
+              //                   holidayData: user.holidaysList[index],
+              //                   availableClick: () {
+              //                     popUp(context);
+              //                   })
+              //               : _pageType == 2
+              //                   ? DocsListing(
+              //                       docData: user.docsList[index],
+              //                       downloadDoc: (url) {
+              //                         showProgressDialog(context,
+              //                             loadingText: 'Downloading...');
+              //                         dProvider
+              //                             .downloadFile(url)
+              //                             .then((value) async {
+              //                           Navigator.of(context).pop();
+              //                           Fluttertoast.showToast(
+              //                               msg: value != null
+              //                                   ? 'Download Success'
+              //                                   : 'Download Failed!!!');
+              //                           if (value != null) {
+              //                             setState(() {
+              //                               docsList![index].setFilePath(
+              //                                   dProvider.checkFile(value));
+              //                             });
+              //                             await OpenFilex.open(value);
+              //                           }
+              //                         });
+              //                       })
+              //                   : FeeListing(
+              //                       feeData: receiptsList![index],
+              //                       isMember: _pageType == 3,
+              //                       downloadReceipt: (url) {
+              //                         showProgressDialog(context,
+              //                             loadingText: 'Downloading...');
+              //                         dProvider
+              //                             .downloadFile(url,type: 'rec')
+              //                             .then((value) async {
+              //                           Navigator.of(context).pop();
+              //                           Fluttertoast.showToast(
+              //                               msg: value != null
+              //                                   ? 'Download Success'
+              //                                   : 'Download Failed!!!');
+              //                           if (value != null) {
+              //                             setState(() {
+              //                               receiptsList![index].setFilePath(
+              //                                   dProvider.checkFile(value));
+              //                             });
+              //                             await OpenFilex.open(value);
+              //                           }
+              //                         });
+              //                       },
+              //                     );
+              //     });
             }),
       ),
     );
