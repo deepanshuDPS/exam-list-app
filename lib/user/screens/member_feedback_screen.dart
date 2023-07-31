@@ -298,8 +298,8 @@ class _MemberFeedbackScreenState extends BaseState<MemberFeedbackScreen> {
         Dio dio = Dio();
         dio.options.contentType = 'application/json';
         dio.options.headers['Content-Type'] = 'application/json';
-        dio.options.headers['phw-auth'] = Constants.phwAuth;
-        dio.options.headers['phw-user-token'] = userData?.token ?? 'N/A';
+        dio.options.headers['phw-auth'] = Constants.apiKey;
+        dio.options.headers['phw-user-token'] = userData?.id ?? 'N/A';
 
         var response =
             await dio.post('${Constants.baseURL}member/feedback', data: data);

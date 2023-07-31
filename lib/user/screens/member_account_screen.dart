@@ -59,7 +59,7 @@ class MemberAccountScreen extends StatelessWidget {
             'Feedback',
             () async{
               Navigator.of(context)
-                  .pushNamed(MemberFeedbackScreen.routeName, arguments: (await PreferencesData.getUserData())?.msNum);
+                  .pushNamed(MemberFeedbackScreen.routeName, arguments: (await PreferencesData.getUserData())?.id);
             }),
         const Divider(
           height: 1,

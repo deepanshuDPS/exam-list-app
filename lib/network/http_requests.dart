@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:exam_list/network/http_utils.dart';
-import 'package:exam_list/responseModels/login/login_response.dart';
 import 'package:exam_list/utils/constants.dart';
-import 'package:exam_list/utils/preferences_data.dart';
 
 class HttpRequests {
   static HttpRequests? _httpRequests;
@@ -21,11 +20,12 @@ class HttpRequests {
   Future<Map<String, String>> getHeaders(bool isAuthHeader) async {
     Map<String, String> headersToSend = {
       'Content-Type': 'application/json',
-      'phw-auth': Constants.phwAuth
+      'x-api-key': Constants.apiKey
     };
-    Data? userData = await PreferencesData.getUserData();
-    if (userData != null) {
-      headersToSend['phw-user-token'] = userData.token ?? 'null';
+    var authUser = FirebaseAuth.instance.currentUser;
+    if (authUser != null) {
+      headersToSend['id-token'] = (await authUser.getIdToken()) ?? "";
+      headersToSend['mobile'] = authUser.phoneNumber??"";
     }
     return headersToSend;
   }
@@ -118,6 +118,9 @@ class HttpRequests {
 }
 
 class ApiEndPoints {
+  static const checkUser = "auth/user/checkUser";
+  static const checkGuestUser = "anon/user/checkGuestUser";
+
   // static const whatWeOffer = 'icons/whatweoffer';
   // static const banner = 'banner';
   // static const preferredPartners = 'partner/preferred';
@@ -143,9 +146,8 @@ class ApiEndPoints {
   static const memberHolidays = 'member/holidays';
   static const memberDocuments = 'member/documents';
   static const memberFee = 'member/fee';
-  static const memberAMC= 'member/amc';
+  static const memberAMC = 'member/amc';
   static const memberTrips = 'member/mytrips/{trip_type}';
   static const memberChangePassword = 'member/change_password';
   static const memberBook = 'member/book/{type}';
-
 }

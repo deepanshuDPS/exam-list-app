@@ -1,4 +1,7 @@
+import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
+import 'package:exam_list/user/extras/otp_sheet.dart';
+import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +10,6 @@ import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
 import 'package:exam_list/widgets/illustration_svg.dart';
 import 'package:provider/provider.dart';
-
-import '../extras/otp_sheet.dart';
 
 class UserLoginScreen extends StatefulWidget {
   static const routeName = "/user-login";
@@ -33,43 +34,46 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     String mobileNumber = _mobileController.text.trim();
     _verificationId = null;
     // switch to otp dialog here
+    showProgressDialog(context);
     userProvider.verifyMobileNumber(
       '+91$mobileNumber',
       (dynamic message, PhoneAuthCredential? phoneAuthCredential) {
         if (message is FirebaseAuthException) {
           // something went wrong
-          print("here error");
         } else if (phoneAuthCredential != null) {
           showSnackBar(context, message);
-          userProvider
-              .loginMobile(phoneAuthCredential)
-              .then((value) {})
-              .onError((error, stackTrace) {});
+          signInForMobile(phoneAuthCredential);
         }
       },
       (verificationId, resendToken) {
-        print("code sent");
+        Navigator.of(context).pop();
         _verificationId = verificationId;
+        showGetOTPSheet();
         // switch to otp screen with verificationId
       },
       (verificationId) {
-        print("timeout");
         _verificationId = verificationId;
         // code auto retrieval timeout
         // request for otp && switch to otp screen with verificationId
         // again verify mobile
+        // Navigator.of(context).popUntil(ModalRoute.withName('/'));
+        // showGetOTPSheet();
       },
     );
+  }
 
+  void showGetOTPSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
         return OTPSheet(
           confirmOTP: (smsCode) {
-            userProvider.authenticateOTP(smsCode, _verificationId!).then((UserCredential value){
-              print(value.user?.phoneNumber);
-            });
+            PhoneAuthCredential credential = PhoneAuthProvider.credential(
+              verificationId: _verificationId!,
+              smsCode: smsCode,
+            );
+            signInForMobile(credential);
           },
         );
       },
@@ -82,20 +86,27 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     );
   }
 
-  // void _signInWithOTP(String smsCode) async {
-  //   PhoneAuthCredential credential = PhoneAuthProvider.credential(
-  //     verificationId: _verificationId,
-  //     smsCode: smsCode,
-  //   );
-  //
-  //   try {
-  //     UserCredential authResult = await _auth.signInWithCredential(credential);
-  //     // User is logged in, navigate to the home screen or perform desired action.
-  //   } catch (e) {
-  //     print('Sign in failed: $e');
-  //     // Handle sign-in failure, e.g., show an error message.
-  //   }
-  // }
+  void signInForMobile(PhoneAuthCredential credential) {
+    showProgressDialog(context);
+    userProvider.loginMobile(credential).then((value) {
+      Navigator.of(context).pop();
+      if (value is String) {
+        showSnackBar(context, value);
+      } else {
+        // successfully login toast
+        // check on boarding and change screen
+        Navigator.pushNamedAndRemoveUntil(
+            context, HomeScreen.routeName, (route) => false);
+      }
+    }).onError((error, stackTrace) {
+      Navigator.of(context).pop();
+      if (error is FirebaseException) {
+        showSnackBar(context, (error).message!);
+      } else {
+        showSnackBar(context, Constants.somethingWentWrong);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

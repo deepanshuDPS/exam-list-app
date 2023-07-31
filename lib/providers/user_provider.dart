@@ -14,11 +14,12 @@ import 'package:exam_list/responseModels/login/member_profile_response.dart'
     as member_details_response;
 import 'package:exam_list/responseModels/login/my_trips_response.dart'
     as trips_response;
-import 'package:exam_list/responseModels/login/login_response.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart'
     as all_places_response;
 import 'package:exam_list/utils/preferences_data.dart';
+
+import '../responseModels/login/check_user_response.dart';
 
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -65,6 +66,11 @@ class UserProvider with ChangeNotifier {
     // await checkUserDetails();
     // await Future.delayed(Duration(milliseconds: 100));
     if (_auth.currentUser != null) {
+      _isLoggedIn = (await PreferencesData.getUserData()) != null;
+      if (!_isLoggedIn) {
+        await _auth.signOut();
+        return 0;
+      }
       return 2;
     }
     return 0;
@@ -79,7 +85,6 @@ class UserProvider with ChangeNotifier {
     await _auth.verifyPhoneNumber(
       phoneNumber: mobileNumber,
       verificationCompleted: (credential) {
-        print("verified");
         isVerificationCompleted("Mobile no. verified", credential);
       },
       verificationFailed: (authException) {
@@ -91,16 +96,19 @@ class UserProvider with ChangeNotifier {
     );
   }
 
-  Future<UserCredential> loginMobile(PhoneAuthCredential phoneAuthCredential) {
-    return _auth.signInWithCredential(phoneAuthCredential);
-  }
-
-  Future<UserCredential> authenticateOTP(String smsCode, String verificationId) {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
-    return _auth.signInWithCredential(credential);
+  Future<dynamic> loginMobile(PhoneAuthCredential phoneAuthCredential) async {
+    await _auth.signInWithCredential(phoneAuthCredential);
+    final response = CheckUserResponse.fromJson(
+        await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
+    if (response.status == true) {
+      PreferencesData.saveUserData(response.data!);
+      _isLoggedIn = true;
+      _notifyListenersWithBinding();
+      return true;
+    }
+    await _auth.signOut();
+    _notifyListenersWithBinding();
+    return response.message ?? 'Something went Wrong';
   }
 
   void notifyWithRequest(RequestData data, bool isLoading) {
@@ -176,29 +184,13 @@ class UserProvider with ChangeNotifier {
     return [..._comTripsList];
   }
 
-  Future<void> checkUser() async {
-    _isLoggedIn = (await PreferencesData.getUserData()) != null;
-  }
-
   Future<void> logoutUser() async {
     await PreferencesData.clearOnLogOut();
     _isLoggedIn = false;
     _notifyListenersWithBinding();
   }
 
-  Future<dynamic> loginUser(String memberNumber, String password) async {
-    var body = {'mem_num': memberNumber, 'mem_pwd': password};
-    final response = LoginResponse.fromJson(await HttpRequests.instance()
-        ?.httpPostRequest(ApiEndPoints.login, body));
-    if (response.data?.isNotEmpty == true) {
-      PreferencesData.saveUserData(response.data![0]);
-      _isLoggedIn = true;
-      _notifyListenersWithBinding();
-      return true;
-    }
-    _notifyListenersWithBinding();
-    return response.message ?? 'Something went Wrong';
-  }
+  Future<dynamic> checkUser() async {}
 
   Future<dynamic> changePassword(String oldPass, String newPass) async {
     var body = {'old_pwd': oldPass, 'new_pwd': newPass, 'cnew_pwd': newPass};

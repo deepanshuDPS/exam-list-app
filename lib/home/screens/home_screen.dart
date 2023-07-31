@@ -21,6 +21,7 @@ import 'package:exam_list/widgets/container_loading.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const routeName = '/home-screen';
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -37,7 +38,7 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      Provider.of<UserProvider>(context, listen: false).checkUser();
+      // Provider.of<UserProvider>(context, listen: false).checkUser();
       Provider.of<DownloadProvider>(context, listen: false).initFilesAgain();
       _fetchHome();
     }

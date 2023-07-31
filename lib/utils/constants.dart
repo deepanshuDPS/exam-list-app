@@ -8,7 +8,7 @@ import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 
 class Constants {
-  static String baseURL = 'https://thepacificholidayworld.com/api/';
+  static String baseURL = 'http://192.168.29.174:8080/';
 
   //SvgPicture.asset(assetName)
   static List<Map<String, String>> membershipList = [
@@ -28,9 +28,12 @@ class Constants {
       "route": MemberListingScreen.routeName,
       "arg": "3"
     },
-    {"text": "AMC Fee", "image": "assets/svg/amc_fee.svg",
+    {
+      "text": "AMC Fee",
+      "image": "assets/svg/amc_fee.svg",
       "route": MemberListingScreen.routeName,
-      "arg": "4"},
+      "arg": "4"
+    },
     {
       "text": "Holidays",
       "image": "assets/svg/ic_holidays.svg",
@@ -160,7 +163,7 @@ class Constants {
     "The Pacific Holiday World authorizes you to look at, print or transfer any content, graphic, kind or document from the positioning for your personal, non-commercial use and you want to not amendment or delete any such material or copyright notice showing on such material. "
         "you'll not modify the materials at this website in any means or repost, republish, reproduce, publicly show, perform, assign, sublicense, sell or prepare spin-off works of or otherwise use the materials for any purpose except as expressly permissible beneath this Agreement. "
         "Copyright within the materials at this website is closely-held by or used with permission and any unauthorized use of any materials at this website might violate copyright, trade mark and alternative proprietary (including however not restricted to intellectual property) legal rights of the corporate. "
-        "As a user of this computing device you\'re granted a nonexclusive, untransferable, revocable, restricted license to access and use this computing device and Content in accordance with these Terms of Use. "
+        "As a user of this computing device you're granted a nonexclusive, untransferable, revocable, restricted license to access and use this computing device and Content in accordance with these Terms of Use. "
         "Supplier might terminate this license at any time for any reason.",
     "All material offered on this computing device is protected by copyright laws. Distribution of the fabric from the net website, for business functions is prohibited. "
         "'The house owners of the material possession, copyrights and logos or its affiliates or third party licensors'. "
@@ -175,5 +178,8 @@ class Constants {
         "These Terms and Conditions govern the conduct of the contests under it hashtag #BlinkToBeThere delivered to you by The Pacific Holiday World and launched the terms and conditions on which you'll participate during this Contest."
   ];
 
-  static String phwAuth = 'd81e13010c093134faab0748ad92e7dee09c4afb';
+  static String apiKey =
+      '122a3a8234a618432663194ba6116194970c116f4014feac40d215f9cee62a17';
+
+  static String somethingWentWrong = 'Something went wrong';
 }

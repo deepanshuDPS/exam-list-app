@@ -52,7 +52,7 @@ class OptionItem extends StatelessWidget {
                     routeName?.contains('feedback') == true)
                   {
                     Navigator.of(context).pushNamed(routeName!,
-                        arguments: (await PreferencesData.getUserData())?.msNum)
+                        arguments: (await PreferencesData.getUserData())?.id)
                   }
                 else if (routeName != null)
                   Navigator.of(context).pushNamed(routeName!)

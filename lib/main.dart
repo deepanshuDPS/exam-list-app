@@ -1,3 +1,4 @@
+import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/launch_screen.dart';
 import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,6 @@ import 'user/screens/change_password_screen.dart';
 import 'user/screens/member_listing_screen.dart';
 import 'user/screens/my_trips_screen.dart';
 import 'options/screens/downloads_screen.dart';
-import 'options/screens/get_in_touch_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
             MemberAccountScreen.routeName: (ctx) => const MemberAccountScreen(),
             UserLoginScreen.routeName: (ctx) => const UserLoginScreen(),
             PaymentScreen.routeName: (ctx) => const PaymentScreen(),
-            GetInTouchScreen.routeName: (ctx) => const GetInTouchScreen(),
+            HomeScreen.routeName: (ctx) => const HomeScreen(),
             SearchScreen.routeName: (ctx) => const SearchScreen(),
             SupportScreen.routeName: (ctx) => const SupportScreen(),
             MemberFeedbackScreen.routeName: (ctx) =>
