@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/styles/app_styles.dart';
+import 'package:flutter/services.dart';
 
 class BaseScaffold extends StatelessWidget {
   final Widget child;
   final String? titleText;
   final double? elevation;
-  final bool? isYellow;
+  final bool? isAppBarColored;
   final PreferredSizeWidget? barBottom;
 
   const BaseScaffold(
@@ -14,7 +15,7 @@ class BaseScaffold extends StatelessWidget {
       this.titleText,
       this.elevation,
       this.barBottom,
-      this.isYellow})
+      this.isAppBarColored})
       : super(key: key);
 
   @override
@@ -30,18 +31,19 @@ class BaseScaffold extends StatelessWidget {
         centerTitle: false,
         title: Text(
           titleText ?? "",
-          style: AppStyles.robotoBold().copyWith(fontSize: 20),
+          style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600),
         ),
-        backgroundColor: isYellow == true
+        backgroundColor: isAppBarColored == true
             ? Theme.of(context).colorScheme.secondary
             : Colors.white,
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back,
+            Icons.arrow_back_ios_new,
             color: Colors.black,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+           // Navigator.of(context).pop();
+            SystemNavigator.pop();
           },
         ),
         elevation: elevation ?? 0,

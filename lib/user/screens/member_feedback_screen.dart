@@ -48,7 +48,7 @@ class _MemberFeedbackScreenState extends BaseState<MemberFeedbackScreen> {
   Widget build(BuildContext context) {
     return BaseScaffold(
         titleText: "Feedback",
-        isYellow: true,
+        isAppBarColored: true,
         child: BaseImageContainer(
           opacity: 0.5,
           child: SingleChildScrollView(

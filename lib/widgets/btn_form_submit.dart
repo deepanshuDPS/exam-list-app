@@ -27,7 +27,7 @@ class ButtonFormSubmit extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: AppStyles.robotoBold().copyWith(fontSize: 18, color: Colors.white),
+          style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );

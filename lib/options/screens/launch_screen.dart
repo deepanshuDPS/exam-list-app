@@ -1,6 +1,7 @@
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/splash_screen.dart';
 import 'package:exam_list/user/screens/user_login_screen.dart';
+import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,8 @@ class LaunchScreen extends StatelessWidget {
         } else {
           if (snapshot.data == 0) {
             return const UserLoginScreen();
+          } else if (snapshot.data == 1) {
+            return const UserOnBoardingScreen();
           } else {
             return const HomeScreen();
           }

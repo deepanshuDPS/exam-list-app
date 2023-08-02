@@ -34,7 +34,7 @@ class _MyTripsScreenState extends BaseState<MyTripsScreen> {
       length: 2,
       child: BaseScaffold(
           titleText: "My Trips",
-          isYellow: true,
+          isAppBarColored: true,
           barBottom: TabBar(
             labelColor: Theme.of(context).colorScheme.secondary,
             unselectedLabelColor: Colors.black54,

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
 import 'package:exam_list/user/screens/member_account_screen.dart';
-import 'package:exam_list/user/screens/member_profile_screen.dart';
+import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
                 const ResortsListingScreen(),
             ResortScreen.routeName: (ctx) => const ResortScreen(),
             VoucherScreen.routeName: (ctx) => const VoucherScreen(),
-            MemberProfileScreen.routeName: (ctx) => const MemberProfileScreen(),
+            UserOnBoardingScreen.routeName: (ctx) => const UserOnBoardingScreen(),
             MemberListingScreen.routeName: (ctx) => const MemberListingScreen(),
             TermsConditionsScreen.routeName: (ctx) => const TermsConditionsScreen(),
             DownloadsScreen.routeName: (ctx) => const DownloadsScreen(),

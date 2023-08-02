@@ -65,7 +65,7 @@ class TermsConditionsScreen extends StatelessWidget {
           ),
         ),
       ),
-      isYellow: true,
+      isAppBarColored: true,
       titleText: 'Terms & Conditions',
     );
   }

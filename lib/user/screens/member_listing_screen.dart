@@ -74,7 +74,7 @@ class _MemberListingScreenState extends BaseState<MemberListingScreen> {
   Widget build(BuildContext context) {
     return BaseScaffold(
       titleText: _heading,
-      isYellow: true,
+      isAppBarColored: true,
       child: BaseImageContainer(
         opacity: 0.4,
         child: Consumer<UserProvider>(

@@ -60,31 +60,38 @@ class Data {
     String? id,
     String? mobile,
     bool? onBoarded,
+    String? customToken
   }) {
     _id = id;
     _mobile = mobile;
     _onBoarded = onBoarded;
+    _customToken = customToken;
   }
 
   Data.fromJson(dynamic json) {
     _id = json['_id'];
     _mobile = json['mobile'];
     _onBoarded = json['onBoarded'];
+    _customToken = json['customToken'];
   }
 
   String? _id;
   String? _mobile;
   bool? _onBoarded;
+  String? _customToken;
+
 
   Data copyWith({
     String? id,
     String? mobile,
     bool? onBoarded,
+    String? customToken
   }) =>
       Data(
         id: id ?? _id,
         mobile: mobile ?? _mobile,
         onBoarded: onBoarded ?? _onBoarded,
+        customToken: customToken ?? _customToken
       );
 
   String? get id => _id;
@@ -93,11 +100,14 @@ class Data {
 
   bool? get onBoarded => _onBoarded;
 
+  String? get customToken => _customToken;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['_id'] = _id;
     map['mobile'] = _mobile;
     map['onBoarded'] = _onBoarded;
+    map['customToken'] = _customToken;
     return map;
   }
 }

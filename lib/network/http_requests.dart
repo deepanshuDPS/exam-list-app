@@ -25,7 +25,7 @@ class HttpRequests {
     var authUser = FirebaseAuth.instance.currentUser;
     if (authUser != null) {
       headersToSend['id-token'] = (await authUser.getIdToken()) ?? "";
-      headersToSend['mobile'] = authUser.phoneNumber??"";
+      headersToSend['mobile'] = authUser.phoneNumber ?? "";
     }
     return headersToSend;
   }
@@ -118,7 +118,12 @@ class HttpRequests {
 }
 
 class ApiEndPoints {
-  static const checkUser = "auth/user/checkUser";
+
+  static const authUser = 'auth/user/';
+
+
+  static const checkUser = "${authUser}checkUser";
+  static const signUpAspirant = "${authUser}signup";
   static const checkGuestUser = "anon/user/checkGuestUser";
 
   // static const whatWeOffer = 'icons/whatweoffer';

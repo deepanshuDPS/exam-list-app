@@ -56,7 +56,7 @@ class _ResortsListingScreenState extends BaseState<ResortsListingScreen> {
   Widget build(BuildContext context) {
     return BaseScaffold(
       titleText: _placeName,
-      isYellow: true,
+      isAppBarColored: true,
       child: BaseImageContainer(
         opacity: 0.4,
         child: Consumer<ResortsProvider>(

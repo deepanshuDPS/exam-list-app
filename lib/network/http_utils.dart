@@ -1,26 +1,28 @@
 dynamic getErrorResponse(int errorCode, dynamic bodyContent) {
-  switch (errorCode) {
-    case 001:
-      bodyContent['message'] = "Something went wrong with your connection."
-          " Please check your Connection and try again.";
-      break;
-    case 400:
-      bodyContent['message'] = 'Something wrong with the request';
-      break;
-    case 404:
-      bodyContent['message'] = 'No Data Found';
-      break;
-    case 401:
-    case 403:
-    case 402:
-    case 406:
-      break;
-    case 500:
-      bodyContent['message'] = 'Unable to reach server';
-      break;
-    default:
-      bodyContent['message'] = 'Something went wrong. Please try again';
+  if(bodyContent['message'] == null) {
+    switch (errorCode) {
+      case 001:
+        bodyContent['message'] = "Something went wrong with your connection."
+            " Please check your Connection and try again.";
+        break;
+      case 400:
+        bodyContent['message'] = 'Something wrong with the request';
+        break;
+      case 404:
+        bodyContent['message'] = 'No Data Found';
+        break;
+      case 401:
+      case 403:
+      case 402:
+      case 406:
+        break;
+      case 500:
+        bodyContent['message'] = 'Unable to reach server';
+        break;
+      default:
+        bodyContent['message'] = 'Something went wrong. Please try again';
+    }
   }
-  bodyContent['status'] = -1;
+  bodyContent['status'] = false;
   return bodyContent;
 }

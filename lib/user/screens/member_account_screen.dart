@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/user/screens/change_password_screen.dart';
-import 'package:exam_list/user/screens/member_profile_screen.dart';
+import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
@@ -50,7 +50,7 @@ class MemberAccountScreen extends StatelessWidget {
         _horizontalOption(
             'Member Profile',
             () =>
-                Navigator.of(context).pushNamed(MemberProfileScreen.routeName)),
+                Navigator.of(context).pushNamed(UserOnBoardingScreen.routeName)),
         _horizontalOption(
             'Change Password',
             () => Navigator.of(context)

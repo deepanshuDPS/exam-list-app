@@ -103,7 +103,7 @@ class SupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      isYellow: true,
+      isAppBarColored: true,
       child: BaseImageContainer(
         opacity: 0.6,
         child: SingleChildScrollView(

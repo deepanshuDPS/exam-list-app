@@ -121,7 +121,7 @@ class _VoucherScreenState extends BaseState<VoucherScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-        isYellow: true,
+        isAppBarColored: true,
         titleText: 'Voucher Details',
         child: BaseImageContainer(
           opacity: 0.7,

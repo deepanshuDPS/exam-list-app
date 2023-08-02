@@ -1,3 +1,4 @@
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
@@ -38,11 +39,9 @@ class UserProvider with ChangeNotifier {
   RequestData myCompTripsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /**
-   * 0-> Login Screen
-   * 1-> Not onBoarded
-   * 2-> Home Screen
-   */
+  /// 0-> Login Screen
+  /// 1-> Not onBoarded
+  /// 2-> Home Screen
   Future<int> initializeApp() async {
     // await Firebase.initializeApp();
     // // set crashlytics
@@ -66,12 +65,15 @@ class UserProvider with ChangeNotifier {
     // await checkUserDetails();
     // await Future.delayed(Duration(milliseconds: 100));
     if (_auth.currentUser != null) {
-      _isLoggedIn = (await PreferencesData.getUserData()) != null;
+      var user = await PreferencesData.getUserData();
+      _isLoggedIn = (user) != null;
       if (!_isLoggedIn) {
         await _auth.signOut();
         return 0;
+      }else if(user?.onBoarded == true){
+        return 2;
       }
-      return 2;
+      return 1;
     }
     return 0;
   }
@@ -96,6 +98,28 @@ class UserProvider with ChangeNotifier {
     );
   }
 
+  Future<dynamic> loginGuest(String mobile) async {
+    final customResponse = CheckUserResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpPostRequest(ApiEndPoints.checkGuestUser, {'mobile':'+91$mobile'}));
+    if (customResponse.status == false) {
+      _notifyListenersWithBinding();
+      return customResponse.message ?? 'Something went Wrong';
+    }
+    await _auth.signInWithCustomToken(customResponse.data?.customToken ?? '');
+    final response = CheckUserResponse.fromJson(
+        await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
+    if (response.status == true) {
+      PreferencesData.saveUserData(response.data!);
+      _isLoggedIn = true;
+      _notifyListenersWithBinding();
+      return response.data?.onBoarded == true;
+    }
+    await _auth.signOut();
+    _notifyListenersWithBinding();
+    return response.message ?? 'Something went Wrong';
+  }
+
   Future<dynamic> loginMobile(PhoneAuthCredential phoneAuthCredential) async {
     await _auth.signInWithCredential(phoneAuthCredential);
     final response = CheckUserResponse.fromJson(
@@ -104,7 +128,7 @@ class UserProvider with ChangeNotifier {
       PreferencesData.saveUserData(response.data!);
       _isLoggedIn = true;
       _notifyListenersWithBinding();
-      return true;
+      return response.data?.onBoarded == true;
     }
     await _auth.signOut();
     _notifyListenersWithBinding();
@@ -313,5 +337,18 @@ class UserProvider with ChangeNotifier {
       return {'errorMessage': response.message ?? 'Something Went Wrong'};
     }
     return response.message;
+  }
+
+  Future<dynamic> signUpAspirant() async {
+    final response = CheckUserResponse.fromJson(
+        await HttpRequests.instance()?.httpPostRequest(ApiEndPoints.signUpAspirant, {}));
+    if (response.status == true) {
+      PreferencesData.saveUserData(response.data!);
+      _isLoggedIn = true;
+      _notifyListenersWithBinding();
+      return response.data?.onBoarded == true;
+    }
+    _notifyListenersWithBinding();
+    return response.message ?? 'Something went Wrong';
   }
 }

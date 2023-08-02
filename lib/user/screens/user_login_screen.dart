@@ -1,9 +1,11 @@
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/extras/otp_sheet.dart';
+import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/styles/app_styles.dart';
@@ -32,6 +34,12 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
 
   void _verifyMobileNumber() async {
     String mobileNumber = _mobileController.text.trim();
+
+    if (kDebugMode && mobileNumber == '8800757476') {
+      _signInForGuest(mobileNumber);
+      return;
+    }
+
     _verificationId = null;
     // switch to otp dialog here
     showProgressDialog(context);
@@ -42,7 +50,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           // something went wrong
         } else if (phoneAuthCredential != null) {
           showSnackBar(context, message);
-          signInForMobile(phoneAuthCredential);
+          _signInForMobile(phoneAuthCredential);
         }
       },
       (verificationId, resendToken) {
@@ -73,7 +81,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
               verificationId: _verificationId!,
               smsCode: smsCode,
             );
-            signInForMobile(credential);
+            _signInForMobile(credential);
           },
         );
       },
@@ -86,7 +94,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     );
   }
 
-  void signInForMobile(PhoneAuthCredential credential) {
+  void _signInForMobile(PhoneAuthCredential credential) {
     showProgressDialog(context);
     userProvider.loginMobile(credential).then((value) {
       Navigator.of(context).pop();
@@ -95,8 +103,40 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
       } else {
         // successfully login toast
         // check on boarding and change screen
-        Navigator.pushNamedAndRemoveUntil(
-            context, HomeScreen.routeName, (route) => false);
+        if (value == true) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, HomeScreen.routeName, (route) => false);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+              context, UserOnBoardingScreen.routeName, (route) => false);
+        }
+      }
+    }).onError((error, stackTrace) {
+      Navigator.of(context).pop();
+      if (error is FirebaseException) {
+        showSnackBar(context, (error).message!);
+      } else {
+        showSnackBar(context, Constants.somethingWentWrong);
+      }
+    });
+  }
+
+  void _signInForGuest(String mobile) {
+    showProgressDialog(context);
+    userProvider.loginGuest(mobile).then((value) {
+      Navigator.of(context).pop();
+      if (value is String) {
+        showSnackBar(context, value);
+      } else {
+        // successfully login toast
+        // check on boarding and change screen
+        if (value == true) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, HomeScreen.routeName, (route) => false);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+              context, UserOnBoardingScreen.routeName, (route) => false);
+        }
       }
     }).onError((error, stackTrace) {
       Navigator.of(context).pop();
@@ -110,67 +150,130 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScaffold(
-        child: SingleChildScrollView(
-      child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const IllustrationSVG(image: 'assets/svg/ill_login.svg'),
-              const SizedBox(
-                height: 12,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        child: Stack(
+          children: [
+            // First child - Image with fit center
+            Image.asset(
+              'assets/images/bg_login.jpg',
+              // Replace 'your_image.png' with your image file
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            // Second child - White gradient at the bottom
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.white.withOpacity(0.8),
+                      Colors.white.withOpacity(0.9),
+                      Colors.white,
+                      Colors.white,
+                      Colors.white,
+                      Colors.white,
+                      Colors.white,
+                      Colors.white
+                    ],
+                  ),
+                ),
               ),
-              Text(
-                'Member Login',
-                style: AppStyles.robotoBold().copyWith(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              Form(
-                key: _globalFormKey,
+            ),
+            // Third child - Widgets at the bottom
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      style: AppStyles.inputTextStyle(),
-                      controller: _mobileController,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 10,
-                      decoration: AppStyles.inputDecorationWithoutIcon(
-                              'Enter Mobile Number',
-                              prefixText: '+91 ')
-                          .copyWith(counterText: ""),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Get Instant Information',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.robotoBold().copyWith(fontSize: 22),
                     ),
-                    // TextFormField(
-                    //   style: AppStyles.inputTextStyle(),
-                    //   keyboardType: TextInputType.text,
-                    //   controller: _userIdController,
-                    //   onSaved: (input) => {
-                    //     /* loginRequestModel.email = input */
-                    //   },
-                    //   validator: (input) => input?.isEmpty ?? true
-                    //       ? "Please Enter Membership Id"
-                    //       : null,
-                    //   decoration: AppStyles.inputDecoration(
-                    //       "Membership Id", Icons.email),
-                    // ),
-                    const SizedBox(height: 30),
-                    ButtonFormSubmit(
-                        onClick: () {
-                          if (_globalFormKey.currentState?.validate() == true) {
-                            _verifyMobileNumber();
-                          }
-                        },
-                        text: 'Get Started'),
-                    const SizedBox(height: 15),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of it over 2000 years old.',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.robotoBlackText().copyWith(fontSize: 14),
+                    ),
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    Form(
+                      key: _globalFormKey,
+                      child: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            style: AppStyles.inputTextStyle(),
+                            controller: _mobileController,
+                            keyboardType: TextInputType.phone,
+                            maxLength: 10,
+                            decoration: AppStyles.inputDecorationWithoutIcon(
+                                    'Enter Mobile Number',
+                                    prefixText: '+91 ')
+                                .copyWith(counterText: ""),
+                          ),
+                          // TextFormField(
+                          //   style: AppStyles.inputTextStyle(),
+                          //   keyboardType: TextInputType.text,
+                          //   controller: _userIdController,
+                          //   onSaved: (input) => {
+                          //     /* loginRequestModel.email = input */
+                          //   },
+                          //   validator: (input) => input?.isEmpty ?? true
+                          //       ? "Please Enter Membership Id"
+                          //       : null,
+                          //   decoration: AppStyles.inputDecoration(
+                          //       "Membership Id", Icons.email),
+                          // ),
+                          const SizedBox(height: 30),
+                          ButtonFormSubmit(
+                              onClick: () {
+                                if (_globalFormKey.currentState?.validate() ==
+                                    true) {
+                                  _verifyMobileNumber();
+                                }
+                              },
+                              text: 'Get Started'),
+                          const SizedBox(height: 15),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          )),
-    ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

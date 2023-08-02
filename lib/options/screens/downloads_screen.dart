@@ -47,7 +47,7 @@ class DownloadsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseScaffold(
       titleText: 'Downloads',
-      isYellow: true,
+      isAppBarColored: true,
       child: BaseImageContainer(
         opacity: 0.5,
         child: SingleChildScrollView(

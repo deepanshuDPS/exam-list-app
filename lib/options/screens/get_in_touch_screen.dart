@@ -38,7 +38,7 @@ class _GetInTouchScreenState extends BaseState<GetInTouchScreen> {
         initialIndex: defaultTabPosition,
         child: BaseScaffold(
           titleText: "Get in Touch",
-          isYellow: true,
+          isAppBarColored: true,
           barBottom: TabBar(
               labelColor: Theme.of(context).colorScheme.secondary,
               unselectedLabelColor: Colors.black54,
