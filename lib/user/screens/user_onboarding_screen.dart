@@ -16,19 +16,49 @@ class UserOnBoardingScreen extends StatefulWidget {
 }
 
 class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
-
   String name = '';
-  String contactNumber =
-      '1234567890'; // You can set the actual contact number here
+  String contactNumber = ''; // You can set the actual contact number here
   DateTime? selectedDate;
-  String? chosenCategory;
-  String? chosenCategoryDisabled;
-  String? chosenQualification;
-  String? gender;
+  Map<String, dynamic>? chosenCategory;
+  Map<String, dynamic>? chosenCategoryDisabled;
+  Map<String, dynamic>? chosenQualification;
+  int? gender;
+  final _globalFormKey = GlobalKey<FormState>();
 
   // Categories for the category list
-  List<String> categories = ['GN', 'SC/ST', 'OBC'];
-  List<String> qualifications = ['Intermediate', 'UG', 'PG'];
+  Map<String, int> reservationCategories = {
+    'General': 1,
+    'OBC': 2,
+    'SC': 3,
+    'ST': 4,
+    'EWS': 5,
+  };
+
+  Map<String, int> educationalQualifications = {
+    'High School (10th Pass)': 1,
+    'Intermediate (12th Pass)': 2,
+    'Diploma': 3,
+    'Bachelor\'s Degree (UG)': 4,
+    'Master\'s Degree (PG)': 5,
+    'Ph.D.': 6,
+  };
+
+  Map<String, int> disabilityCategories = {
+    'OD-Orthopedic Disability': 1,
+    'VI-Visual Impairment': 2,
+    'HI-Hearing Impairment': 3,
+    'LD-Learning Disability': 4,
+    'MD-Multiple Disability': 5
+  };
+
+  @override
+  void didChangeDependencies() {
+    if (isFirstTime) {
+      contactNumber = userProvider.userDetails?.mobile ?? "";
+      printDebug(contactNumber);
+    }
+    super.didChangeDependencies();
+  }
 
   Widget _buildFormField(String heading, Widget child) {
     return Column(
@@ -65,6 +95,7 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Form(
+                      key: _globalFormKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -99,9 +130,12 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                 onTap: () async {
                                   DateTime? pickedDate = await showDatePicker(
                                     context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1900),
-                                    lastDate: DateTime.now(),
+                                    initialDate: DateTime.now().subtract(
+                                        const Duration(days: 14 * 365)),
+                                    firstDate: DateTime.now().subtract(
+                                        const Duration(days: 50 * 365)),
+                                    lastDate: DateTime.now().subtract(
+                                        const Duration(days: 14 * 365)),
                                   );
                                   if (pickedDate != null &&
                                       pickedDate != selectedDate) {
@@ -117,7 +151,8 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                     selectedDate == null
                                         ? 'Select date'
                                         : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                                    style: _textStyle(),
+                                    style: _textStyle()
+                                        .copyWith(color: Colors.blueGrey),
                                   ),
                                 ),
                               )),
@@ -125,16 +160,20 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                           _buildFormField(
                               'Category',
                               DropdownButtonFormField<String>(
-                                value: chosenCategory,
+                                value: chosenCategory?['optionName'],
                                 onChanged: (value) {
                                   setState(() {
-                                    chosenCategory = value;
+                                    chosenCategory = {
+                                      'optionName': value,
+                                      'id': reservationCategories[value]
+                                    };
                                   });
                                 },
-                                validator: (input) => chosenCategory != null
-                                    ? "Please Enter Valid Voucher"
+                                validator: (input) => chosenCategory == null
+                                    ? "Please Enter Valid Category"
                                     : null,
-                                items: categories.map((category) {
+                                items:
+                                    reservationCategories.keys.map((category) {
                                   return DropdownMenuItem<String>(
                                     value: category,
                                     child: Text(
@@ -147,11 +186,19 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Disabled Category',
+                              'Disabled Category (Only for differentially able)',
                               DropdownButtonFormField<String>(
-                                value: chosenCategoryDisabled,
-                                onChanged: null,
-                                items: categories.map((category) {
+                                value: chosenCategoryDisabled?['optionName'],
+                                onChanged: (value) {
+                                  setState(() {
+                                    chosenCategory = {
+                                      'optionName': value,
+                                      'id': disabilityCategories[value]
+                                    };
+                                  });
+                                },
+                                items:
+                                    disabilityCategories.keys.map((category) {
                                   return DropdownMenuItem<String>(
                                     value: category,
                                     child: Text(
@@ -166,13 +213,17 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                           _buildFormField(
                               'Qualification',
                               DropdownButtonFormField<String>(
-                                value: chosenQualification,
+                                value: chosenQualification?['optionName'],
                                 onChanged: (value) {
                                   setState(() {
-                                    chosenQualification = value;
+                                    chosenQualification = {
+                                      'optionName': value,
+                                      'id': educationalQualifications[value]
+                                    };
                                   });
                                 },
-                                items: qualifications.map((qualification) {
+                                items: educationalQualifications.keys
+                                    .map((qualification) {
                                   return DropdownMenuItem<String>(
                                     value: qualification,
                                     child: Text(
@@ -191,30 +242,30 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                 children: [
                                   Radio<String>(
                                     value: 'Male',
-                                    groupValue: gender,
+                                    groupValue: gender == 1 ? 'Male' : null,
                                     onChanged: (value) {
                                       setState(() {
-                                        gender = value;
+                                        gender = 1;
                                       });
                                     },
                                   ),
                                   const Text('Male'),
                                   Radio<String>(
                                     value: 'Female',
-                                    groupValue: gender,
+                                    groupValue: gender == 2 ? 'Female' : null,
                                     onChanged: (value) {
                                       setState(() {
-                                        gender = value;
+                                        gender = 2;
                                       });
                                     },
                                   ),
                                   const Text('Female'),
                                   Radio<String>(
                                     value: 'Other',
-                                    groupValue: gender,
+                                    groupValue: gender == 0 ? 'other' : null,
                                     onChanged: (value) {
                                       setState(() {
-                                        gender = value;
+                                        gender = 0;
                                       });
                                     },
                                   ),
@@ -222,9 +273,12 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                 ],
                               )),
                           const SizedBox(height: 16),
-                          ButtonFormSubmit(onClick: () {
-                            _signUpAspirant();
-                          }, text: 'Continue')
+                          ButtonFormSubmit(
+                              onClick: () {
+                                if (_globalFormKey.currentState?.validate() ==
+                                    true) _signUpAspirant();
+                              },
+                              text: 'Continue')
                         ],
                       ),
                     ),
@@ -234,9 +288,34 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
     );
   }
 
+  UserProvider get userProvider {
+    // Initialize the property only when accessed for the first time
+    return Provider.of<UserProvider>(context, listen: false);
+  }
+
   void _signUpAspirant() {
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.signUpAspirant().then((value) {
+    if (selectedDate == null) {
+      showSnackBar(context, 'Select Date of Birth');
+    } else if (chosenCategory == null) {
+      showSnackBar(context, 'Choose Reservation Category');
+      return;
+    } else if (chosenQualification == null) {
+      showSnackBar(context, 'Choose Qualification');
+      return;
+    } else if (gender == null) {
+      showSnackBar(context, 'Choose Gender');
+      return;
+    }
+    printDebug('here for signup');
+    userProvider.signUpAspirant({
+      'name': name,
+      'dob': selectedDate?.toIso8601String(),
+      'category': chosenCategory,
+      'diffAbleCategory': chosenCategoryDisabled,
+      'eduQualification': chosenQualification,
+      'gender': gender,
+      'accountType': 1
+    }).then((value) {
       printDebug(value);
     });
   }

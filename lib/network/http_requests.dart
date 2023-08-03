@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:exam_list/network/http_utils.dart';
@@ -8,7 +9,7 @@ import 'package:exam_list/utils/constants.dart';
 
 class HttpRequests {
   static HttpRequests? _httpRequests;
-  final dynamic _emptyError = {'message': '', 'status': -1};
+  final dynamic _emptyError = {'message': null, 'status': -1};
 
   HttpRequests._();
 
@@ -26,6 +27,8 @@ class HttpRequests {
     if (authUser != null) {
       headersToSend['id-token'] = (await authUser.getIdToken()) ?? "";
       headersToSend['mobile'] = authUser.phoneNumber ?? "";
+      headersToSend['user-id'] = (await PreferencesData.getUserData())?.id ?? "";
+
     }
     return headersToSend;
   }

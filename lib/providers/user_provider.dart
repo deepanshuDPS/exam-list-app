@@ -1,4 +1,3 @@
-import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
@@ -20,7 +19,8 @@ import 'package:exam_list/responseModels/search/all_places_response.dart'
     as all_places_response;
 import 'package:exam_list/utils/preferences_data.dart';
 
-import '../responseModels/login/check_user_response.dart';
+import '../responseModels/login/check_user_response.dart'
+    as check_user_response;
 
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -34,6 +34,8 @@ class UserProvider with ChangeNotifier {
   final List<all_places_response.Data> _domesticList = [];
   final List<all_places_response.Data> _internationalList = [];
   member_details_response.Data? _memberDetailsData;
+  check_user_response.Data? _userDetailsData;
+
   RequestData memberRequestData = RequestData();
   RequestData myUpTripsRequestData = RequestData();
   RequestData myCompTripsRequestData = RequestData();
@@ -65,12 +67,12 @@ class UserProvider with ChangeNotifier {
     // await checkUserDetails();
     // await Future.delayed(Duration(milliseconds: 100));
     if (_auth.currentUser != null) {
-      var user = await PreferencesData.getUserData();
-      _isLoggedIn = (user) != null;
+      _userDetailsData = await PreferencesData.getUserData();
+      _isLoggedIn = (_userDetailsData) != null;
       if (!_isLoggedIn) {
         await _auth.signOut();
         return 0;
-      }else if(user?.onBoarded == true){
+      } else if (_userDetailsData?.onBoarded == true) {
         return 2;
       }
       return 1;
@@ -99,18 +101,19 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<dynamic> loginGuest(String mobile) async {
-    final customResponse = CheckUserResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpPostRequest(ApiEndPoints.checkGuestUser, {'mobile':'+91$mobile'}));
+    final customResponse = check_user_response.CheckUserResponse.fromJson(
+        await HttpRequests.instance()?.httpPostRequest(
+            ApiEndPoints.checkGuestUser, {'mobile': '+91$mobile'}));
     if (customResponse.status == false) {
       _notifyListenersWithBinding();
       return customResponse.message ?? 'Something went Wrong';
     }
     await _auth.signInWithCustomToken(customResponse.data?.customToken ?? '');
-    final response = CheckUserResponse.fromJson(
+    final response = check_user_response.CheckUserResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
     if (response.status == true) {
       PreferencesData.saveUserData(response.data!);
+      _userDetailsData = response.data!;
       _isLoggedIn = true;
       _notifyListenersWithBinding();
       return response.data?.onBoarded == true;
@@ -122,10 +125,11 @@ class UserProvider with ChangeNotifier {
 
   Future<dynamic> loginMobile(PhoneAuthCredential phoneAuthCredential) async {
     await _auth.signInWithCredential(phoneAuthCredential);
-    final response = CheckUserResponse.fromJson(
+    final response = check_user_response.CheckUserResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
     if (response.status == true) {
       PreferencesData.saveUserData(response.data!);
+      _userDetailsData = response.data!;
       _isLoggedIn = true;
       _notifyListenersWithBinding();
       return response.data?.onBoarded == true;
@@ -182,6 +186,10 @@ class UserProvider with ChangeNotifier {
 
   member_details_response.Data? get memberDetails {
     return _memberDetailsData;
+  }
+
+  check_user_response.Data? get userDetails {
+    return _userDetailsData;
   }
 
   List<fee_response.Data> get feeList {
@@ -339,11 +347,13 @@ class UserProvider with ChangeNotifier {
     return response.message;
   }
 
-  Future<dynamic> signUpAspirant() async {
-    final response = CheckUserResponse.fromJson(
-        await HttpRequests.instance()?.httpPostRequest(ApiEndPoints.signUpAspirant, {}));
+  Future<dynamic> signUpAspirant(Map<String, dynamic> body) async {
+    final response = check_user_response.CheckUserResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpPostRequest(ApiEndPoints.signUpAspirant, body));
     if (response.status == true) {
       PreferencesData.saveUserData(response.data!);
+      _userDetailsData = response.data!;
       _isLoggedIn = true;
       _notifyListenersWithBinding();
       return response.data?.onBoarded == true;
