@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -27,8 +28,8 @@ class HttpRequests {
     if (authUser != null) {
       headersToSend['id-token'] = (await authUser.getIdToken()) ?? "";
       headersToSend['mobile'] = authUser.phoneNumber ?? "";
-      headersToSend['user-id'] = (await PreferencesData.getUserData())?.id ?? "";
-
+      headersToSend['user-id'] =
+          (await PreferencesData.getUserData())?.id ?? "";
     }
     return headersToSend;
   }
@@ -106,8 +107,12 @@ class HttpRequests {
       var headersToSend = await getHeaders(includeAuthHeader);
       final response = await http.get(Uri.parse(url), headers: headersToSend);
       if (response.statusCode < 300) {
+        printDebug(utf8.decode(response.bodyBytes));
         return jsonDecode(utf8.decode(response.bodyBytes));
       } else {
+        if (response.statusCode == 404) {
+          return getErrorResponse(response.statusCode, _emptyError);
+        }
         return getErrorResponse(
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
       }
@@ -121,20 +126,14 @@ class HttpRequests {
 }
 
 class ApiEndPoints {
+  static const authUser = 'auth/user';
 
-  static const authUser = 'auth/user/';
-
-
-  static const checkUser = "${authUser}checkUser";
-  static const signUpAspirant = "${authUser}signup";
+  static const checkUser = "$authUser/checkUser";
+  static const signUpAspirant = "$authUser/signup";
+  static const getAspirant = "$authUser/aspirant";
   static const checkGuestUser = "anon/user/checkGuestUser";
 
-  // static const whatWeOffer = 'icons/whatweoffer';
-  // static const banner = 'banner';
-  // static const preferredPartners = 'partner/preferred';
-  // static const travelPartners = 'partner/travel';
-  // static const mediaPartners = 'partner/media';
-  // static const airlinesPartners = 'partner/airlines';
+  /////////////////////////////////////////////////////////////////////////////
   static const home = 'home';
   static const domesticPlaces = 'destination?category=domestic';
   static const internationalPlaces = 'destination?category=international';

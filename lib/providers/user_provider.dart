@@ -1,3 +1,5 @@
+import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
@@ -10,8 +12,8 @@ import 'package:exam_list/responseModels/login/documents_response.dart'
     as docs_response;
 import 'package:exam_list/responseModels/login/member_fee_payments.dart'
     as fee_response;
-import 'package:exam_list/responseModels/login/member_profile_response.dart'
-    as member_details_response;
+import 'package:exam_list/responseModels/login/aspirant_profile_response.dart'
+    as aspirant_profile_response;
 import 'package:exam_list/responseModels/login/my_trips_response.dart'
     as trips_response;
 import 'package:exam_list/responseModels/request_data.dart';
@@ -33,7 +35,7 @@ class UserProvider with ChangeNotifier {
   final List<trips_response.Data> _comTripsList = [];
   final List<all_places_response.Data> _domesticList = [];
   final List<all_places_response.Data> _internationalList = [];
-  member_details_response.Data? _memberDetailsData;
+  AspirantData? _aspirantDetailsData;
   check_user_response.Data? _userDetailsData;
 
   RequestData memberRequestData = RequestData();
@@ -184,8 +186,8 @@ class UserProvider with ChangeNotifier {
     return _isLoggedIn;
   }
 
-  member_details_response.Data? get memberDetails {
-    return _memberDetailsData;
+  AspirantData? get memberDetails {
+    return _aspirantDetailsData;
   }
 
   check_user_response.Data? get userDetails {
@@ -222,7 +224,20 @@ class UserProvider with ChangeNotifier {
     _notifyListenersWithBinding();
   }
 
-  Future<dynamic> checkUser() async {}
+  Future<dynamic> getAspirantUser() async {
+    _aspirantDetailsData = null;
+    notifyWithRequest(memberRequestData, true);
+    final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpGetRequest(ApiEndPoints.getAspirant));
+    if (response.data != null) {
+      _aspirantDetailsData = response.data;
+      printDebug(_aspirantDetailsData?.name??"");
+    } else {
+      memberRequestData.setErrorData(response.toJson());
+    }
+    notifyWithRequest(memberRequestData, false);
+  }
 
   Future<dynamic> changePassword(String oldPass, String newPass) async {
     var body = {'old_pwd': oldPass, 'new_pwd': newPass, 'cnew_pwd': newPass};
@@ -235,13 +250,13 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> getMemberDetails() async {
-    _memberDetailsData = null;
+    _aspirantDetailsData = null;
     notifyWithRequest(memberRequestData, true);
-    final response = member_details_response.MemberProfileResponse.fromJson(
+    final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberProfile));
-    if (response.data?.isNotEmpty == true) {
-      _memberDetailsData = response.data![0];
+    if (response.data!=null) {
+      _aspirantDetailsData = response.data;
     } else {
       memberRequestData.setErrorData(response.toJson());
     }

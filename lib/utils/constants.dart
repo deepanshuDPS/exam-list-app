@@ -10,6 +10,39 @@ import 'package:exam_list/search/search_screen.dart';
 class Constants {
   static String baseURL = 'http://192.168.29.174:8080/';
 
+  // Categories for the category list
+  static Map<String, int> reservationCategories = {
+    'General': 1,
+    'OBC': 2,
+    'SC': 3,
+    'ST': 4,
+    'EWS': 5,
+  };
+
+  static Map<String, int> educationalQualifications = {
+    'High School (10th Pass)': 1,
+    'Intermediate (12th Pass)': 2,
+    'Diploma': 3,
+    'Bachelor\'s Degree (UG)': 4,
+    'Master\'s Degree (PG)': 5,
+    'Ph.D.': 6,
+  };
+
+  static Map<String, int> additionalQualifications = {
+    'JBT': 1,
+    'D Ed': 2,
+    'B Ed': 3,
+  };
+
+  static Map<String, int> disabilityCategories = {
+    'OD-Orthopedic Disability': 1,
+    'VI-Visual Impairment': 2,
+    'HI-Hearing Impairment': 3,
+    'LD-Learning Disability': 4,
+    'MD-Multiple Disability': 5
+  };
+
+
   //SvgPicture.asset(assetName)
   static List<Map<String, String>> membershipList = [
     {
@@ -182,4 +215,6 @@ class Constants {
       '122a3a8234a618432663194ba6116194970c116f4014feac40d215f9cee62a17';
 
   static String somethingWentWrong = 'Something went wrong';
+
+
 }

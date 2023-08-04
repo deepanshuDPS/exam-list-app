@@ -1,3 +1,5 @@
+import 'package:exam_list/home/screens/home_screen.dart';
+import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
 import 'package:flutter/material.dart';
@@ -19,37 +21,14 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
   String name = '';
   String contactNumber = ''; // You can set the actual contact number here
   DateTime? selectedDate;
+  bool diffAble = false;
   Map<String, dynamic>? chosenCategory;
   Map<String, dynamic>? chosenCategoryDisabled;
   Map<String, dynamic>? chosenQualification;
+  Map<String, dynamic>? chosenQualificationAdd;
   int? gender;
   final _globalFormKey = GlobalKey<FormState>();
 
-  // Categories for the category list
-  Map<String, int> reservationCategories = {
-    'General': 1,
-    'OBC': 2,
-    'SC': 3,
-    'ST': 4,
-    'EWS': 5,
-  };
-
-  Map<String, int> educationalQualifications = {
-    'High School (10th Pass)': 1,
-    'Intermediate (12th Pass)': 2,
-    'Diploma': 3,
-    'Bachelor\'s Degree (UG)': 4,
-    'Master\'s Degree (PG)': 5,
-    'Ph.D.': 6,
-  };
-
-  Map<String, int> disabilityCategories = {
-    'OD-Orthopedic Disability': 1,
-    'VI-Visual Impairment': 2,
-    'HI-Hearing Impairment': 3,
-    'LD-Learning Disability': 4,
-    'MD-Multiple Disability': 5
-  };
 
   @override
   void didChangeDependencies() {
@@ -125,7 +104,7 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Date of Birth',
+                              'Date of Birth*',
                               InkWell(
                                 onTap: () async {
                                   DateTime? pickedDate = await showDatePicker(
@@ -158,14 +137,14 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Category',
+                              'Category*',
                               DropdownButtonFormField<String>(
                                 value: chosenCategory?['optionName'],
                                 onChanged: (value) {
                                   setState(() {
                                     chosenCategory = {
                                       'optionName': value,
-                                      'id': reservationCategories[value]
+                                      'id': Constants.reservationCategories[value]
                                     };
                                   });
                                 },
@@ -173,7 +152,7 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                     ? "Please Enter Valid Category"
                                     : null,
                                 items:
-                                    reservationCategories.keys.map((category) {
+                                Constants.reservationCategories.keys.map((category) {
                                   return DropdownMenuItem<String>(
                                     value: category,
                                     child: Text(
@@ -186,19 +165,47 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Disabled Category (Only for differentially able)',
+                              'Differently Able?',
+                              Row(
+                                children: [
+                                  Radio<bool>(
+                                    value: true,
+                                    groupValue: diffAble,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        diffAble = true;
+                                      });
+                                    },
+                                  ),
+                                  const Text('Yes'),
+                                  Radio<bool>(
+                                    value: false,
+                                    groupValue: diffAble,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        diffAble = false;
+                                      });
+                                    },
+                                  ),
+                                  const Text('No'),
+                                ],
+                              )),
+                          const SizedBox(height: 12),
+                          if(diffAble)
+                          _buildFormField(
+                              'Differently Able Category',
                               DropdownButtonFormField<String>(
                                 value: chosenCategoryDisabled?['optionName'],
                                 onChanged: (value) {
                                   setState(() {
                                     chosenCategory = {
                                       'optionName': value,
-                                      'id': disabilityCategories[value]
+                                      'id': Constants.disabilityCategories[value]
                                     };
                                   });
                                 },
                                 items:
-                                    disabilityCategories.keys.map((category) {
+                                Constants.disabilityCategories.keys.map((category) {
                                   return DropdownMenuItem<String>(
                                     value: category,
                                     child: Text(
@@ -209,20 +216,21 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                 }).toList(),
                                 decoration: _inputDecoration('Select Option'),
                               )),
+                          if(diffAble)
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Qualification',
+                              'Qualification*',
                               DropdownButtonFormField<String>(
                                 value: chosenQualification?['optionName'],
                                 onChanged: (value) {
                                   setState(() {
                                     chosenQualification = {
                                       'optionName': value,
-                                      'id': educationalQualifications[value]
+                                      'id': Constants.educationalQualifications[value]
                                     };
                                   });
                                 },
-                                items: educationalQualifications.keys
+                                items: Constants.educationalQualifications.keys
                                     .map((qualification) {
                                   return DropdownMenuItem<String>(
                                     value: qualification,
@@ -237,7 +245,33 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(
-                              'Gender',
+                              'Additional Qualification',
+                              DropdownButtonFormField<String>(
+                                value: chosenQualificationAdd?['optionName'],
+                                onChanged: (value) {
+                                  setState(() {
+                                    chosenQualificationAdd = {
+                                      'optionName': value,
+                                      'id': Constants.additionalQualifications[value]
+                                    };
+                                  });
+                                },
+                                items: Constants.additionalQualifications.keys
+                                    .map((qualification) {
+                                  return DropdownMenuItem<String>(
+                                    value: qualification,
+                                    child: Text(
+                                      qualification,
+                                      style: _textStyle(),
+                                    ),
+                                  );
+                                }).toList(),
+                                decoration:
+                                _inputDecoration('Choose Additional Qualification'),
+                              )),
+                          const SizedBox(height: 12),
+                          _buildFormField(
+                              'Gender*',
                               Row(
                                 children: [
                                   Radio<String>(
@@ -306,17 +340,30 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
       showSnackBar(context, 'Choose Gender');
       return;
     }
-    printDebug('here for signup');
+    showProgressDialog(context);
     userProvider.signUpAspirant({
       'name': name,
       'dob': selectedDate?.toIso8601String(),
       'category': chosenCategory,
       'diffAbleCategory': chosenCategoryDisabled,
       'eduQualification': chosenQualification,
+      'addQualification': chosenQualificationAdd,
       'gender': gender,
       'accountType': 1
     }).then((value) {
-      printDebug(value);
+      Navigator.of(context).pop();
+      if (value is String) {
+        showSnackBar(context, value);
+      } else {
+        // successfully login toast
+        // check on boarding and change screen
+        if (value == true) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, HomeScreen.routeName, (route) => false);
+        } else {
+          showSnackBar(context, 'Something went Wrong');
+        }
+      }
     });
   }
 
