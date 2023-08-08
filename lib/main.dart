@@ -4,7 +4,7 @@ import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
-import 'package:exam_list/user/screens/member_account_screen.dart';
+import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/options/screens/payment_screen.dart';
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
                   .copyWith(secondary: appRed, secondaryContainer: appDarkBlue)),
           routes: {
             '/': (ctx) => const LaunchScreen(),
-            MemberAccountScreen.routeName: (ctx) => const MemberAccountScreen(),
+            YourProfileOptionsScreen.routeName: (ctx) => const YourProfileOptionsScreen(),
             UserLoginScreen.routeName: (ctx) => const UserLoginScreen(),
             PaymentScreen.routeName: (ctx) => const PaymentScreen(),
             HomeScreen.routeName: (ctx) => const HomeScreen(),

@@ -10,7 +10,7 @@ import 'package:exam_list/utils/constants.dart';
 
 class HttpRequests {
   static HttpRequests? _httpRequests;
-  final dynamic _emptyError = {'message': null, 'status': -1};
+  final dynamic _emptyError = {'message': '', 'status': -1};
 
   HttpRequests._();
 
@@ -106,6 +106,9 @@ class HttpRequests {
       var url = "${Constants.baseURL}$endPoint";
       var headersToSend = await getHeaders(includeAuthHeader);
       final response = await http.get(Uri.parse(url), headers: headersToSend);
+      response.headers.values.forEach((element) {
+        printDebug(element);
+      });
       if (response.statusCode < 300) {
         printDebug(utf8.decode(response.bodyBytes));
         return jsonDecode(utf8.decode(response.bodyBytes));

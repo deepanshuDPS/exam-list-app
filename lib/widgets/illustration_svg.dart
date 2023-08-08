@@ -13,7 +13,7 @@ class IllustrationSVG extends StatelessWidget {
     return SvgPicture.asset(
       image,
       width: double.infinity,
-      height: 250,
+      height: 270,
       fit: fit ?? BoxFit.fitHeight,
     );
   }

@@ -1,6 +1,6 @@
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
-import 'package:exam_list/user/screens/member_account_screen.dart';
+import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/user/screens/member_listing_screen.dart';
 import 'package:exam_list/user/screens/my_trips_screen.dart';
@@ -48,7 +48,7 @@ class Constants {
     {
       "text": "Member Account",
       "image": "assets/svg/ic_mem_account.svg",
-      "route": MemberAccountScreen.routeName
+      "route": YourProfileOptionsScreen.routeName
     },
     {
       "text": "My Trips",

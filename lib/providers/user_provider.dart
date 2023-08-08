@@ -1,6 +1,7 @@
 import 'package:exam_list/responseModels/login/aspirant_data.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/global_response.dart';
@@ -151,9 +152,13 @@ class UserProvider with ChangeNotifier {
   }
 
   void _notifyListenersWithBinding() {
-    WidgetsBinding.instance.addPostFrameCallback((status) {
+    if (kDebugMode) {
       notifyListeners();
-    });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((status) {
+        notifyListeners();
+      });
+    }
   }
 
   List<all_places_response.Data> get allPlacesList {
@@ -186,7 +191,7 @@ class UserProvider with ChangeNotifier {
     return _isLoggedIn;
   }
 
-  AspirantData? get memberDetails {
+  AspirantData? get aspirantDetails {
     return _aspirantDetailsData;
   }
 
@@ -232,7 +237,6 @@ class UserProvider with ChangeNotifier {
             ?.httpGetRequest(ApiEndPoints.getAspirant));
     if (response.data != null) {
       _aspirantDetailsData = response.data;
-      printDebug(_aspirantDetailsData?.name??"");
     } else {
       memberRequestData.setErrorData(response.toJson());
     }
@@ -255,7 +259,7 @@ class UserProvider with ChangeNotifier {
     final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberProfile));
-    if (response.data!=null) {
+    if (response.data != null) {
       _aspirantDetailsData = response.data;
     } else {
       memberRequestData.setErrorData(response.toJson());

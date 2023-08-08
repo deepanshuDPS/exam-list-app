@@ -1,5 +1,5 @@
 dynamic getErrorResponse(int errorCode, dynamic bodyContent) {
-  if(bodyContent['message'] == null) {
+  if(bodyContent['message'] == '') {
     switch (errorCode) {
       case 001:
         bodyContent['message'] = "Something went wrong with your connection."
