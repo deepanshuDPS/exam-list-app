@@ -10,6 +10,10 @@ class AppStyles {
     );
   }
 
+  static TextStyle fontSize12() {
+    return const TextStyle(fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w400);
+  }
+
   static TextStyle description() {
     return const TextStyle(color: Colors.black, fontWeight: FontWeight.w200);
   }

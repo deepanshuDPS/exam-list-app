@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/responseModels/global_response.dart';
 import 'package:exam_list/responseModels/home/check_voucher_response.dart'
     as voucher;
-import 'package:exam_list/responseModels/home/home_response.dart';
+import 'package:exam_list/responseModels/home/exam_list_response.dart'
+    as exam_list_response;
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/home/testimonials_response.dart'
     as testimonials;
 import 'package:exam_list/responseModels/request_data.dart';
 
 class HomeProvider with ChangeNotifier {
-  final List<Data> _homeData = [];
+  final List<exam_list_response.Data> _allExams = [];
+  final Map<int, List<exam_list_response.Data>> _differentTypesExams = {};
+  final List<exam_list_response.Data> _currentList = [];
   final List<testimonials.Data> _testimonials = [];
   RequestData homeRequest = RequestData();
   RequestData testimonialsRequest = RequestData();
 
-  List<Data> get homeData {
-    return [..._homeData];
+  List<exam_list_response.Data> get currentList {
+    return [..._currentList];
   }
 
   List<testimonials.Data> get getTestimonials {
@@ -28,26 +31,25 @@ class HomeProvider with ChangeNotifier {
       data.data = null;
       data.isError = false;
     }
-    WidgetsBinding.instance?.addPostFrameCallback((status) {
+    WidgetsBinding.instance.addPostFrameCallback((status) {
       notifyListeners();
     });
   }
 
-  Future<RequestData> fetchHomePage() async {
-    // try {
-    _homeData.clear();
+  Future<RequestData> fetchExams() async {
+    _allExams.clear();
+    _currentList.clear();
+    _differentTypesExams.clear();
     notifyWithRequest(homeRequest, true);
-    final response = HomeResponse.fromJson(
-        await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.home));
-    if (response.status == -1) {
+    final response = exam_list_response.ExamListResponse.fromJson(
+        await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.getExams));
+    if (response.status == false) {
       homeRequest.setErrorData(response.toJson());
     } else {
-      _homeData.addAll(response.data!);
+      _allExams.addAll(response.data!);
+      _currentList.addAll(response.data!);
     }
     notifyWithRequest(homeRequest, false);
-    // } catch (e) {
-    //   rethrow;
-    // }
     return homeRequest;
   }
 

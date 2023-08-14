@@ -106,9 +106,9 @@ class HttpRequests {
       var url = "${Constants.baseURL}$endPoint";
       var headersToSend = await getHeaders(includeAuthHeader);
       final response = await http.get(Uri.parse(url), headers: headersToSend);
-      response.headers.values.forEach((element) {
+      for (var element in response.headers.values) {
         printDebug(element);
-      });
+      }
       if (response.statusCode < 300) {
         printDebug(utf8.decode(response.bodyBytes));
         return jsonDecode(utf8.decode(response.bodyBytes));
@@ -130,11 +130,15 @@ class HttpRequests {
 
 class ApiEndPoints {
   static const authUser = 'auth/user';
+  static const authExam = 'auth/exam';
 
   static const checkUser = "$authUser/checkUser";
   static const signUpAspirant = "$authUser/signup";
   static const getAspirant = "$authUser/aspirant";
   static const checkGuestUser = "anon/user/checkGuestUser";
+
+
+  static const getExams = '$authExam/';
 
   /////////////////////////////////////////////////////////////////////////////
   static const home = 'home';

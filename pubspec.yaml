@@ -51,6 +51,7 @@ dependencies:
   html: ^0.15.3
   firebase_core: ^2.15.0
   firebase_auth: ^4.7.2
+  intl: ^0.17.0
 
 
 

@@ -22,7 +22,7 @@ import 'package:exam_list/utils/colors.dart';
 import 'package:provider/provider.dart';
 
 import 'user/screens/change_password_screen.dart';
-import 'user/screens/member_listing_screen.dart';
+import 'user/screens/exam_listing_screen.dart';
 import 'user/screens/my_trips_screen.dart';
 import 'options/screens/downloads_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
             ResortScreen.routeName: (ctx) => const ResortScreen(),
             VoucherScreen.routeName: (ctx) => const VoucherScreen(),
             UserOnBoardingScreen.routeName: (ctx) => const UserOnBoardingScreen(),
-            MemberListingScreen.routeName: (ctx) => const MemberListingScreen(),
+            ExamListingScreen.routeName: (ctx) => const ExamListingScreen(),
             TermsConditionsScreen.routeName: (ctx) => const TermsConditionsScreen(),
             DownloadsScreen.routeName: (ctx) => const DownloadsScreen(),
           }),

@@ -2,13 +2,30 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
-import 'package:exam_list/user/screens/member_listing_screen.dart';
+import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/my_trips_screen.dart';
 import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 
 class Constants {
   static String baseURL = 'http://192.168.29.174:8080/';
+
+
+  // Filters for the exams list
+  static Map<int, String> examCategories = {
+    0: 'All',
+    1: 'All India',
+    2: 'State',
+    3: 'Teaching',
+    4: 'Defense',
+  };
+
+  // Filters for the resources list
+  static Map<int, String> resourcesCategories = {
+    0: 'All',
+    1: 'Books',
+    2: 'Videos',
+  };
 
   // Categories for the category list
   static Map<String, int> reservationCategories = {
@@ -58,31 +75,31 @@ class Constants {
     {
       "text": "Membership Fee",
       "image": "assets/svg/ic_mem_fee.svg",
-      "route": MemberListingScreen.routeName,
+      "route": ExamListingScreen.routeName,
       "arg": "3"
     },
     {
       "text": "AMC Fee",
       "image": "assets/svg/amc_fee.svg",
-      "route": MemberListingScreen.routeName,
+      "route": ExamListingScreen.routeName,
       "arg": "4"
     },
     {
       "text": "Holidays",
       "image": "assets/svg/ic_holidays.svg",
-      "route": MemberListingScreen.routeName,
+      "route": ExamListingScreen.routeName,
       "arg": "1"
     },
     {
       "text": "Offers",
       "image": "assets/svg/ic_offers.svg",
-      "route": MemberListingScreen.routeName,
+      "route": ExamListingScreen.routeName,
       "arg": "0"
     },
     {
       "text": "Documents",
       "image": "assets/svg/ic_documents.svg",
-      "route": MemberListingScreen.routeName,
+      "route": ExamListingScreen.routeName,
       "arg": "2"
     },
     {
