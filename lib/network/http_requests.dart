@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/utils/hive_cache_handling.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -30,6 +31,9 @@ class HttpRequests {
       headersToSend['mobile'] = authUser.phoneNumber ?? "";
       headersToSend['user-id'] =
           (await PreferencesData.getUserData())?.id ?? "";
+    }
+    if (!await PreferencesData.isFCMSent()) {
+      headersToSend['fcm-token'] = await PreferencesData.getFCMToken();
     }
     return headersToSend;
   }
@@ -84,10 +88,18 @@ class HttpRequests {
       {bool includeAuthHeader = true, Map<String, String>? queryParams}) async {
     try {
       var headersToSend = await getHeaders(includeAuthHeader);
+      var cachedResponse =
+      await getAuthCachedResponse(endPoint, headersToSend);
+      if (cachedResponse != null) {
+        return cachedResponse;
+      }
       var uri = Uri.http(Constants.baseURL, endPoint, queryParams);
       final response = await http.get(uri, headers: headersToSend);
       if (response.statusCode < 300) {
-        return jsonDecode(utf8.decode(response.bodyBytes));
+        var responseAsString = utf8.decode(response.bodyBytes);
+        await saveAuthCachedResponse(endPoint, headersToSend, response);
+        printDebug(responseAsString);
+        return jsonDecode(responseAsString);
       } else {
         return getErrorResponse(
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
@@ -105,13 +117,18 @@ class HttpRequests {
     try {
       var url = "${Constants.baseURL}$endPoint";
       var headersToSend = await getHeaders(includeAuthHeader);
-      final response = await http.get(Uri.parse(url), headers: headersToSend);
-      for (var element in response.headers.values) {
-        printDebug(element);
+      var cachedResponse =
+          await getAuthCachedResponse(endPoint, headersToSend);
+      if (cachedResponse != null) {
+        printDebug("here cached");
+        return cachedResponse;
       }
+      final response = await http.get(Uri.parse(url), headers: headersToSend);
       if (response.statusCode < 300) {
-        printDebug(utf8.decode(response.bodyBytes));
-        return jsonDecode(utf8.decode(response.bodyBytes));
+        var responseAsString = utf8.decode(response.bodyBytes);
+        await saveAuthCachedResponse(endPoint, headersToSend, response);
+        printDebug(responseAsString);
+        return jsonDecode(responseAsString);
       } else {
         if (response.statusCode == 404) {
           return getErrorResponse(response.statusCode, _emptyError);
@@ -120,6 +137,7 @@ class HttpRequests {
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
       }
     } catch (error) {
+      printDebug("here error: "+error.runtimeType.toString());
       if (error is SocketException) {
         return getErrorResponse(1, _emptyError);
       }
@@ -136,7 +154,6 @@ class ApiEndPoints {
   static const signUpAspirant = "$authUser/signup";
   static const getAspirant = "$authUser/aspirant";
   static const checkGuestUser = "anon/user/checkGuestUser";
-
 
   static const getExams = '$authExam/';
 

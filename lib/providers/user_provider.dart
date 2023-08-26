@@ -1,5 +1,4 @@
 import 'package:exam_list/responseModels/login/aspirant_data.dart';
-import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,8 @@ import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart'
     as all_places_response;
 import 'package:exam_list/utils/preferences_data.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../responseModels/login/check_user_response.dart'
     as check_user_response;
@@ -69,6 +70,7 @@ class UserProvider with ChangeNotifier {
     // // set descriptions for applications
     // await checkUserDetails();
     // await Future.delayed(Duration(milliseconds: 100));
+    Hive.init((await getApplicationDocumentsDirectory()).path);
     if (_auth.currentUser != null) {
       _userDetailsData = await PreferencesData.getUserData();
       _isLoggedIn = (_userDetailsData) != null;

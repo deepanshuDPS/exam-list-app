@@ -46,17 +46,17 @@ class Constants {
   };
 
   static Map<String, int> additionalQualifications = {
-    'JBT': 1,
-    'D Ed': 2,
-    'B Ed': 3,
+    'JBT': 21,
+    'D Ed': 22,
+    'B Ed': 23,
   };
 
   static Map<String, int> disabilityCategories = {
-    'OD-Orthopedic Disability': 1,
-    'VI-Visual Impairment': 2,
-    'HI-Hearing Impairment': 3,
-    'LD-Learning Disability': 4,
-    'MD-Multiple Disability': 5
+    'OD-Orthopedic Disability': 21,
+    'VI-Visual Impairment': 22,
+    'HI-Hearing Impairment': 23,
+    'LD-Learning Disability': 24,
+    'MD-Multiple Disability': 25
   };
 
 
@@ -193,6 +193,10 @@ class Constants {
   ];
 
   static String userData = 'USER_DATA';
+  static String fcmToken = 'FCM_TOKEN';
+  static String isFcmTokenSent = 'IS_FCM_TOKEN_SENT';
+  static String currentVersion = 'CURRENT_VERSION';
+
 
   static List<String> termsConditionsTitles = [
     'Terms & Condition',

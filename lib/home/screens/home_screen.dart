@@ -1,10 +1,13 @@
-import 'package:exam_list/home/screens/resources_screen.dart';
+
 import 'package:exam_list/providers/home_provider.dart';
 import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:provider/provider.dart';
+
+import '../../utils/extras_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home-screen';
@@ -18,8 +21,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends BaseState<HomeScreen> {
   final screens = [
     const ExamListingScreen(),
-    const ExamListingScreen(),
-    const ResourcesScreen(),
+    // const ExamListingScreen(),
+    // const ResourcesScreen(),
     const YourProfileOptionsScreen()
   ];
 
@@ -33,6 +36,13 @@ class _HomeScreenState extends BaseState<HomeScreen> {
     if (isFirstTime) {
       // Provider.of<UserProvider>(context, listen: false).getAspirantUser();
       Provider.of<HomeProvider>(context, listen: false).fetchExams();
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        printDebug('Got a message whilst in the foreground!');
+        printDebug('Message data: ${message.data}');
+        if (message.notification != null) {
+          printDebug('Message also contained a notification: ${message.notification}');
+        }
+      });
     }
     super.didChangeDependencies();
   }
@@ -87,16 +97,16 @@ class _HomeScreenState extends BaseState<HomeScreen> {
               icon: _buildNavItemIcon(Icons.home, _selectedIndex == 0),
               label: '',
             ),
+            // BottomNavigationBarItem(
+            //   icon: _buildNavItemIcon(Icons.location_on, _selectedIndex == 1),
+            //   label: '',
+            // ),
+            // BottomNavigationBarItem(
+            //   icon: _buildNavItemIcon(Icons.menu_book, _selectedIndex == 2),
+            //   label: '',
+            // ),
             BottomNavigationBarItem(
-              icon: _buildNavItemIcon(Icons.location_on, _selectedIndex == 1),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavItemIcon(Icons.menu_book, _selectedIndex == 2),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavItemIcon(Icons.person, _selectedIndex == 3),
+              icon: _buildNavItemIcon(Icons.person, _selectedIndex == 1),
               label: '',
             ),
           ],

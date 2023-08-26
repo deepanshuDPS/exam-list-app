@@ -7,21 +7,14 @@ import 'package:intl/intl.dart';
 
 class ExamListResponse {
   ExamListResponse({
-      num? totalItems, 
-      num? totalPages, 
-      num? fetchTime,
-      bool? status,
-      List<Data>? data,}){
-    _totalItems = totalItems;
-    _totalPages = totalPages;
-    _fetchTime = fetchTime;
+    bool? status,
+    List<Data>? data,
+  }) {
+    _status = status;
     _data = data;
-}
+  }
 
   ExamListResponse.fromJson(dynamic json) {
-    _totalItems = json['totalItems'];
-    _totalPages = json['totalPages'];
-    _fetchTime = json['fetchTime'];
     _status = json['status'];
     if (json['data'] != null) {
       _data = [];
@@ -30,40 +23,33 @@ class ExamListResponse {
       });
     }
   }
-  num? _totalItems;
-  num? _totalPages;
-  num? _fetchTime;
   List<Data>? _data;
   bool? _status;
 
-ExamListResponse copyWith({  num? totalItems,
-  num? totalPages,
-  num? fetchTime,
-  List<Data>? data,
-  bool? status,
-}) => ExamListResponse(  totalItems: totalItems ?? _totalItems,
-  totalPages: totalPages ?? _totalPages,
-  fetchTime: fetchTime ?? _fetchTime,
-  data: data ?? _data,
-  status: status ?? status,
-);
-  num? get totalItems => _totalItems;
-  num? get totalPages => _totalPages;
-  num? get fetchTime => _fetchTime;
+  ExamListResponse copyWith({
+    num? totalItems,
+    num? totalPages,
+    num? fetchTime,
+    List<Data>? data,
+    bool? status,
+  }) =>
+      ExamListResponse(
+        data: data ?? _data,
+        status: status ?? status,
+      );
+
   List<Data>? get data => _data;
+
   bool? get status => _status;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['totalItems'] = _totalItems;
-    map['totalPages'] = _totalPages;
-    map['fetchTime'] = _fetchTime;
+    map['status'] = _status;
     if (_data != null) {
       map['data'] = _data?.map((v) => v.toJson()).toList();
     }
     return map;
   }
-
 }
 
 /// _id : "exam123"
@@ -82,19 +68,24 @@ ExamListResponse copyWith({  num? totalItems,
 
 class Data {
   Data({
-      String? id, 
-      String? examName, 
-      String? adNumber, 
-      List<String>? categoryTypes, 
-      String? applicationStartDate, 
-      String? applicationEndDate, 
-      num? totalPosts, 
-      num? noOfLevels, 
-      List<CategoryPosts>? categoryPosts, 
-      List<CategoryFees>? categoryFees, 
-      List<Notices>? notices, 
-      String? createdAt, 
-      String? updatedAt,}){
+    String? id,
+    String? examName,
+    String? adNumber,
+    List<num>? categoryTypes,
+    String? applicationStartDate,
+    String? applicationEndDate,
+    num? totalPosts,
+    num? noOfLevels,
+    List<Extras>? categoryPosts,
+    List<Extras>? categoryFees,
+    List<Extras>? notices,
+    String? createdAt,
+    String? updatedAt,
+    String? minAgeDate,
+    String? maxAgeDate,
+    List<num>? addQualifications,
+    num? maxQualification,
+  }) {
     _id = id;
     _examName = examName;
     _adNumber = adNumber;
@@ -108,13 +99,17 @@ class Data {
     _notices = notices;
     _createdAt = createdAt;
     _updatedAt = updatedAt;
-}
+    _minAgeDate = minAgeDate;
+    _maxAgeDate = maxAgeDate;
+    _addQualifications = addQualifications;
+    _maxQualification = maxQualification;
+  }
 
   Data.fromJson(dynamic json) {
     _id = json['_id'];
     _examName = json['examName'];
     _adNumber = json['adNumber'];
-    _categoryTypes = json['categoryTypes'] != null ? json['categoryTypes'].cast<String>() : [];
+    _categoryTypes = json['categoryTypes'] != null ? json['categoryTypes'].cast<num>() : [];
     _applicationStartDate = json['applicationStartDate'];
     _applicationEndDate = json['applicationEndDate'];
     _totalPosts = json['totalPosts'];
@@ -122,96 +117,144 @@ class Data {
     if (json['categoryPosts'] != null) {
       _categoryPosts = [];
       json['categoryPosts'].forEach((v) {
-        _categoryPosts?.add(CategoryPosts.fromJson(v));
+        _categoryPosts?.add(Extras.fromJson(v));
       });
     }
     if (json['categoryFees'] != null) {
       _categoryFees = [];
       json['categoryFees'].forEach((v) {
-        _categoryFees?.add(CategoryFees.fromJson(v));
+        _categoryFees?.add(Extras.fromJson(v));
       });
     }
     if (json['notices'] != null) {
       _notices = [];
       json['notices'].forEach((v) {
-        _notices?.add(Notices.fromJson(v));
+        _notices?.add(Extras.fromJson(v));
       });
     }
     _createdAt = json['createdAt'];
     _updatedAt = json['updatedAt'];
+    _minAgeDate = json['minAgeDate'];
+    _maxAgeDate = json['maxAgeDate'];
+    _addQualifications = json['addQualifications'] != null ? json['addQualifications'].cast<num>() : [];
+    _maxQualification = json['maxQualification'];
   }
+
   String? _id;
   String? _examName;
   String? _adNumber;
-  List<String>? _categoryTypes;
+  List<num>? _categoryTypes;
   String? _applicationStartDate;
   String? _applicationEndDate;
   num? _totalPosts;
   num? _noOfLevels;
-  List<CategoryPosts>? _categoryPosts;
-  List<CategoryFees>? _categoryFees;
-  List<Notices>? _notices;
+  List<Extras>? _categoryPosts;
+  List<Extras>? _categoryFees;
+  List<Extras>? _notices;
   String? _createdAt;
   String? _updatedAt;
-Data copyWith({  String? id,
-  String? examName,
-  String? adNumber,
-  List<String>? categoryTypes,
-  String? applicationStartDate,
-  String? applicationEndDate,
-  num? totalPosts,
-  num? noOfLevels,
-  List<CategoryPosts>? categoryPosts,
-  List<CategoryFees>? categoryFees,
-  List<Notices>? notices,
-  String? createdAt,
-  String? updatedAt,
-}) => Data(  id: id ?? _id,
-  examName: examName ?? _examName,
-  adNumber: adNumber ?? _adNumber,
-  categoryTypes: categoryTypes ?? _categoryTypes,
-  applicationStartDate: applicationStartDate ?? _applicationStartDate,
-  applicationEndDate: applicationEndDate ?? _applicationEndDate,
-  totalPosts: totalPosts ?? _totalPosts,
-  noOfLevels: noOfLevels ?? _noOfLevels,
-  categoryPosts: categoryPosts ?? _categoryPosts,
-  categoryFees: categoryFees ?? _categoryFees,
-  notices: notices ?? _notices,
-  createdAt: createdAt ?? _createdAt,
-  updatedAt: updatedAt ?? _updatedAt,
-);
+  String? _minAgeDate;
+  String? _maxAgeDate;
+  List<num>? _addQualifications;
+  num? _maxQualification;
+
+  Data copyWith({
+    String? id,
+    String? examName,
+    String? adNumber,
+    List<num>? categoryTypes,
+    String? applicationStartDate,
+    String? applicationEndDate,
+    num? totalPosts,
+    num? noOfLevels,
+    List<Extras>? categoryPosts,
+    List<Extras>? categoryFees,
+    List<Extras>? notices,
+    String? createdAt,
+    String? updatedAt,
+    String? minAgeDate,
+    String? maxAgeDate,
+    List<num>? addQualifications,
+    num? maxQualification,
+  }) =>
+      Data(
+        id: id ?? _id,
+        examName: examName ?? _examName,
+        adNumber: adNumber ?? _adNumber,
+        categoryTypes: categoryTypes ?? _categoryTypes,
+        applicationStartDate: applicationStartDate ?? _applicationStartDate,
+        applicationEndDate: applicationEndDate ?? _applicationEndDate,
+        totalPosts: totalPosts ?? _totalPosts,
+        noOfLevels: noOfLevels ?? _noOfLevels,
+        categoryPosts: categoryPosts ?? _categoryPosts,
+        categoryFees: categoryFees ?? _categoryFees,
+        notices: notices ?? _notices,
+        createdAt: createdAt ?? _createdAt,
+        updatedAt: updatedAt ?? _updatedAt,
+        minAgeDate: minAgeDate ?? _minAgeDate,
+        maxAgeDate: maxAgeDate ?? _maxAgeDate,
+        addQualifications: addQualifications ?? _addQualifications,
+        maxQualification: maxQualification ?? _maxQualification,
+      );
+
   String? get id => _id;
+
   String? get examName => _examName;
+
   String? get adNumber => _adNumber;
-  List<String>? get categoryTypes => _categoryTypes;
+
+  List<num>? get categoryTypes => _categoryTypes;
+
   String? get applicationStartDate => _applicationStartDate;
+
+
+
   String? get formatAppStartDate {
-    if(_applicationStartDate!=null){
+    if (_applicationStartDate != null) {
       final parsedDateTime = DateTime.parse(_applicationStartDate!);
-      final formattedDate = DateFormat.yMMMMd().format(parsedDateTime); // August 10, 2023
+      final formattedDate =
+          DateFormat.yMMMMd().format(parsedDateTime); // August 10, 2023
       return formattedDate;
     } else {
       return "";
     }
   }
+
   String? get applicationEndDate => _applicationEndDate;
+
   String? get formatAppEndDate {
-    if(_applicationEndDate!=null){
+    if (_applicationEndDate != null) {
       final parsedDateTime = DateTime.parse(_applicationEndDate!);
-      final formattedDate = DateFormat.yMMMMd().format(parsedDateTime); // August 10, 2023
+      final formattedDate =
+          DateFormat.yMMMMd().format(parsedDateTime); // August 10, 2023
       final formattedTime = DateFormat.jm().format(parsedDateTime);
       return '$formattedDate, $formattedTime';
     } else {
       return "";
     }
   }
+
   num? get totalPosts => _totalPosts;
+
   num? get noOfLevels => _noOfLevels;
-  List<CategoryPosts>? get categoryPosts => _categoryPosts;
-  List<CategoryFees>? get categoryFees => _categoryFees;
-  List<Notices>? get notices => _notices;
+
+  List<Extras>? get categoryPosts => _categoryPosts;
+
+  List<Extras>? get categoryFees => _categoryFees;
+
+  List<Extras>? get notices => _notices;
+
   String? get createdAt => _createdAt;
+
   String? get updatedAt => _updatedAt;
+
+  String? get minAgeDate => _minAgeDate;
+
+  String? get maxAgeDate => _maxAgeDate;
+
+  List<num>? get addQualifications => _addQualifications;
+
+  num? get maxQualification => _maxQualification;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -234,79 +277,12 @@ Data copyWith({  String? id,
     }
     map['createdAt'] = _createdAt;
     map['updatedAt'] = _updatedAt;
+    map['minAgeDate'] = _minAgeDate;
+    map['maxAgeDate'] = _maxAgeDate;
+    map['addQualifications'] = _addQualifications;
+    map['maxQualification'] = _maxQualification;
     return map;
   }
-
-}
-
-/// name : "Important Notice"
-/// posts : "All Posts"
-/// gender : []
-/// fee : 0
-/// date : "2023-08-10T08:00:00Z"
-/// link : "https://example.com/notice"
-
-class Notices {
-  Notices({
-      String? name, 
-      String? posts, 
-      List<num>? gender,
-      num? fee, 
-      String? date, 
-      String? link,}){
-    _name = name;
-    _posts = posts;
-    _gender = gender;
-    _fee = fee;
-    _date = date;
-    _link = link;
-}
-
-  Notices.fromJson(dynamic json) {
-    _name = json['name'];
-    _posts = json['posts'];
-    _gender = json['gender'] != null ? json['gender'].cast<num>() : [];
-    _fee = json['fee'];
-    _date = json['date'];
-    _link = json['link'];
-  }
-  String? _name;
-  String? _posts;
-  List<num>? _gender;
-  num? _fee;
-  String? _date;
-  String? _link;
-Notices copyWith({  String? name,
-  String? posts,
-  List<num>? gender,
-  num? fee,
-  String? date,
-  String? link,
-}) => Notices(  name: name ?? _name,
-  posts: posts ?? _posts,
-  gender: gender ?? _gender,
-  fee: fee ?? _fee,
-  date: date ?? _date,
-  link: link ?? _link,
-);
-  String? get name => _name;
-  String? get posts => _posts;
-  List<dynamic>? get gender => _gender;
-  num? get fee => _fee;
-  String? get date => _date;
-  String? get link => _link;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['name'] = _name;
-    map['posts'] = _posts;
-    map['gender'] = _gender;
-    map['fee'] = _fee;
-    map['date'] = _date;
-    map['link'] = _link;
-    return map;
-  }
-
 }
 
 /// name : "Category A"
@@ -316,54 +292,73 @@ Notices copyWith({  String? name,
 /// date : "2023-08-20T10:00:00Z"
 /// link : "https://example.com"
 
-class CategoryFees {
-  CategoryFees({
-      String? name, 
-      String? posts, 
-      List<num>? gender, 
-      num? fee, 
-      String? date, 
-      String? link,}){
+class Extras {
+  Extras({
+    String? name,
+    num? posts,
+    List<num>? categoryIds,
+    List<num>? gender,
+    num? fee,
+    String? date,
+    String? link,
+  }) {
     _name = name;
     _posts = posts;
     _gender = gender;
     _fee = fee;
     _date = date;
     _link = link;
-}
+  }
 
-  CategoryFees.fromJson(dynamic json) {
+  Extras.fromJson(dynamic json) {
     _name = json['name'];
     _posts = json['posts'];
+    _categoryIds = json['categoryIds'] != null ? json['categoryIds'].cast<num>() : [];
     _gender = json['gender'] != null ? json['gender'].cast<num>() : [];
     _fee = json['fee'];
     _date = json['date'];
     _link = json['link'];
   }
+
   String? _name;
-  String? _posts;
+  num? _posts;
   List<num>? _gender;
+  List<num>? _categoryIds;
   num? _fee;
   String? _date;
   String? _link;
-CategoryFees copyWith({  String? name,
-  String? posts,
-  List<num>? gender,
-  num? fee,
-  String? date,
-  String? link,
-}) => CategoryFees(  name: name ?? _name,
-  posts: posts ?? _posts,
-  gender: gender ?? _gender,
-  fee: fee ?? _fee,
-  date: date ?? _date,
-  link: link ?? _link,
-);
+
+  Extras copyWith({
+    String? name,
+    num? posts,
+    List<num>? gender,
+    List<num>? categoryIds,
+    num? fee,
+    String? date,
+    String? link,
+  }) =>
+      Extras(
+        name: name ?? _name,
+        posts: posts ?? _posts,
+        gender: gender ?? _gender,
+        fee: fee ?? _fee,
+        date: date ?? _date,
+        link: link ?? _link,
+        categoryIds: categoryIds ?? _categoryIds,
+      );
+
   String? get name => _name;
-  String? get posts => _posts;
+
+  num? get posts => _posts;
+
+  List<num>? get categoryIds => _categoryIds;
+  
   List<num>? get gender => _gender;
+
   num? get fee => _fee;
+
   String? get date => _date;
+
   String? get link => _link;
 
   Map<String, dynamic> toJson() {
@@ -374,77 +369,7 @@ CategoryFees copyWith({  String? name,
     map['fee'] = _fee;
     map['date'] = _date;
     map['link'] = _link;
+    map['categoryIds'] = _categoryIds;
     return map;
   }
-
-}
-
-/// name : "Category A"
-/// posts : "Post A1"
-/// gender : [1,2]
-/// fee : 50
-/// date : "2023-08-20T10:00:00Z"
-/// link : "https://example.com"
-
-class CategoryPosts {
-  CategoryPosts({
-      String? name, 
-      String? posts, 
-      List<num>? gender, 
-      num? fee, 
-      String? date, 
-      String? link,}){
-    _name = name;
-    _posts = posts;
-    _gender = gender;
-    _fee = fee;
-    _date = date;
-    _link = link;
-}
-
-  CategoryPosts.fromJson(dynamic json) {
-    _name = json['name'];
-    _posts = json['posts'];
-    _gender = json['gender'] != null ? json['gender'].cast<num>() : [];
-    _fee = json['fee'];
-    _date = json['date'];
-    _link = json['link'];
-  }
-  String? _name;
-  String? _posts;
-  List<num>? _gender;
-  num? _fee;
-  String? _date;
-  String? _link;
-CategoryPosts copyWith({  String? name,
-  String? posts,
-  List<num>? gender,
-  num? fee,
-  String? date,
-  String? link,
-}) => CategoryPosts(  name: name ?? _name,
-  posts: posts ?? _posts,
-  gender: gender ?? _gender,
-  fee: fee ?? _fee,
-  date: date ?? _date,
-  link: link ?? _link,
-);
-  String? get name => _name;
-  String? get posts => _posts;
-  List<num>? get gender => _gender;
-  num? get fee => _fee;
-  String? get date => _date;
-  String? get link => _link;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['name'] = _name;
-    map['posts'] = _posts;
-    map['gender'] = _gender;
-    map['fee'] = _fee;
-    map['date'] = _date;
-    map['link'] = _link;
-    return map;
-  }
-
 }

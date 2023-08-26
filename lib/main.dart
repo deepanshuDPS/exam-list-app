@@ -1,6 +1,8 @@
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/launch_screen.dart';
 import 'package:exam_list/user/screens/user_login_screen.dart';
+import 'package:exam_list/utils/extras_utils.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:exam_list/home/screens/support_screen.dart';
@@ -29,6 +31,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  printDebug("Handling a background message: ${message.messageId}");
+}
+
 Future<void> loadBeforeApp() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -38,6 +46,7 @@ Future<void> loadBeforeApp() async{
       DeviceOrientation.portraitUp,
     ],
   );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }
 
 void main() {
