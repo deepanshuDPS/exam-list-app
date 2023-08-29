@@ -1,4 +1,3 @@
-
 import 'package:exam_list/providers/home_provider.dart';
 import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/user_provider.dart';
 import '../../utils/extras_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,13 +34,13 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      // Provider.of<UserProvider>(context, listen: false).getAspirantUser();
-      Provider.of<HomeProvider>(context, listen: false).fetchExams();
+      Provider.of<UserProvider>(context, listen: false).getAspirantUser();
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         printDebug('Got a message whilst in the foreground!');
         printDebug('Message data: ${message.data}');
         if (message.notification != null) {
-          printDebug('Message also contained a notification: ${message.notification}');
+          printDebug(
+              'Message also contained a notification: ${message.notification}');
         }
       });
     }

@@ -3,9 +3,9 @@ import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/user/extras/otp_sheet.dart';
-import 'package:exam_list/providers/resorts_provider.dart';
-import 'package:exam_list/resorts/widgets/resort_list_book_item.dart';
-import 'package:exam_list/resorts/widgets/resort_list_item.dart';
+import 'package:exam_list/providers/exams_provider.dart';
+import 'package:exam_list/exams/widgets/resort_list_book_item.dart';
+import 'package:exam_list/exams/widgets/resort_list_item.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart'
     as dest;
 import 'package:exam_list/widgets/container_error.dart';
@@ -59,7 +59,7 @@ class _ResortsListingScreenState extends BaseState<ResortsListingScreen> {
       isAppBarColored: true,
       child: BaseImageContainer(
         opacity: 0.4,
-        child: Consumer<ResortsProvider>(
+        child: Consumer<ExamsProvider>(
             child: const ContainerLoading(),
             builder: (ctx, resorts, ch) {
               if (resorts.resortsListingRequestData.isLoading) {
@@ -69,7 +69,7 @@ class _ResortsListingScreenState extends BaseState<ResortsListingScreen> {
                     jsonData: resorts.resortsListingRequestData.data,
                     onTryAgain: () => {_fetchData()});
               }
-              var itemList = resorts.resortsList;
+              var itemList = resorts.exam;
 
               return Container();
             }),
@@ -78,7 +78,6 @@ class _ResortsListingScreenState extends BaseState<ResortsListingScreen> {
   }
 
   void _fetchData() {
-    Provider.of<ResortsProvider>(context, listen: false)
-        .getDestinationResorts(_dId);
+    // Provider.of<ExamsProvider>(context, listen: false).getDestinationResorts(_dId);
   }
 }

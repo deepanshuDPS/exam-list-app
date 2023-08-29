@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
-import 'package:exam_list/resorts/screens/resort_screen.dart';
+import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/responseModels/resorts/get_resorts_response.dart';
 import 'package:exam_list/responseModels/search/search_places_response.dart'
     as search;
@@ -29,7 +29,7 @@ class ResortListItem extends StatelessWidget {
               .replaceAll('{dId}', dId)
               .replaceAll("{rId}", data?.id ?? sData?.id ?? "0");
           Navigator.of(context)
-              .pushNamed(ResortScreen.routeName, arguments: endPoint);
+              .pushNamed(ExamScreen.routeName, arguments: endPoint);
         },
         child: ClipRRect(
           child: SizedBox(

@@ -50,8 +50,8 @@ class BaseScaffold extends StatelessWidget {
                   color: Colors.black,
                 ),
                 onPressed: () {
-                  // Navigator.of(context).pop();
-                  SystemNavigator.pop();
+                  Navigator.of(context).pop();
+                  // SystemNavigator.pop();
                 },
               )
             : null,

@@ -1,4 +1,7 @@
+import 'package:exam_list/exams/screens/exam_screen.dart';
+import 'package:exam_list/providers/exams_provider.dart';
 import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
@@ -16,6 +19,8 @@ class ExamListingScreen extends StatefulWidget {
 }
 
 class _ExamListingScreenState extends BaseState<ExamListingScreen> {
+  int _selectedCategoryIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -24,9 +29,14 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
   final _searchTextController = TextEditingController();
   String currentText = '';
 
+  HomeProvider _homeProvider() {
+    return Provider.of<HomeProvider>(context, listen: false);
+  }
+
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
+      _homeProvider().fetchExams(_selectedCategoryIndex);
       _searchTextController.addListener(() {
         setState(() {
           currentText = _searchTextController.value.text;
@@ -36,27 +46,26 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
     super.didChangeDependencies();
   }
 
-  int selectedIndex = 2; // Index of the initially selected item
-
   Widget _examCategory(int index) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: selectedIndex == index ? Colors.red : Colors.white,
+        color: _selectedCategoryIndex == index ? Colors.red : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: selectedIndex == index ? Colors.red : Colors.grey,
+          color: _selectedCategoryIndex == index ? Colors.red : Colors.grey,
         ),
       ),
       child: Center(
         child: Text(
           Constants.examCategories[index] ?? "All",
           style: TextStyle(
-            color: selectedIndex == index ? Colors.white : Colors.grey,
+            color: _selectedCategoryIndex == index ? Colors.white : Colors.grey,
             fontSize: 14,
-            fontWeight:
-                selectedIndex == index ? FontWeight.w500 : FontWeight.normal,
+            fontWeight: _selectedCategoryIndex == index
+                ? FontWeight.w500
+                : FontWeight.normal,
           ),
         ),
       ),
@@ -88,12 +97,26 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Hi $currentText',
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w200,
-                              color: Colors.white),
+                        Consumer<UserProvider>(
+                          child: const Text(
+                            'Hi Aspirant',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w200,
+                                color: Colors.white),
+                          ),
+                          builder: (context, user, child) {
+                            if (user.aspirantDetails != null) {
+                              return Text(
+                                'Hi ${user.aspirantDetails?.name}',
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w200,
+                                    color: Colors.white),
+                              );
+                            }
+                            return child!;
+                          },
                         ),
                         const SizedBox(height: 4),
                         const Text(
@@ -163,7 +186,10 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
                 return GestureDetector(
                   onTap: () {
                     // Update the selected index when an item is tapped
-                    selectedIndex = index;
+                    setState(() {
+                      _selectedCategoryIndex = index;
+                    });
+                    _homeProvider().setIndex(index);
                   },
                   child: _examCategory(index),
                 );
@@ -181,16 +207,23 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
                 if (home.homeRequest.isLoading) {
                   return child!;
                 } else {
-                  return
-                    Expanded(
-                      child: ListView.builder(
-                          physics: const ClampingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          itemCount: home.currentList.length,
-                          itemBuilder: (context, index) {
-                        return ExamListItem(exam: home.currentList[index]);
-                      }),
-                    );
+                  return Expanded(
+                    child: ListView.builder(
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        itemCount: home.currentList.length,
+                        itemBuilder: (context, index) {
+                          return ExamListItem(
+                            exam: home.currentList[index],
+                            onClick: () {
+                              Provider.of<ExamsProvider>(context, listen: false)
+                                  .setExam(home.currentList[index]);
+                              Navigator.of(context)
+                                  .pushNamed(ExamScreen.routeName);
+                            },
+                          );
+                        }),
+                  );
                 }
               })
         ],

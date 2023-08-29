@@ -14,11 +14,11 @@ import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/options/screens/voucher_screen.dart';
 import 'package:exam_list/providers/download_provider.dart';
 import 'package:exam_list/providers/home_provider.dart';
-import 'package:exam_list/providers/resorts_provider.dart';
+import 'package:exam_list/providers/exams_provider.dart';
 import 'package:exam_list/providers/search_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
-import 'package:exam_list/resorts/screens/resort_screen.dart';
-import 'package:exam_list/resorts/screens/resorts_listing_screen.dart';
+import 'package:exam_list/exams/screens/exam_screen.dart';
+import 'package:exam_list/exams/screens/resorts_listing_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (ctx) => HomeProvider()),
         ChangeNotifierProvider(create: (ctx) => SearchProvider()),
-        ChangeNotifierProvider(create: (ctx) => ResortsProvider()),
+        ChangeNotifierProvider(create: (ctx) => ExamsProvider()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx)=> DownloadProvider())
       ],
@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
             MyTripsScreen.routeName: (ctx) => const MyTripsScreen(),
             ResortsListingScreen.routeName: (ctx) =>
                 const ResortsListingScreen(),
-            ResortScreen.routeName: (ctx) => const ResortScreen(),
+            ExamScreen.routeName: (ctx) => const ExamScreen(),
             VoucherScreen.routeName: (ctx) => const VoucherScreen(),
             UserOnBoardingScreen.routeName: (ctx) => const UserOnBoardingScreen(),
             ExamListingScreen.routeName: (ctx) => const ExamListingScreen(),

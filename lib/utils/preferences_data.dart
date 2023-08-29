@@ -44,7 +44,7 @@ class PreferencesData {
 
   static Future<int> getCurrentVersion() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(Constants.currentVersion) ?? 0;
+    return prefs.getInt(Constants.currentVersion) ?? 1;
   }
 
   static Future<void> setCurrentVersion() async {

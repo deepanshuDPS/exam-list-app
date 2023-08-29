@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/providers/search_provider.dart';
-import 'package:exam_list/resorts/widgets/resort_list_item.dart';
+import 'package:exam_list/exams/widgets/resort_list_item.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart';
 import 'package:exam_list/responseModels/search/search_places_response.dart'
     as search;

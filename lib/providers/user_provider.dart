@@ -1,4 +1,5 @@
 import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class UserProvider with ChangeNotifier {
   AspirantData? _aspirantDetailsData;
   check_user_response.Data? _userDetailsData;
 
-  RequestData memberRequestData = RequestData();
+  RequestData aspirantRequestData = RequestData();
   RequestData myUpTripsRequestData = RequestData();
   RequestData myCompTripsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -113,6 +114,7 @@ class UserProvider with ChangeNotifier {
       _notifyListenersWithBinding();
       return customResponse.message ?? 'Something went Wrong';
     }
+    printDebug(customResponse.data?.customToken ?? '');
     await _auth.signInWithCustomToken(customResponse.data?.customToken ?? '');
     final response = check_user_response.CheckUserResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
@@ -233,16 +235,16 @@ class UserProvider with ChangeNotifier {
 
   Future<dynamic> getAspirantUser() async {
     _aspirantDetailsData = null;
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.getAspirant));
     if (response.data != null) {
       _aspirantDetailsData = response.data;
     } else {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<dynamic> changePassword(String oldPass, String newPass) async {
@@ -257,72 +259,72 @@ class UserProvider with ChangeNotifier {
 
   Future<void> getMemberDetails() async {
     _aspirantDetailsData = null;
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberProfile));
     if (response.data != null) {
       _aspirantDetailsData = response.data;
     } else {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getHolidays() async {
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     _holidaysList.clear();
     final response = holiday_response.HolidaysResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberHolidays));
     if (response.status == -1) {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     } else {
       _holidaysList.addAll(response.data!);
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getDocs() async {
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     _docsList.clear();
     final response = docs_response.DocumentsResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberDocuments));
     if (response.status == -1) {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     } else {
       _docsList.addAll(response.data!);
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getMemberFees({bool isAMC = false}) async {
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     _feesList.clear();
     final response = fee_response.MemberFeePayments.fromJson(
         await HttpRequests.instance()?.httpGetRequest(
             isAMC ? ApiEndPoints.memberAMC : ApiEndPoints.memberFee));
     if (response.status == -1) {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     } else {
       _feesList.addAll(response.data!);
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getOffers() async {
-    notifyWithRequest(memberRequestData, true);
+    notifyWithRequest(aspirantRequestData, true);
     _offersList.clear();
     final response = offers_response.OffersResponse.fromJson(
         await HttpRequests.instance()
             ?.httpGetRequest(ApiEndPoints.memberOffers));
     if (response.status == -1) {
-      memberRequestData.setErrorData(response.toJson());
+      aspirantRequestData.setErrorData(response.toJson());
     } else {
       _offersList.addAll(response.data!);
     }
-    notifyWithRequest(memberRequestData, false);
+    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getTrips(int type) async {

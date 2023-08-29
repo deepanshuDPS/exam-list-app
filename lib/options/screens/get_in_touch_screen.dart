@@ -5,7 +5,6 @@ import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/options/pages/benefits_page.dart';
 import 'package:exam_list/options/pages/offers_page.dart';
 import 'package:exam_list/options/pages/overview_page.dart';
-import 'package:exam_list/options/pages/testimonials_page.dart';
 import 'package:exam_list/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +25,7 @@ class _GetInTouchScreenState extends BaseState<GetInTouchScreen> {
   void didChangeDependencies() {
     if (isFirstTime) {
       defaultTabPosition = ModalRoute.of(context)?.settings.arguments as int;
-      Provider.of<HomeProvider>(context, listen: false).fetchTestimonials();
+      // Provider.of<HomeProvider>(context, listen: false).fetchTestimonials();
     }
     super.didChangeDependencies();
   }
@@ -64,8 +63,7 @@ class _GetInTouchScreenState extends BaseState<GetInTouchScreen> {
             child: TabBarView(children: [
               OverviewPage(),
               BenefitsPage(),
-              OffersPage(),
-              TestimonialsPage()
+              OffersPage()
             ]),
           ),
         ));

@@ -8,7 +8,7 @@ import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 
 class Constants {
-  static String baseURL = 'http://192.168.29.174:8080/';
+  static String baseURL = 'http://192.168.1.11:8080/';
 
 
   // Filters for the exams list
@@ -18,6 +18,7 @@ class Constants {
     2: 'State',
     3: 'Teaching',
     4: 'Defense',
+    5: 'Bank Jobs'
   };
 
   // Filters for the resources list

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:exam_list/resorts/screens/resorts_listing_screen.dart';
+import 'package:exam_list/exams/screens/resorts_listing_screen.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/image_handling.dart';

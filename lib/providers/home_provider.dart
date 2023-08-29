@@ -1,3 +1,4 @@
+import 'package:exam_list/responseModels/home/exam_data.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/responseModels/global_response.dart';
 import 'package:exam_list/responseModels/home/check_voucher_response.dart'
@@ -5,24 +6,27 @@ import 'package:exam_list/responseModels/home/check_voucher_response.dart'
 import 'package:exam_list/responseModels/home/exam_list_response.dart'
     as exam_list_response;
 import 'package:exam_list/network/http_requests.dart';
-import 'package:exam_list/responseModels/home/testimonials_response.dart'
-    as testimonials;
 import 'package:exam_list/responseModels/request_data.dart';
 
 class HomeProvider with ChangeNotifier {
-  final List<exam_list_response.Data> _allExams = [];
-  final Map<int, List<exam_list_response.Data>> _differentTypesExams = {};
-  final List<exam_list_response.Data> _currentList = [];
-  final List<testimonials.Data> _testimonials = [];
+  final List<ExamData> _allExams = [];
+  final Map<num, List<ExamData>> _differentTypesExams = {};
+  final List<ExamData> _currentList = [];
   RequestData homeRequest = RequestData();
   RequestData testimonialsRequest = RequestData();
 
-  List<exam_list_response.Data> get currentList {
-    return [..._currentList];
+  void setIndex(int index, {bool notify = true}) {
+    _currentList.clear();
+    if (index == 0) {
+      _currentList.addAll(_allExams);
+    } else {
+      _currentList.addAll(_differentTypesExams[index] ?? []);
+    }
+    if (notify) notifyTheProvider();
   }
 
-  List<testimonials.Data> get getTestimonials {
-    return [..._testimonials];
+  List<ExamData> get currentList {
+    return [..._currentList];
   }
 
   void notifyWithRequest(RequestData data, bool isLoading) {
@@ -31,14 +35,17 @@ class HomeProvider with ChangeNotifier {
       data.data = null;
       data.isError = false;
     }
+    notifyTheProvider();
+  }
+
+  void notifyTheProvider() {
     WidgetsBinding.instance.addPostFrameCallback((status) {
       notifyListeners();
     });
   }
 
-  Future<RequestData> fetchExams() async {
+  Future<RequestData> fetchExams(int selectedIndex) async {
     _allExams.clear();
-    _currentList.clear();
     _differentTypesExams.clear();
     notifyWithRequest(homeRequest, true);
     final response = exam_list_response.ExamListResponse.fromJson(
@@ -46,26 +53,24 @@ class HomeProvider with ChangeNotifier {
     if (response.status == false) {
       homeRequest.setErrorData(response.toJson());
     } else {
-      _allExams.addAll(response.data!);
-      _currentList.addAll(response.data!);
+      if (response.data != null && response.data?.isNotEmpty == true) {
+        _allExams.addAll(response.data!);
+        // different types -> list
+        response.data?.forEach((exam) {
+          exam.categoryTypes?.forEach((type) {
+            if (_differentTypesExams[type] == null) {
+              _differentTypesExams[type] = [exam];
+            } else {
+              var examList = _differentTypesExams[type];
+              examList?.add(exam);
+            }
+          });
+        });
+        setIndex(selectedIndex, notify: false);
+      }
     }
     notifyWithRequest(homeRequest, false);
     return homeRequest;
-  }
-
-  Future<RequestData> fetchTestimonials() async {
-    _testimonials.clear();
-    notifyWithRequest(testimonialsRequest, true);
-    final response = testimonials.TestimonialsResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpGetRequest(ApiEndPoints.testimonials));
-    if (response.status == -1) {
-      testimonialsRequest.setErrorData(response.toJson());
-    } else {
-      _testimonials.addAll(response.data!);
-    }
-    notifyWithRequest(testimonialsRequest, false);
-    return testimonialsRequest;
   }
 
   Future<dynamic> checkVoucher(String vNum) async {

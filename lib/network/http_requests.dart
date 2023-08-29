@@ -133,6 +133,7 @@ class HttpRequests {
         if (response.statusCode == 404) {
           return getErrorResponse(response.statusCode, _emptyError);
         }
+        printDebug("here error"+response.statusCode.toString());
         return getErrorResponse(
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
       }
@@ -149,6 +150,7 @@ class HttpRequests {
 class ApiEndPoints {
   static const authUser = 'auth/user';
   static const authExam = 'auth/exam';
+  static const authExamPattern = '/auth/exam-pattern';
 
   static const checkUser = "$authUser/checkUser";
   static const signUpAspirant = "$authUser/signup";
@@ -156,6 +158,8 @@ class ApiEndPoints {
   static const checkGuestUser = "anon/user/checkGuestUser";
 
   static const getExams = '$authExam/';
+  static const getExamByAdNumber = '$authExam/{adNumber}';
+  static const getExamPatterByID = '$authExamPattern/{examId}';
 
   /////////////////////////////////////////////////////////////////////////////
   static const home = 'home';

@@ -141,7 +141,7 @@ AspirantData copyWith({  String? id,
 class EduQualification {
   EduQualification({
       String? optionName, 
-      String? id,}){
+      num? id,}){
     _optionName = optionName;
     _id = id;
 }
@@ -151,14 +151,14 @@ class EduQualification {
     _id = json['id'];
   }
   String? _optionName;
-  String? _id;
+  num? _id;
 EduQualification copyWith({  String? optionName,
-  String? id,
+  num? id,
 }) => EduQualification(  optionName: optionName ?? _optionName,
   id: id ?? _id,
 );
   String? get optionName => _optionName;
-  String? get id => _id;
+  num? get id => _id;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -175,7 +175,7 @@ EduQualification copyWith({  String? optionName,
 class Category {
   Category({
       String? optionName, 
-      String? id,}){
+      num? id,}){
     _optionName = optionName;
     _id = id;
 }
@@ -185,14 +185,14 @@ class Category {
     _id = json['id'];
   }
   String? _optionName;
-  String? _id;
+  num? _id;
 Category copyWith({  String? optionName,
-  String? id,
+  num? id,
 }) => Category(  optionName: optionName ?? _optionName,
   id: id ?? _id,
 );
   String? get optionName => _optionName;
-  String? get id => _id;
+  num? get id => _id;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
