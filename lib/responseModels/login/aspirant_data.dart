@@ -1,16 +1,3 @@
-/// _id : "64c7b4ef84b8240bbef08400"
-/// mobile : "+918800757476"
-/// onBoarded : true
-/// createdAt : "2023-07-31T13:19:43.534+00:00"
-/// updatedAt : "2023-08-04T12:50:45.156+00:00"
-/// isDiffAble : false
-/// subscriptionLimit : 5
-/// dob : "1997-12-09T00:00:00.000+00:00"
-/// accountType : 1
-/// name : "Deepanshu"
-/// category : {"optionName":"General","id":"1"}
-/// eduQualification : {"optionName":"Bachelor's Degree (UG)","id":"4"}
-/// gender : 1
 
 class AspirantData {
   AspirantData({
@@ -135,69 +122,63 @@ AspirantData copyWith({  String? id,
 
 }
 
-/// optionName : "Bachelor's Degree (UG)"
-/// id : "4"
-
 class EduQualification {
   EduQualification({
       String? optionName, 
-      num? id,}){
+      num? optionId,}){
     _optionName = optionName;
-    _id = id;
+    _optionId = optionId;
 }
 
   EduQualification.fromJson(dynamic json) {
     _optionName = json['optionName'];
-    _id = json['id'];
+    _optionId = json['optionId'];
   }
   String? _optionName;
-  num? _id;
+  num? _optionId;
 EduQualification copyWith({  String? optionName,
-  num? id,
+  num? optionId,
 }) => EduQualification(  optionName: optionName ?? _optionName,
-  id: id ?? _id,
+  optionId: optionId ?? _optionId,
 );
   String? get optionName => _optionName;
-  num? get id => _id;
+  num? get optionId => _optionId;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['optionName'] = _optionName;
-    map['id'] = _id;
+    map['optionId'] = _optionId;
     return map;
   }
 
 }
 
-/// optionName : "General"
-/// id : "1"
-
 class Category {
   Category({
       String? optionName, 
-      num? id,}){
+      num? optionId,}){
     _optionName = optionName;
-    _id = id;
+    _optionId = optionId;
 }
 
   Category.fromJson(dynamic json) {
     _optionName = json['optionName'];
-    _id = json['id'];
+    _optionId = json['optionId'];
   }
   String? _optionName;
-  num? _id;
+  num? _optionId;
 Category copyWith({  String? optionName,
-  num? id,
+  num? optionId,
 }) => Category(  optionName: optionName ?? _optionName,
-  id: id ?? _id,
+  optionId: optionId ?? _optionId,
 );
   String? get optionName => _optionName;
-  num? get id => _id;
+  num? get optionId => _optionId;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['optionName'] = _optionName;
-    map['id'] = _id;
+    map['optionId'] = _optionId;
     return map;
   }
 

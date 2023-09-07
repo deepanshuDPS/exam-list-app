@@ -8,17 +8,17 @@ import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 
 class Constants {
-  static String baseURL = 'http://192.168.1.11:8080/';
+  static String baseURL = 'http://192.168.29.174:8080/';
 
 
   // Filters for the exams list
   static Map<int, String> examCategories = {
     0: 'All',
     1: 'All India',
-    2: 'State',
-    3: 'Teaching',
-    4: 'Defense',
-    5: 'Bank Jobs'
+    2: 'Banks',
+    3: 'Railways',
+    4: 'Police/Defence',
+    5: 'Teaching'
   };
 
   // Filters for the resources list
@@ -30,34 +30,34 @@ class Constants {
 
   // Categories for the category list
   static Map<String, int> reservationCategories = {
-    'General': 1,
-    'OBC': 2,
-    'SC': 3,
-    'ST': 4,
-    'EWS': 5,
+    'General': 0,
+    'OBC': 1,
+    'SC': 2,
+    'ST': 3,
+    'EWS': 4,
   };
 
   static Map<String, int> educationalQualifications = {
-    'High School (10th Pass)': 1,
-    'Intermediate (12th Pass)': 2,
-    'Diploma': 3,
-    'Bachelor\'s Degree (UG)': 4,
-    'Master\'s Degree (PG)': 5,
-    'Ph.D.': 6,
+    'High School (10th Pass)': 0,
+    'Intermediate (12th Pass)': 1,
+    'Diploma': 2,
+    'Bachelor\'s Degree (UG)': 3,
+    'Master\'s Degree (PG)': 4,
+    'Ph.D.': 5,
   };
 
   static Map<String, int> additionalQualifications = {
-    'JBT': 21,
-    'D Ed': 22,
-    'B Ed': 23,
+    'JBT': 20,
+    'D Ed': 21,
+    'B Ed': 22,
   };
 
   static Map<String, int> disabilityCategories = {
-    'OD-Orthopedic Disability': 21,
-    'VI-Visual Impairment': 22,
-    'HI-Hearing Impairment': 23,
-    'LD-Learning Disability': 24,
-    'MD-Multiple Disability': 25
+    'OD-Orthopedic Disability': 20,
+    'VI-Visual Impairment': 21,
+    'HI-Hearing Impairment': 22,
+    'LD-Learning Disability': 23,
+    'MD-Multiple Disability': 24
   };
 
 

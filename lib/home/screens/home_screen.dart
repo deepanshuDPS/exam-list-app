@@ -1,13 +1,13 @@
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/user_provider.dart';
-import '../../utils/extras_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home-screen';
@@ -26,9 +26,16 @@ class _HomeScreenState extends BaseState<HomeScreen> {
     const YourProfileOptionsScreen()
   ];
 
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
   @override
   void initState() {
     super.initState();
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    flutterLocalNotificationsPlugin.initialize(
+        const InitializationSettings(android: initializationSettingsAndroid));
   }
 
   @override
@@ -41,6 +48,21 @@ class _HomeScreenState extends BaseState<HomeScreen> {
         if (message.notification != null) {
           printDebug(
               'Message also contained a notification: ${message.notification}');
+          const AndroidNotificationDetails androidPlatformChannelSpecifics =
+              AndroidNotificationDetails(
+            'exam_notifications',
+            'Exam Notifications',
+          );
+
+          const NotificationDetails platformChannelSpecifics =
+              NotificationDetails(android: androidPlatformChannelSpecifics);
+
+          flutterLocalNotificationsPlugin.show(
+            0, // Notification ID
+            'Notification Title',
+            'Notification Body',
+            platformChannelSpecifics,
+          );
         }
       });
     }
