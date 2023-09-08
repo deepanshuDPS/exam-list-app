@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
@@ -28,18 +28,18 @@ class _ForgotPasswordSheetState extends BaseState<ForgotPasswordSheet> {
   }
 
   void onProceedClick() {
-    var enteredText = _memberIdController.text.trim();
-    showProgressDialog(context);
-    Provider.of<HomeProvider>(context, listen: false)
-        .forgotPassword(enteredText)
-        .then((value) {
-      Navigator.of(context).pop();
-      if (value is String) {
-        _memberIdController.clear();
-      }
-      Fluttertoast.showToast(
-          msg: value is String ? value : value['errorMessage']);
-    });
+    // var enteredText = _memberIdController.text.trim();
+    // showProgressDialog(context);
+    // Provider.of<HomeProvider>(context, listen: false)
+    //     .forgotPassword(enteredText)
+    //     .then((value) {
+    //   Navigator.of(context).pop();
+    //   if (value is String) {
+    //     _memberIdController.clear();
+    //   }
+    //   Fluttertoast.showToast(
+    //       msg: value is String ? value : value['errorMessage']);
+    // });
   }
 
   @override

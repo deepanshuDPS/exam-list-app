@@ -1,6 +1,5 @@
 import 'package:exam_list/exams/screens/exam_screen.dart';
-import 'package:exam_list/providers/exams_provider.dart';
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
@@ -29,14 +28,18 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
   final _searchTextController = TextEditingController();
   String currentText = '';
 
-  HomeProvider _homeProvider() {
-    return Provider.of<HomeProvider>(context, listen: false);
+  ExamProvider _examProvider() {
+    return Provider.of<ExamProvider>(context, listen: false);
+  }
+
+  UserProvider _userProvider() {
+    return Provider.of<UserProvider>(context, listen: false);
   }
 
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      _homeProvider().fetchExams(_selectedCategoryIndex);
+      _examProvider().fetchExams(_selectedCategoryIndex);
       _searchTextController.addListener(() {
         setState(() {
           currentText = _searchTextController.value.text;
@@ -189,7 +192,7 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
                     setState(() {
                       _selectedCategoryIndex = index;
                     });
-                    _homeProvider().setIndex(index);
+                    _examProvider().setIndex(index);
                   },
                   child: _examCategory(index),
                 );
@@ -199,25 +202,25 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
           const SizedBox(
             height: 8,
           ),
-          Consumer<HomeProvider>(
+          Consumer<ExamProvider>(
               child: const Center(
                 child: CircularProgressIndicator(),
               ),
-              builder: (context, home, child) {
-                if (home.homeRequest.isLoading) {
+              builder: (context, exams, child) {
+                if (exams.examRequest.isLoading) {
                   return child!;
                 } else {
                   return Expanded(
                     child: ListView.builder(
                         physics: const ClampingScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        itemCount: home.currentList.length,
+                        itemCount: exams.currentList.length,
                         itemBuilder: (context, index) {
                           return ExamListItem(
-                            exam: home.currentList[index],
+                            exam: exams.currentList[index],
+                            aspirant: _userProvider().aspirantDetails!,
                             onClick: () {
-                              Provider.of<ExamsProvider>(context, listen: false)
-                                  .setExam(home.currentList[index]);
+                              exams.setExam(exams.currentList[index]);
                               Navigator.of(context)
                                   .pushNamed(ExamScreen.routeName);
                             },

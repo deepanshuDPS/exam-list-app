@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/options/screens/voucher_screen.dart';
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/responseModels/home/check_voucher_response.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/extras_utils.dart';
@@ -30,21 +30,21 @@ class _VoucherSheetState extends BaseState<VoucherSheet> {
   }
 
   void onProceedClick() {
-    var enteredText = _voucher.text.trim();
-    FocusScope.of(context).requestFocus(FocusNode());
-    showProgressDialog(context);
-    Provider.of<HomeProvider>(context, listen: false)
-        .checkVoucher(enteredText)
-        .then((value) {
-      Navigator.of(context).pop();
-      if (value is Data) {
-        Navigator.of(context)
-            .pushNamed(VoucherScreen.routeName, arguments: value);
-      } else {
-        Fluttertoast.showToast(
-            msg: value as String, backgroundColor: Colors.red);
-      }
-    });
+    // var enteredText = _voucher.text.trim();
+    // FocusScope.of(context).requestFocus(FocusNode());
+    // showProgressDialog(context);
+    // Provider.of<HomeProvider>(context, listen: false)
+    //     .checkVoucher(enteredText)
+    //     .then((value) {
+    //   Navigator.of(context).pop();
+    //   if (value is Data) {
+    //     Navigator.of(context)
+    //         .pushNamed(VoucherScreen.routeName, arguments: value);
+    //   } else {
+    //     Fluttertoast.showToast(
+    //         msg: value as String, backgroundColor: Colors.red);
+    //   }
+    // });
   }
 
   @override

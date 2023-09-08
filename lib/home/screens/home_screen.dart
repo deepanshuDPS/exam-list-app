@@ -2,12 +2,12 @@ import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/widgets/container_error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home-screen';
@@ -71,10 +71,29 @@ class _HomeScreenState extends BaseState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: _buildBottomNavigationBar(),
-      body: _getPage(_selectedIndex),
-    );
+    return Consumer<UserProvider>(
+        child: Container(
+          color: Colors.white,
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        builder: (context, user, ch) {
+          if (user.aspirantRequestData.isLoading) {
+            return ch!;
+          }
+
+          if (user.aspirantRequestData.isError) {
+            return ContainerError(
+                jsonData: user.aspirantRequestData.data,
+                onTryAgain: () => user.getAspirantUser());
+          }
+
+          return Scaffold(
+            bottomNavigationBar: _buildBottomNavigationBar(),
+            body: _getPage(_selectedIndex),
+          );
+        });
   }
 
   int _selectedIndex = 0;

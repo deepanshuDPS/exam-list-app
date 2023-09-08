@@ -1,8 +1,7 @@
 import 'package:exam_list/containers/base_scaffold.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/providers/exams_provider.dart';
-import 'package:exam_list/widgets/container_error.dart';
 import 'package:exam_list/widgets/container_loading.dart';
 import 'package:provider/provider.dart';
 
@@ -26,23 +25,19 @@ class _ExamScreenState extends BaseState<ExamScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      _examName = Provider.of<ExamsProvider>(context,listen: false).exam?.examName??'N/A';
+      _examName = Provider.of<ExamProvider>(context,listen: false).exam?.examName??'N/A';
     }
     super.didChangeDependencies();
-  }
-
-  void _fetchData() {
-    Provider.of<ExamsProvider>(context, listen: false).getResort(_adNumber);
   }
 
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-        titleText: _examName,
+        titleText: "Exam Details",
         isBackRequired: true,
-        child: Consumer<ExamsProvider>(
+        child: Consumer<ExamProvider>(
             child: const ContainerLoading(),
-            builder: (ctx, resort, ch) {
+            builder: (ctx, exams, ch) {
               // if (resort.examRequestData.isLoading) return ch!;
               // if (resort.examRequestData.isError) {
               //   return ContainerError(
@@ -52,10 +47,14 @@ class _ExamScreenState extends BaseState<ExamScreen> {
 
               // var resortData = resort.exam;
               // if (resortData != null) {
-              var exam = Provider.of<ExamsProvider>(context).exam;
+              var exam = exams.exam;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      _examName,
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
                     Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text(

@@ -1,19 +1,21 @@
 import 'package:exam_list/responseModels/home/exam_data.dart';
 import 'package:flutter/material.dart';
-import 'package:exam_list/responseModels/global_response.dart';
-import 'package:exam_list/responseModels/home/check_voucher_response.dart'
-    as voucher;
 import 'package:exam_list/responseModels/home/exam_list_response.dart'
     as exam_list_response;
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 
-class HomeProvider with ChangeNotifier {
+class ExamProvider with ChangeNotifier {
+
   final List<ExamData> _allExams = [];
   final Map<num, List<ExamData>> _differentTypesExams = {};
   final List<ExamData> _currentList = [];
-  RequestData homeRequest = RequestData();
-  RequestData testimonialsRequest = RequestData();
+  RequestData examRequest = RequestData();
+
+  late ExamData? _selectedExam;
+  // adNumber for opened exam
+  String _openedExam = "";
+  RequestData examRequestData = RequestData();
 
   void setIndex(int index, {bool notify = true}) {
     _currentList.clear();
@@ -47,16 +49,28 @@ class HomeProvider with ChangeNotifier {
   Future<RequestData> fetchExams(int selectedIndex) async {
     _allExams.clear();
     _differentTypesExams.clear();
-    notifyWithRequest(homeRequest, true);
+    notifyWithRequest(examRequest, true);
     final response = exam_list_response.ExamListResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.getExams));
     if (response.status == false) {
-      homeRequest.setErrorData(response.toJson());
+      examRequest.setErrorData(response.toJson());
     } else {
       if (response.data != null && response.data?.isNotEmpty == true) {
-        _allExams.addAll(response.data!);
+        // traverse parent exams
+        response.data
+            ?.where((element) =>
+                element.parent == null || element.parent == true)
+            .forEach((exam) {
+          // filter child exams
+          var listOfChild = response.data?.where((element) =>
+              element.parent == false && element.adNumber == exam.adNumber);
+          if (listOfChild != null && listOfChild.isNotEmpty) {
+            exam.setChildExams(listOfChild.toList());
+          }
+          _allExams.add(exam);
+        });
         // different types -> list
-        response.data?.forEach((exam) {
+        for (var exam in _allExams) {
           exam.categoryTypes?.forEach((type) {
             if (_differentTypesExams[type] == null) {
               _differentTypesExams[type] = [exam];
@@ -65,44 +79,38 @@ class HomeProvider with ChangeNotifier {
               examList?.add(exam);
             }
           });
-        });
+        }
         setIndex(selectedIndex, notify: false);
       }
     }
-    notifyWithRequest(homeRequest, false);
-    return homeRequest;
+    notifyWithRequest(examRequest, false);
+    return examRequest;
   }
 
-  Future<dynamic> checkVoucher(String vNum) async {
-    final response = voucher.CheckVoucherResponse.fromJson(
-        await HttpRequests.instance()?.httpGetRequest(
-            ApiEndPoints.checkVoucher.replaceAll("{voucher_num}", vNum)));
-    // printDebug(response.toString());
-    if (response.data?.isNotEmpty == true) {
-      return response.data![0];
-    } else {
-      return response.message ?? 'Something went wrong';
-    }
+  ExamData? get exam {
+    return _selectedExam;
   }
 
-  Future<dynamic> forgotPassword(String memNum) async {
-    final response = GlobalResponse.fromJson(await HttpRequests.instance()
-        ?.httpPutRequest(ApiEndPoints.forgotPassword, {'mem_num': memNum}));
-    // printDebug(response.toString());
-    if (response.status != -1) {
-      return response.message;
-    } else {
-      return {'errorMessage': response.message ?? 'Something went wrong'};
-    }
+  void setExam(ExamData exam) {
+    _selectedExam = exam;
   }
 
-  Future<dynamic> getOffers(Map<String, String> requestBody) async {
-    final response = GlobalResponse.fromJson(await HttpRequests.instance()
-        ?.httpPostRequest(ApiEndPoints.enquiry, requestBody));
-    if (response.status != -1) {
-      return response.message;
+  Future<void> getExams(String adNumber) async {
+    if (_openedExam == adNumber) {
+      return;
     } else {
-      return {'errorMessage': response.message ?? 'Something went wrong'};
+      _selectedExam = null;
+      notifyWithRequest(examRequestData, true);
     }
+    final resortResponse = exam_list_response.ExamListResponse.fromJson(
+        await HttpRequests.instance()?.httpGetRequest(adNumber));
+
+    if (resortResponse.status == true) {
+      _selectedExam = resortResponse.data?.first;
+      _openedExam = adNumber;
+    } else {
+      examRequestData.setErrorData(resortResponse.toJson());
+    }
+    notifyWithRequest(examRequestData, false);
   }
 }

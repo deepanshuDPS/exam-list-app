@@ -1,40 +1,26 @@
 import 'package:intl/intl.dart';
 
-
-/// _id : "exam123"
-/// examName : "Sample Exam"
-/// adNumber : "2023/123"
-/// categoryTypes : ["slug1","slug2"]
-/// applicationStartDate : "2023-08-15T00:00:00Z"
-/// applicationEndDate : "2023-09-01T00:00:00Z"
-/// totalPosts : 100
-/// noOfLevels : 3
-/// categoryPosts : [{"name":"Category A","posts":"Post A1","gender":[1,2],"fee":50,"date":"2023-08-20T10:00:00Z","link":"https://example.com"},{"name":"Category B","posts":"Post B1","gender":[1],"fee":75,"date":"2023-08-25T14:00:00Z","link":"https://example.com"}]
-/// categoryFees : [{"name":"Category A","posts":"Post A1","gender":[1,2],"fee":50,"date":"2023-08-20T10:00:00Z","link":"https://example.com"}]
-/// notices : [{"name":"Important Notice","posts":"All Posts","gender":[],"fee":0,"date":"2023-08-10T08:00:00Z","link":"https://example.com/notice"}]
-/// createdAt : "2023-07-01T10:00:00Z"
-/// updatedAt : "2023-08-01T15:00:00Z"
-
 class ExamData {
-  ExamData({
-    String? id,
-    String? examName,
-    String? adNumber,
-    List<num>? categoryTypes,
-    String? applicationStartDate,
-    String? applicationEndDate,
-    num? totalPosts,
-    num? noOfLevels,
-    List<Extras>? categoryPosts,
-    List<Extras>? categoryFees,
-    List<Extras>? notices,
-    String? createdAt,
-    String? updatedAt,
-    String? minAgeDate,
-    String? maxAgeDate,
-    List<num>? addQualifications,
-    num? maxQualification,
-  }) {
+  ExamData(
+      {String? id,
+      String? examName,
+      String? adNumber,
+      List<num>? categoryTypes,
+      String? applicationStartDate,
+      String? applicationEndDate,
+      num? totalPosts,
+      num? noOfLevels,
+      List<Extras>? categoryPosts,
+      List<Extras>? categoryFees,
+      List<Extras>? notices,
+      String? createdAt,
+      String? updatedAt,
+      String? minAgeDate,
+      String? maxAgeDate,
+      List<num>? addQualifications,
+      num? maxQualification,
+      bool? filtered,
+      bool? parent}) {
     _id = id;
     _examName = examName;
     _adNumber = adNumber;
@@ -52,13 +38,16 @@ class ExamData {
     _maxAgeDate = maxAgeDate;
     _addQualifications = addQualifications;
     _maxQualification = maxQualification;
+    _filtered = filtered;
+    _parent = parent;
   }
 
   ExamData.fromJson(dynamic json) {
     _id = json['_id'];
     _examName = json['examName'];
     _adNumber = json['adNumber'];
-    _categoryTypes = json['categoryTypes'] != null ? json['categoryTypes'].cast<num>() : [];
+    _categoryTypes =
+        json['categoryTypes'] != null ? json['categoryTypes'].cast<num>() : [];
     _applicationStartDate = json['applicationStartDate'];
     _applicationEndDate = json['applicationEndDate'];
     _totalPosts = json['totalPosts'];
@@ -85,8 +74,12 @@ class ExamData {
     _updatedAt = json['updatedAt'];
     _minAgeDate = json['minAgeDate'];
     _maxAgeDate = json['maxAgeDate'];
-    _addQualifications = json['addQualifications'] != null ? json['addQualifications'].cast<num>() : [];
+    _addQualifications = json['addQualifications'] != null
+        ? json['addQualifications'].cast<num>()
+        : [];
     _maxQualification = json['maxQualification'];
+    _filtered = json['filtered'];
+    _parent = json['parent'];
   }
 
   String? _id;
@@ -106,45 +99,50 @@ class ExamData {
   String? _maxAgeDate;
   List<num>? _addQualifications;
   num? _maxQualification;
+  bool? _filtered;
+  bool? _parent;
+  List<ExamData> _childExams = [];
 
-  ExamData copyWith({
-    String? id,
-    String? examName,
-    String? adNumber,
-    List<num>? categoryTypes,
-    String? applicationStartDate,
-    String? applicationEndDate,
-    num? totalPosts,
-    num? noOfLevels,
-    List<Extras>? categoryPosts,
-    List<Extras>? categoryFees,
-    List<Extras>? notices,
-    String? createdAt,
-    String? updatedAt,
-    String? minAgeDate,
-    String? maxAgeDate,
-    List<num>? addQualifications,
-    num? maxQualification,
-  }) =>
+  ExamData copyWith(
+          {String? id,
+          String? examName,
+          String? adNumber,
+          List<num>? categoryTypes,
+          String? applicationStartDate,
+          String? applicationEndDate,
+          num? totalPosts,
+          num? noOfLevels,
+          List<Extras>? categoryPosts,
+          List<Extras>? categoryFees,
+          List<Extras>? notices,
+          String? createdAt,
+          String? updatedAt,
+          String? minAgeDate,
+          String? maxAgeDate,
+          List<num>? addQualifications,
+          num? maxQualification,
+          bool? filtered,
+          bool? parent}) =>
       ExamData(
-        id: id ?? _id,
-        examName: examName ?? _examName,
-        adNumber: adNumber ?? _adNumber,
-        categoryTypes: categoryTypes ?? _categoryTypes,
-        applicationStartDate: applicationStartDate ?? _applicationStartDate,
-        applicationEndDate: applicationEndDate ?? _applicationEndDate,
-        totalPosts: totalPosts ?? _totalPosts,
-        noOfLevels: noOfLevels ?? _noOfLevels,
-        categoryPosts: categoryPosts ?? _categoryPosts,
-        categoryFees: categoryFees ?? _categoryFees,
-        notices: notices ?? _notices,
-        createdAt: createdAt ?? _createdAt,
-        updatedAt: updatedAt ?? _updatedAt,
-        minAgeDate: minAgeDate ?? _minAgeDate,
-        maxAgeDate: maxAgeDate ?? _maxAgeDate,
-        addQualifications: addQualifications ?? _addQualifications,
-        maxQualification: maxQualification ?? _maxQualification,
-      );
+          id: id ?? _id,
+          examName: examName ?? _examName,
+          adNumber: adNumber ?? _adNumber,
+          categoryTypes: categoryTypes ?? _categoryTypes,
+          applicationStartDate: applicationStartDate ?? _applicationStartDate,
+          applicationEndDate: applicationEndDate ?? _applicationEndDate,
+          totalPosts: totalPosts ?? _totalPosts,
+          noOfLevels: noOfLevels ?? _noOfLevels,
+          categoryPosts: categoryPosts ?? _categoryPosts,
+          categoryFees: categoryFees ?? _categoryFees,
+          notices: notices ?? _notices,
+          createdAt: createdAt ?? _createdAt,
+          updatedAt: updatedAt ?? _updatedAt,
+          minAgeDate: minAgeDate ?? _minAgeDate,
+          maxAgeDate: maxAgeDate ?? _maxAgeDate,
+          addQualifications: addQualifications ?? _addQualifications,
+          maxQualification: maxQualification ?? _maxQualification,
+          filtered: filtered ?? _filtered,
+          parent: parent ?? _parent);
 
   String? get id => _id;
 
@@ -156,13 +154,11 @@ class ExamData {
 
   String? get applicationStartDate => _applicationStartDate;
 
-
-
   String? get formatAppStartDate {
     if (_applicationStartDate != null) {
       final parsedDateTime = DateTime.parse(_applicationStartDate!);
       final formattedDate =
-      DateFormat.yMMMd().format(parsedDateTime); // August 10, 2023
+          DateFormat.yMMMd().format(parsedDateTime); // August 10, 2023
       return formattedDate;
     } else {
       return "";
@@ -175,7 +171,7 @@ class ExamData {
     if (_applicationEndDate != null) {
       final parsedDateTime = DateTime.parse(_applicationEndDate!);
       final formattedDate =
-      DateFormat.yMMMd().format(parsedDateTime); // August 10, 2023
+          DateFormat.yMMMd().format(parsedDateTime); // August 10, 2023
       final formattedTime = DateFormat.jm().format(parsedDateTime);
       return '$formattedDate, $formattedTime';
     } else {
@@ -205,6 +201,12 @@ class ExamData {
 
   num? get maxQualification => _maxQualification;
 
+  bool? get filtered => _filtered;
+
+  bool? get parent => _parent;
+
+  List<ExamData> get childExams => _childExams;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['_id'] = _id;
@@ -230,7 +232,13 @@ class ExamData {
     map['maxAgeDate'] = _maxAgeDate;
     map['addQualifications'] = _addQualifications;
     map['maxQualification'] = _maxQualification;
+    map['filtered'] = _filtered;
+    map['parent'] = _parent;
     return map;
+  }
+
+  void setChildExams(List<ExamData> childExams) {
+    _childExams = childExams;
   }
 }
 
@@ -262,7 +270,8 @@ class Extras {
   Extras.fromJson(dynamic json) {
     _name = json['name'];
     _posts = json['posts'];
-    _categoryIds = json['categoryIds'] != null ? json['categoryIds'].cast<num>() : [];
+    _categoryIds =
+        json['categoryIds'] != null ? json['categoryIds'].cast<num>() : [];
     _gender = json['gender'] != null ? json['gender'].cast<num>() : [];
     _fee = json['fee'];
     _date = json['date'];

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/image_handling.dart';

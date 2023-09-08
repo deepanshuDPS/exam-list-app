@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
-import 'package:exam_list/providers/home_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
@@ -185,17 +185,17 @@ class _OffersPageState extends State<OffersPage> {
     };
 
     showProgressDialog(context);
-    Provider.of<HomeProvider>(context, listen: false)
-        .getOffers(requestBody)
-        .then((value) {
-      Navigator.of(context).pop();
-      if (value is String) {
-        for (var element in [_name, _email, _phone, _location]) {
-          element.clear();
-        }
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-          makeSnackBar(value is String ? value : value['errorMessage']));
-    });
+    // Provider.of<HomeProvider>(context, listen: false)
+    //     .getOffers(requestBody)
+    //     .then((value) {
+    //   Navigator.of(context).pop();
+    //   if (value is String) {
+    //     for (var element in [_name, _email, _phone, _location]) {
+    //       element.clear();
+    //     }
+    //   }
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //       makeSnackBar(value is String ? value : value['errorMessage']));
+    // });
   }
 }

@@ -13,8 +13,7 @@ import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/options/screens/voucher_screen.dart';
 import 'package:exam_list/providers/download_provider.dart';
-import 'package:exam_list/providers/home_provider.dart';
-import 'package:exam_list/providers/exams_provider.dart';
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/search_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_screen.dart';
@@ -65,9 +64,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => HomeProvider()),
+        ChangeNotifierProvider(create: (ctx) => ExamProvider()),
         ChangeNotifierProvider(create: (ctx) => SearchProvider()),
-        ChangeNotifierProvider(create: (ctx) => ExamsProvider()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx)=> DownloadProvider())
       ],

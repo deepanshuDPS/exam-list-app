@@ -1,13 +1,21 @@
 import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/responseModels/login/aspirant_data.dart';
 import 'package:exam_list/styles/app_styles.dart';
+import 'package:exam_list/utils/exam_utils.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ExamListItem extends StatelessWidget {
   final ExamData exam;
+  final AspirantData aspirant;
   final Function onClick;
 
-  const ExamListItem({Key? key, required this.exam, required this.onClick}) : super(key: key);
+  const ExamListItem(
+      {Key? key,
+      required this.exam,
+      required this.onClick,
+      required this.aspirant})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,19 +53,18 @@ class ExamListItem extends StatelessWidget {
                         style: AppStyles.fontSize12(),
                       ),
                       Text(
-                        'Your category posts: ${(exam.categoryPosts![0].posts ?? 0)}',
+                        'Your category posts: ${getTotalCategoryPosts(aspirant.category?.optionId ?? 0, aspirant.gender ?? 0, exam)}',
                         style: AppStyles.fontSize12(),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total posts: ${(exam.totalPosts)}',
-                            style:
-                                AppStyles.fontSize12(),
+                            'Total posts: ${(getTotalPosts(exam))}',
+                            style: AppStyles.fontSize12(),
                           ),
                           Text(
-                            'Fees: ${exam.categoryFees![0].fee ?? 0}',
+                            'Fees: ${getExamFees(aspirant.category?.optionId ?? 0, aspirant.gender ?? 0, exam)}',
                             textAlign: TextAlign.right,
                             style: AppStyles.fontSize12(),
                           )
@@ -67,15 +74,13 @@ class ExamListItem extends StatelessWidget {
                   ),
                 )),
             Positioned(
-                top: 4,
-                right: 4,
-                child: IconButton(
-                  icon: Icon(
-                    false ? Icons.notifications_active : Icons.notifications_off,
+                top: 8,
+                right: 8,
+                child: InkWell(
+                  child: SvgPicture.asset(
+                    'assets/svg/ic_notification_on.svg',
                   ),
-                  onPressed: () {
-                    // Implement your notification toggle logic here
-                  },
+                  onTap: () {},
                 ))
           ],
         ),
