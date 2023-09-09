@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/launch_screen.dart';
 import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +23,7 @@ import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/exams/screens/resorts_listing_screen.dart';
 import 'package:exam_list/search/search_screen.dart';
 import 'package:exam_list/utils/colors.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'user/screens/change_password_screen.dart';
@@ -34,12 +38,29 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   printDebug("Handling a background message: ${message.messageId}");
+  // var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  // await PreferencesData.setCurrentVersion();
+  // const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  // AndroidNotificationDetails(
+  //   'exam_notifications',
+  //   'Exam Notifications',
+  //   styleInformation: BigTextStyleInformation(''),
+  // );
+  // const NotificationDetails platformChannelSpecifics =
+  // NotificationDetails(android: androidPlatformChannelSpecifics);
+  // flutterLocalNotificationsPlugin.show(
+  //   Random().nextInt(12345), // Notification ID
+  //   message.notification?.title??'Hey, aspirant Something new for you',
+  //   message.notification?.body?? 'Please, be updated with the latest news',
+  //   platformChannelSpecifics,
+  // );
 }
 
 Future<void> loadBeforeApp() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await PreferencesData.checkFCMToken();
   await SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitUp,

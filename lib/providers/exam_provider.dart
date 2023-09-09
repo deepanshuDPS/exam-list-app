@@ -1,4 +1,5 @@
 import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/responseModels/home/exam_list_response.dart'
     as exam_list_response;
@@ -49,6 +50,7 @@ class ExamProvider with ChangeNotifier {
   Future<RequestData> fetchExams(int selectedIndex) async {
     _allExams.clear();
     _differentTypesExams.clear();
+    _currentList.clear();
     notifyWithRequest(examRequest, true);
     final response = exam_list_response.ExamListResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.getExams));
@@ -69,6 +71,7 @@ class ExamProvider with ChangeNotifier {
           }
           _allExams.add(exam);
         });
+        printDebug(response.data?.length.toString()??'');
         // different types -> list
         for (var exam in _allExams) {
           exam.categoryTypes?.forEach((type) {

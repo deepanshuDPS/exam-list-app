@@ -25,8 +25,8 @@ class PreferencesData {
   static Future<void> checkFCMToken() async {
     var fcmToken = await FirebaseMessaging.instance.getToken();
     final prefs = await SharedPreferences.getInstance();
-    var savedToken = prefs.getString(Constants.fcmToken) ?? "";
-    if (savedToken != fcmToken) {
+    var savedToken = prefs.getString(Constants.fcmToken);
+    if (fcmToken != savedToken) {
       prefs.setString(Constants.fcmToken, fcmToken ?? "");
       prefs.setBool(Constants.isFcmTokenSent, false);
     }
@@ -44,7 +44,7 @@ class PreferencesData {
 
   static Future<int> getCurrentVersion() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(Constants.currentVersion) ?? 1;
+    return prefs.getInt(Constants.currentVersion) ?? 0;
   }
 
   static Future<void> setCurrentVersion() async {
@@ -55,5 +55,6 @@ class PreferencesData {
   static Future<void> clearOnLogOut() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Constants.userData);
+    prefs.remove(Constants.isFcmTokenSent);
   }
 }

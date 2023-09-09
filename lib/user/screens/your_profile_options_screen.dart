@@ -65,6 +65,7 @@ class YourProfileOptionsScreen extends StatelessWidget {
               _horizontalOption('Logout', () {
                 Provider.of<UserProvider>(context, listen: false).logoutUser();
                 Navigator.of(context).pop();
+                Navigator.of(context).pushNamed("/");
               }),
             ],
           ),

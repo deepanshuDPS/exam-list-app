@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/utils/preferences_data.dart';
 import 'package:exam_list/widgets/container_error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +36,7 @@ class _HomeScreenState extends BaseState<HomeScreen> {
     super.initState();
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+        AndroidInitializationSettings('drawable/ic_launcher');
     flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(android: initializationSettingsAndroid));
   }
@@ -41,26 +44,27 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      Provider.of<UserProvider>(context, listen: false).getAspirantUser();
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.getAspirantUser();
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         printDebug('Got a message whilst in the foreground!');
         printDebug('Message data: ${message.data}');
         if (message.notification != null) {
           printDebug(
               'Message also contained a notification: ${message.notification}');
+          PreferencesData.setCurrentVersion();
           const AndroidNotificationDetails androidPlatformChannelSpecifics =
               AndroidNotificationDetails(
             'exam_notifications',
             'Exam Notifications',
+            styleInformation: BigTextStyleInformation(''),
           );
-
           const NotificationDetails platformChannelSpecifics =
               NotificationDetails(android: androidPlatformChannelSpecifics);
-
           flutterLocalNotificationsPlugin.show(
-            0, // Notification ID
-            'Notification Title',
-            'Notification Body',
+            Random().nextInt(12345), // Notification ID
+            message.notification?.title??'Hey, aspirant Something new for you',
+            message.notification?.body?? 'Please, be updated with the latest news',
             platformChannelSpecifics,
           );
         }
