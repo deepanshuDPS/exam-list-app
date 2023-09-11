@@ -84,6 +84,53 @@ class HttpRequests {
     }
   }
 
+  Future<dynamic> httpPatchRequest(String endPoint, Map<String, dynamic> request,
+      {bool includeAuthHeader = true}) async {
+    try {
+      var url = "${Constants.baseURL}$endPoint";
+      var headersToSend = await getHeaders(includeAuthHeader);
+
+      final response = await http.patch(Uri.parse(url),
+          headers: headersToSend, body: jsonEncode(request));
+
+      if (response.statusCode < 300) {
+        return jsonDecode(utf8.decode(response.bodyBytes));
+      } else {
+        return getErrorResponse(
+            response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
+      }
+    } catch (error) {
+      if (error is SocketException) {
+        return getErrorResponse(1, _emptyError);
+      }
+      return getErrorResponse(0, _emptyError);
+    }
+  }
+
+  Future<dynamic> httpDeleteRequest(String endPoint, Map<String, dynamic> request,
+      {bool includeAuthHeader = true}) async {
+    try {
+      var url = "${Constants.baseURL}$endPoint";
+      var headersToSend = await getHeaders(includeAuthHeader);
+
+      final response = await http.delete(Uri.parse(url),
+          headers: headersToSend, body: jsonEncode(request));
+
+      if (response.statusCode < 300) {
+        return jsonDecode(utf8.decode(response.bodyBytes));
+      } else {
+        return getErrorResponse(
+            response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
+      }
+    } catch (error) {
+      if (error is SocketException) {
+        return getErrorResponse(1, _emptyError);
+      }
+      return getErrorResponse(0, _emptyError);
+    }
+  }
+
+
   Future<dynamic> httpGetQueryRequest(String endPoint,
       {bool includeAuthHeader = true, Map<String, String>? queryParams}) async {
     try {
@@ -155,6 +202,7 @@ class ApiEndPoints {
   static const checkUser = "$authUser/checkUser";
   static const signUpAspirant = "$authUser/signup";
   static const getAspirant = "$authUser/aspirant";
+  static const notifyMe = "$authUser/notifyMe";
   static const checkGuestUser = "anon/user/checkGuestUser";
 
   static const getExams = '$authExam/';

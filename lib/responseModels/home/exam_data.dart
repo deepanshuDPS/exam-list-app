@@ -102,6 +102,7 @@ class ExamData {
   bool? _filtered;
   bool? _parent;
   List<ExamData> _childExams = [];
+  int _isNotify = 0;
 
   ExamData copyWith(
           {String? id,
@@ -207,6 +208,8 @@ class ExamData {
 
   List<ExamData> get childExams => _childExams;
 
+  int get isNotify => _isNotify;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['_id'] = _id;
@@ -239,6 +242,10 @@ class ExamData {
 
   void setChildExams(List<ExamData> childExams) {
     _childExams = childExams;
+  }
+
+  void setNotifyStatus(int status) {
+    _isNotify = status;
   }
 }
 
@@ -316,6 +323,17 @@ class Extras {
   num? get fee => _fee;
 
   String? get date => _date;
+
+  String get formattedDate {
+    if (_date != null) {
+      final parsedDateTime = DateTime.parse(_date!);
+      final formattedDate =
+          DateFormat.yMMMd().format(parsedDateTime); // August 10, 2023
+      return formattedDate;
+    } else {
+      return "";
+    }
+  }
 
   String? get link => _link;
 

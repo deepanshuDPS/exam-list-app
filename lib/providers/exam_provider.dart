@@ -7,13 +7,13 @@ import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 
 class ExamProvider with ChangeNotifier {
-
   final List<ExamData> _allExams = [];
   final Map<num, List<ExamData>> _differentTypesExams = {};
   final List<ExamData> _currentList = [];
   RequestData examRequest = RequestData();
 
   late ExamData? _selectedExam;
+
   // adNumber for opened exam
   String _openedExam = "";
   RequestData examRequestData = RequestData();
@@ -47,7 +47,8 @@ class ExamProvider with ChangeNotifier {
     });
   }
 
-  Future<RequestData> fetchExams(int selectedIndex) async {
+  Future<RequestData> fetchExams(
+      int selectedIndex, Map<String, int> subscriptions) async {
     _allExams.clear();
     _differentTypesExams.clear();
     _currentList.clear();
@@ -60,8 +61,8 @@ class ExamProvider with ChangeNotifier {
       if (response.data != null && response.data?.isNotEmpty == true) {
         // traverse parent exams
         response.data
-            ?.where((element) =>
-                element.parent == null || element.parent == true)
+            ?.where(
+                (element) => element.parent == null || element.parent == true)
             .forEach((exam) {
           // filter child exams
           var listOfChild = response.data?.where((element) =>
@@ -69,9 +70,10 @@ class ExamProvider with ChangeNotifier {
           if (listOfChild != null && listOfChild.isNotEmpty) {
             exam.setChildExams(listOfChild.toList());
           }
+          exam.setNotifyStatus(subscriptions[exam.adNumber] ?? 0);
           _allExams.add(exam);
         });
-        printDebug(response.data?.length.toString()??'');
+        printDebug(response.data?.length.toString() ?? '');
         // different types -> list
         for (var exam in _allExams) {
           exam.categoryTypes?.forEach((type) {

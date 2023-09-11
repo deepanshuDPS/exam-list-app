@@ -9,12 +9,14 @@ class ExamListItem extends StatelessWidget {
   final ExamData exam;
   final AspirantData aspirant;
   final Function onClick;
+  final Function onNotify;
 
   const ExamListItem(
       {Key? key,
       required this.exam,
       required this.onClick,
-      required this.aspirant})
+      required this.aspirant,
+      required this.onNotify})
       : super(key: key);
 
   @override
@@ -77,10 +79,12 @@ class ExamListItem extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: InkWell(
+                  onTap: () => onNotify(exam.adNumber),
                   child: SvgPicture.asset(
-                    'assets/svg/ic_notification_on.svg',
+                    exam.isNotify == 2
+                        ? 'assets/svg/ic_notification_on.svg'
+                        : 'assets/svg/ic_notification_off.svg',
                   ),
-                  onTap: () {},
                 ))
           ],
         ),

@@ -13,7 +13,8 @@ class AspirantData {
       String? name, 
       Category? category, 
       EduQualification? eduQualification, 
-      num? gender,}){
+      num? gender,
+      List<String>? subscribedChannels}){
     _id = id;
     _mobile = mobile;
     _onBoarded = onBoarded;
@@ -27,6 +28,7 @@ class AspirantData {
     _category = category;
     _eduQualification = eduQualification;
     _gender = gender;
+    _subscribedChannels = subscribedChannels;
 }
 
   AspirantData.fromJson(dynamic json) {
@@ -43,6 +45,7 @@ class AspirantData {
     _category = json['category'] != null ? Category.fromJson(json['category']) : null;
     _eduQualification = json['eduQualification'] != null ? EduQualification.fromJson(json['eduQualification']) : null;
     _gender = json['gender'];
+    _subscribedChannels = json['subscribedChannels'] != null ? json['subscribedChannels'].cast<String>() : [];
   }
   String? _id;
   String? _mobile;
@@ -57,6 +60,8 @@ class AspirantData {
   Category? _category;
   EduQualification? _eduQualification;
   num? _gender;
+  List<String>? _subscribedChannels;
+
 AspirantData copyWith({  String? id,
   String? mobile,
   bool? onBoarded,
@@ -70,6 +75,7 @@ AspirantData copyWith({  String? id,
   Category? category,
   EduQualification? eduQualification,
   num? gender,
+  List<String>? subscribedChannels,
 }) => AspirantData(  id: id ?? _id,
   mobile: mobile ?? _mobile,
   onBoarded: onBoarded ?? _onBoarded,
@@ -83,6 +89,7 @@ AspirantData copyWith({  String? id,
   category: category ?? _category,
   eduQualification: eduQualification ?? _eduQualification,
   gender: gender ?? _gender,
+  subscribedChannels: subscribedChannels ?? _subscribedChannels,
 );
   String? get id => _id;
   String? get mobile => _mobile;
@@ -97,6 +104,7 @@ AspirantData copyWith({  String? id,
   Category? get category => _category;
   EduQualification? get eduQualification => _eduQualification;
   num? get gender => _gender;
+  List<String>? get subscribedChannels => _subscribedChannels;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -117,6 +125,7 @@ AspirantData copyWith({  String? id,
       map['eduQualification'] = _eduQualification?.toJson();
     }
     map['gender'] = _gender;
+    map['subscribedChannels'] = _subscribedChannels;
     return map;
   }
 

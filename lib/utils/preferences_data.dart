@@ -22,6 +22,26 @@ class PreferencesData {
     return userDetails;
   }
 
+  static Future<void> notifyAddNumber(String adNumber) async {
+    final prefs = await SharedPreferences.getInstance();
+    var subsList = prefs.getStringList(Constants.subscriptions) ?? [];
+    if (!subsList.contains(adNumber)) {
+      subsList.add(adNumber);
+    }
+    prefs.setStringList(Constants.subscriptions, subsList);
+  }
+
+  static Future<void> setNewSubsList(List<String> subsList) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(Constants.subscriptions, subsList);
+  }
+
+  // get user details
+  static Future<List<String>> getSubscriptions() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(Constants.subscriptions) ?? [];
+  }
+
   static Future<void> checkFCMToken() async {
     var fcmToken = await FirebaseMessaging.instance.getToken();
     final prefs = await SharedPreferences.getInstance();

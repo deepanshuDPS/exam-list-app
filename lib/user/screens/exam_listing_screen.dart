@@ -4,6 +4,7 @@ import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,8 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      _examProvider().fetchExams(_selectedCategoryIndex);
+      _examProvider().fetchExams(
+          _selectedCategoryIndex, _userProvider().subscriptionStatus);
       _searchTextController.addListener(() {
         setState(() {
           currentText = _searchTextController.value.text;
@@ -219,6 +221,10 @@ class _ExamListingScreenState extends BaseState<ExamListingScreen> {
                           return ExamListItem(
                             exam: exams.currentList[index],
                             aspirant: _userProvider().aspirantDetails!,
+                            onNotify: (adNumber) {
+                              printDebug(adNumber);
+                              _userProvider().notifyMe(adNumber);
+                            },
                             onClick: () {
                               exams.setExam(exams.currentList[index]);
                               Navigator.of(context)

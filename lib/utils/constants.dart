@@ -1,15 +1,12 @@
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:exam_list/home/screens/support_screen.dart';
-import 'package:exam_list/user/screens/your_profile_options_screen.dart';
-import 'package:exam_list/user/screens/member_feedback_screen.dart';
-import 'package:exam_list/user/screens/exam_listing_screen.dart';
-import 'package:exam_list/user/screens/my_trips_screen.dart';
-import 'package:exam_list/options/screens/payment_screen.dart';
-import 'package:exam_list/search/search_screen.dart';
 
 class Constants {
   static String baseURL = 'http://192.168.29.174:8080/';
 
+  static Map<int, String> genders = {
+    0: 'Others',
+    1: 'Male',
+    2: 'Female',
+  };
 
   // Filters for the exams list
   static Map<int, String> examCategories = {
@@ -60,143 +57,11 @@ class Constants {
     'MD-Multiple Disability': 24
   };
 
-
-  //SvgPicture.asset(assetName)
-  static List<Map<String, String>> membershipList = [
-    {
-      "text": "Member Account",
-      "image": "assets/svg/ic_mem_account.svg",
-      "route": YourProfileOptionsScreen.routeName
-    },
-    {
-      "text": "My Trips",
-      "image": "assets/svg/ic_my_trips.svg",
-      "route": MyTripsScreen.routeName
-    },
-    {
-      "text": "Membership Fee",
-      "image": "assets/svg/ic_mem_fee.svg",
-      "route": ExamListingScreen.routeName,
-      "arg": "3"
-    },
-    {
-      "text": "AMC Fee",
-      "image": "assets/svg/amc_fee.svg",
-      "route": ExamListingScreen.routeName,
-      "arg": "4"
-    },
-    {
-      "text": "Holidays",
-      "image": "assets/svg/ic_holidays.svg",
-      "route": ExamListingScreen.routeName,
-      "arg": "1"
-    },
-    {
-      "text": "Offers",
-      "image": "assets/svg/ic_offers.svg",
-      "route": ExamListingScreen.routeName,
-      "arg": "0"
-    },
-    {
-      "text": "Documents",
-      "image": "assets/svg/ic_documents.svg",
-      "route": ExamListingScreen.routeName,
-      "arg": "2"
-    },
-    {
-      "text": "Feedback",
-      "image": "assets/svg/ic_feedback.svg",
-      "route": MemberFeedbackScreen.routeName,
-    },
-  ];
-
-  // static List<Map<String, String>> optionsList = [
-  //   {
-  //     "text": "Member Login",
-  //     "image": "assets/svg/ic_mem_account.svg",
-  //     "route": MemberLoginScreen.routeName
-  //   },
-  //   {
-  //     "text": "Vouchers",
-  //     "image": "assets/svg/vouchers.svg",
-  //     "sheet": "voucher"
-  //   },
-  //   {
-  //     "text": "Payments",
-  //     "image": "assets/svg/ic_payments.svg",
-  //     "route": PaymentScreen.routeName
-  //   },
-  //   {
-  //     "text": "Support",
-  //     "image": "assets/svg/ic_support.svg",
-  //     "route": SupportScreen.routeName
-  //   },
-  // ];
-
-  static Map<int, List<Map<String, dynamic>>> homePageSequenceData = {
-    1: servicesList,
-    2: membershipList,
-    6: getInTouchList
-  };
-
-  static List<Map<String, String>> servicesList = [
-    {
-      "text": "Vouchers",
-      "image": "assets/svg/ic_vouchers.svg",
-      "sheet": "voucher"
-    },
-    {
-      "text": "Payments",
-      "image": "assets/svg/ic_payments.svg",
-      "route": PaymentScreen.routeName
-    },
-    {
-      "text": "Locations",
-      "image": "assets/svg/ic_locations.svg",
-      "route": SearchScreen.routeName
-    },
-    {
-      "text": "Support",
-      "image": "assets/svg/ic_support.svg",
-      "route": SupportScreen.routeName
-    },
-  ];
-
-  static List<Map<String, dynamic>> getInTouchList = [
-    {
-      "text": "Overview",
-      "image": "assets/svg/ic_overview.svg",
-      "tab_position": 0
-    },
-    {
-      "text": "Benefits",
-      "image": "assets/svg/ic_benefits.svg",
-      "tab_position": 1
-    },
-    {
-      "text": "Offers",
-      "image": "assets/svg/ic_offers_2.svg",
-      "tab_position": 2
-    },
-    {
-      "text": "Testimonials",
-      "image": "assets/svg/ic_testimonials.svg",
-      "tab_position": 3
-    },
-  ];
-
-  static List<Map<String, dynamic>> socialNetworksList = [
-    {"link": "Facebook", "image": LineAwesomeIcons.facebook},
-    {"link": "Linkedin", "image": LineAwesomeIcons.linkedin},
-    {"link": "Twitter", "image": LineAwesomeIcons.twitter},
-    {"link": "Instgram", "image": LineAwesomeIcons.instagram},
-    {"link": "Youtube", "image": LineAwesomeIcons.youtube}
-  ];
-
   static String userData = 'USER_DATA';
   static String fcmToken = 'FCM_TOKEN';
   static String isFcmTokenSent = 'IS_FCM_TOKEN_SENT';
   static String currentVersion = 'CURRENT_VERSION';
+  static String subscriptions = 'SUBSCRIPTIONS';
 
 
   static List<String> termsConditionsTitles = [

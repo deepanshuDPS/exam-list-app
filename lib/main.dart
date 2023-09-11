@@ -8,7 +8,6 @@ import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:exam_list/home/screens/support_screen.dart';
 import 'package:exam_list/user/screens/your_profile_options_screen.dart';
 import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/user/screens/member_feedback_screen.dart';
@@ -104,7 +103,6 @@ class MyApp extends StatelessWidget {
             PaymentScreen.routeName: (ctx) => const PaymentScreen(),
             HomeScreen.routeName: (ctx) => const HomeScreen(),
             SearchScreen.routeName: (ctx) => const SearchScreen(),
-            SupportScreen.routeName: (ctx) => const SupportScreen(),
             MemberFeedbackScreen.routeName: (ctx) =>
                 const MemberFeedbackScreen(),
             ChangePasswordScreen.routeName: (ctx) =>

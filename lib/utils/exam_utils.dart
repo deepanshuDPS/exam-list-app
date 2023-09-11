@@ -76,3 +76,19 @@ String getExamFees(num categoryId, num gender, ExamData exam) {
 
   return examFees.isNotEmpty ? examFees : "₹ 0";
 }
+
+List<Extras> getNotices(ExamData exam) {
+  List<Extras> notices = [];
+
+  if (exam.filtered == true) {
+    notices.addAll(exam.notices ?? []);
+  }
+
+  if (exam.childExams.isNotEmpty) {
+    for (var childExam in exam.childExams) {
+      notices.addAll(childExam.notices ?? []);
+    }
+  }
+
+  return notices;
+}

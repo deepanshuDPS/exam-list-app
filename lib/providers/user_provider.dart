@@ -1,16 +1,12 @@
+import 'package:exam_list/responseModels/login/Notify_me_response.dart';
 import 'package:exam_list/responseModels/login/aspirant_data.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/global_response.dart';
-import 'package:exam_list/responseModels/login/holidays_response.dart'
-    as holiday_response;
-import 'package:exam_list/responseModels/login/offers_response.dart'
-    as offers_response;
-import 'package:exam_list/responseModels/login/documents_response.dart'
-    as docs_response;
 import 'package:exam_list/responseModels/login/member_fee_payments.dart'
     as fee_response;
 import 'package:exam_list/responseModels/login/aspirant_profile_response.dart'
@@ -30,14 +26,13 @@ import '../responseModels/login/check_user_response.dart'
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
 
-  final List<holiday_response.Data> _holidaysList = [];
-  final List<offers_response.Data> _offersList = [];
-  final List<docs_response.Data> _docsList = [];
   final List<fee_response.Data> _feesList = [];
   final List<trips_response.Data> _upTripsList = [];
   final List<trips_response.Data> _comTripsList = [];
   final List<all_places_response.Data> _domesticList = [];
   final List<all_places_response.Data> _internationalList = [];
+  final Map<String, int> subscriptionStatus = {};
+
   AspirantData? _aspirantDetailsData;
   check_user_response.Data? _userDetailsData;
 
@@ -207,18 +202,6 @@ class UserProvider with ChangeNotifier {
     return _feesList;
   }
 
-  List<holiday_response.Data> get holidaysList {
-    return [..._holidaysList];
-  }
-
-  List<offers_response.Data> get offersList {
-    return [..._offersList];
-  }
-
-  List<docs_response.Data> get docsList {
-    return [..._docsList];
-  }
-
   List<trips_response.Data> get upTripsList {
     return [..._upTripsList];
   }
@@ -241,6 +224,7 @@ class UserProvider with ChangeNotifier {
             ?.httpGetRequest(ApiEndPoints.getAspirant));
     if (response.data != null) {
       _aspirantDetailsData = response.data;
+      checkSubscriptionsStatus(_aspirantDetailsData?.subscribedChannels);
     } else {
       aspirantRequestData.setErrorData(response.toJson());
     }
@@ -255,76 +239,6 @@ class UserProvider with ChangeNotifier {
       return {'errorMessage': response.message ?? 'Something Went Wrong'};
     }
     return response.message;
-  }
-
-  Future<void> getMemberDetails() async {
-    _aspirantDetailsData = null;
-    notifyWithRequest(aspirantRequestData, true);
-    final response = aspirant_profile_response.AspirantProfileResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpGetRequest(ApiEndPoints.memberProfile));
-    if (response.data != null) {
-      _aspirantDetailsData = response.data;
-    } else {
-      aspirantRequestData.setErrorData(response.toJson());
-    }
-    notifyWithRequest(aspirantRequestData, false);
-  }
-
-  Future<void> getHolidays() async {
-    notifyWithRequest(aspirantRequestData, true);
-    _holidaysList.clear();
-    final response = holiday_response.HolidaysResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpGetRequest(ApiEndPoints.memberHolidays));
-    if (response.status == -1) {
-      aspirantRequestData.setErrorData(response.toJson());
-    } else {
-      _holidaysList.addAll(response.data!);
-    }
-    notifyWithRequest(aspirantRequestData, false);
-  }
-
-  Future<void> getDocs() async {
-    notifyWithRequest(aspirantRequestData, true);
-    _docsList.clear();
-    final response = docs_response.DocumentsResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpGetRequest(ApiEndPoints.memberDocuments));
-    if (response.status == -1) {
-      aspirantRequestData.setErrorData(response.toJson());
-    } else {
-      _docsList.addAll(response.data!);
-    }
-    notifyWithRequest(aspirantRequestData, false);
-  }
-
-  Future<void> getMemberFees({bool isAMC = false}) async {
-    notifyWithRequest(aspirantRequestData, true);
-    _feesList.clear();
-    final response = fee_response.MemberFeePayments.fromJson(
-        await HttpRequests.instance()?.httpGetRequest(
-            isAMC ? ApiEndPoints.memberAMC : ApiEndPoints.memberFee));
-    if (response.status == -1) {
-      aspirantRequestData.setErrorData(response.toJson());
-    } else {
-      _feesList.addAll(response.data!);
-    }
-    notifyWithRequest(aspirantRequestData, false);
-  }
-
-  Future<void> getOffers() async {
-    notifyWithRequest(aspirantRequestData, true);
-    _offersList.clear();
-    final response = offers_response.OffersResponse.fromJson(
-        await HttpRequests.instance()
-            ?.httpGetRequest(ApiEndPoints.memberOffers));
-    if (response.status == -1) {
-      aspirantRequestData.setErrorData(response.toJson());
-    } else {
-      _offersList.addAll(response.data!);
-    }
-    notifyWithRequest(aspirantRequestData, false);
   }
 
   Future<void> getTrips(int type) async {
@@ -383,5 +297,64 @@ class UserProvider with ChangeNotifier {
     }
     _notifyListenersWithBinding();
     return response.message ?? 'Something went Wrong';
+  }
+
+  Future<dynamic> notifyMe(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpPatchRequest(ApiEndPoints.notifyMe, {'adNumber': adNumber}));
+    if (response.status == true) {
+      await checkSubscriptionsStatus(response.data);
+      // TODO: update local hive for get user
+      _notifyListenersWithBinding();
+      return true;
+    }
+    _notifyListenersWithBinding();
+    return response.message;
+  }
+
+  Future<dynamic> updateHiveForUser(List<String> subsList) async {
+
+  }
+
+
+  Future<dynamic> removeNotifyMe(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpDeleteRequest(ApiEndPoints.notifyMe, {'ad_number': adNumber}));
+    if (response.status == true) {
+      await checkSubscriptionsStatus(response.data);
+      // TODO: update local hive for get user
+      _notifyListenersWithBinding();
+      return true;
+    }
+    _notifyListenersWithBinding();
+    return response.message;
+  }
+
+  Future<void> checkSubscriptionsStatus(List<String>? subscriptions) async {
+    if (subscriptions == null) return;
+    var subsList = await PreferencesData.getSubscriptions();
+    if (subsList.length <= subscriptions.length) {
+      // 0 means not subscribed in local
+      for (var element in subscriptions) {
+        subscriptionStatus[element] = subsList.contains(element) ? 2 : 0;
+      }
+      subscriptionStatus.forEach((key, value) async {
+        if (value == 0) {
+          await FirebaseMessaging.instance.subscribeToTopic(key);
+          subscriptionStatus[key] = 2;
+          await PreferencesData.notifyAddNumber(key);
+        }
+      });
+    } else {
+      var removeSubs = Set.of(subsList).difference(Set.of(subscriptions));
+      for (var adNumber in subscriptions) {
+        subscriptionStatus[adNumber] = 2;
+      }
+      for (var topic in removeSubs) {
+        await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+        subscriptionStatus[topic] = 0;
+      }
+      await PreferencesData.setNewSubsList(subscriptions);
+    }
   }
 }
