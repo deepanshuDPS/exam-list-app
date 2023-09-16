@@ -25,7 +25,7 @@ class BaseScaffold extends StatelessWidget {
       body: Container(
         width: double.infinity,
         constraints: const BoxConstraints.expand(), // ← this guy
-        color: Colors.white,
+        color: Colors.transparent,
         child: child,
       ),
       appBar: AppBar(

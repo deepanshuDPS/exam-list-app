@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:exam_list/providers/user_provider.dart';
-import 'package:exam_list/user/screens/exam_listing_screen.dart';
-import 'package:exam_list/user/screens/your_profile_options_screen.dart';
+import 'package:exam_list/exams/screens/exam_listing_screen.dart';
+import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:exam_list/widgets/container_error.dart';
@@ -10,6 +10,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,19 +22,15 @@ class HomeScreen extends StatefulWidget {
   BaseState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends BaseState<HomeScreen> {
-  final screens = [
-    const ExamListingScreen(),
-    // const ExamListingScreen(),
-    // const ResourcesScreen(),
-    const YourProfileOptionsScreen()
-  ];
+class _HomeScreenState extends BaseState<HomeScreen> with SingleTickerProviderStateMixin {
 
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  late TabController _tabController; // Manages the tab index
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this, animationDuration: Duration.zero);
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('drawable/ic_launcher');
@@ -41,9 +38,25 @@ class _HomeScreenState extends BaseState<HomeScreen> {
         const InitializationSettings(android: initializationSettingsAndroid));
   }
 
+  Future<PermissionStatus> requestNotificationPermissions() async {
+    final PermissionStatus status = await Permission.notification.request();
+    return status;
+  }
+
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
+      requestNotificationPermissions().then((status) async {
+        if (status.isGranted) {
+          // showSnackBar(context, "Permission Granted");
+        } else if (status.isDenied) {
+          showSnackBar(context, "Permission Denied for Notifications");
+        } else if (status.isPermanentlyDenied) {
+          showSnackBar(
+              context, "Permission Denied Permanently for Notifications");
+          // await openAppSettings();
+        }
+      });
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.getAspirantUser();
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -63,8 +76,10 @@ class _HomeScreenState extends BaseState<HomeScreen> {
               NotificationDetails(android: androidPlatformChannelSpecifics);
           flutterLocalNotificationsPlugin.show(
             Random().nextInt(12345), // Notification ID
-            message.notification?.title??'Hey, aspirant Something new for you',
-            message.notification?.body?? 'Please, be updated with the latest news',
+            message.notification?.title ??
+                'Hey, aspirant Something new for you',
+            message.notification?.body ??
+                'Please, be updated with the latest news',
             platformChannelSpecifics,
           );
         }
@@ -75,29 +90,39 @@ class _HomeScreenState extends BaseState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-        child: Container(
-          color: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: Consumer<UserProvider>(
           child: const Center(
-            child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
           ),
-        ),
-        builder: (context, user, ch) {
-          if (user.aspirantRequestData.isLoading) {
-            return ch!;
-          }
+          builder: (context, user, ch) {
+            if (user.aspirantRequestData.isLoading) {
+              return ch!;
+            }
 
-          if (user.aspirantRequestData.isError) {
-            return ContainerError(
-                jsonData: user.aspirantRequestData.data,
-                onTryAgain: () => user.getAspirantUser());
-          }
+            if (user.aspirantRequestData.isError) {
+              return ContainerError(
+                  jsonData: user.aspirantRequestData.data,
+                  onTryAgain: () => user.getAspirantUser());
+            }
 
-          return Scaffold(
-            bottomNavigationBar: _buildBottomNavigationBar(),
-            body: _getPage(_selectedIndex),
-          );
-        });
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              bottomNavigationBar: _buildBottomNavigationBar(),
+              body: TabBarView(
+                controller: _tabController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: const [
+                  ExamListingScreen(),
+                  // const ExamListingScreen(),
+                  // const ResourcesScreen(),
+                  UserProfileOptionsScreen()
+                ],
+              ),
+            );
+          }),
+    );
   }
 
   int _selectedIndex = 0;
@@ -105,6 +130,7 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _tabController.index = index;
     });
   }
 
@@ -178,9 +204,9 @@ class _HomeScreenState extends BaseState<HomeScreen> {
     );
   }
 
-  Widget _getPage(int index) {
-    // Return your different content pages based on the selected index
-    // Example: Return a Text widget for demonstration purposes
-    return screens[index];
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }

@@ -63,7 +63,7 @@ SnackBar makeSnackBar(String message) {
     content: Text(
       message,
       style: const TextStyle(
-          color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400),
+          color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
     ),
     backgroundColor: (appRed),
   );
@@ -75,7 +75,7 @@ Widget clickToAction(BuildContext context, String text, Function onClick) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12), // <-- Radius
         ),
-        primary: Theme.of(context).colorScheme.secondary),
+        foregroundColor: Theme.of(context).colorScheme.secondary),
     onPressed: () => onClick(),
     child: UnconstrainedBox(
       child: Container(

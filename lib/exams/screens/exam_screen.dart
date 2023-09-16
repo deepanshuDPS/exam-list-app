@@ -1,8 +1,9 @@
+import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/responseModels/home/exam_data.dart';
-import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/exam_utils.dart';
@@ -55,9 +56,7 @@ class _ExamScreenState extends BaseState<ExamScreen> {
       child: Text(
         title,
         style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: sharpGrey),
+            fontSize: 18, fontWeight: FontWeight.w600, color: sharpGrey),
       ),
     );
   }
@@ -68,9 +67,20 @@ class _ExamScreenState extends BaseState<ExamScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('$title:', style: const TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.w500),),
-          const SizedBox(width: 4,),
-          Text(value, style: const TextStyle(color: sharpGrey, fontSize: 14, fontWeight: FontWeight.w400),maxLines: 2,),
+          Text(
+            '$title:',
+            style: const TextStyle(
+                color: Colors.red, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            width: 4,
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+                color: sharpGrey, fontSize: 14, fontWeight: FontWeight.w400),
+            maxLines: 2,
+          ),
         ],
       ),
     );
@@ -119,57 +129,61 @@ class _ExamScreenState extends BaseState<ExamScreen> {
     return BaseScaffold(
         titleText: "Exam Details",
         isBackRequired: true,
-        child: Consumer<ExamProvider>(
-            child: const ContainerLoading(),
-            builder: (ctx, exams, ch) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 4),
-                      child: Text(
-                        _examName,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black54),
-                      )),
-                  _heading('General Details:'),
-                  Column(
+        elevation: 2,
+        child: BaseImageContainer(
+            opacity: 0.3,
+            child: Consumer<ExamProvider>(
+                child: const ContainerLoading(),
+                builder: (ctx, exams, ch) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _detailsRow(
-                          'Total Posts', getTotalPosts(_exam).toString()),
-                      const SizedBox(height: 6),
-                      _detailsRow(
-                          '${_aspirantData.category?.optionName ?? 'N/A'} Category Posts',
-                          getTotalCategoryPosts(
-                                  _aspirantData.category?.optionId ?? 0,
-                                  _aspirantData.gender ?? 0,
-                                  _exam)
-                              .toString()),
-                      const SizedBox(height: 6),
-                      _detailsRow(
-                          '${_aspirantData.category?.optionName ?? 'N/A'} ${Constants.genders[_aspirantData.gender ?? 0]} Fees',
-                          getExamFees(_aspirantData.category?.optionId ?? 0,
-                                  _aspirantData.gender ?? 0, _exam)
-                              .toString()),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8),
+                          child: Text(
+                            _examName,
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: sharpGrey),
+                          )),
+                      _heading('General Details:'),
+                      Column(
+                        children: [
+                          _detailsRow(
+                              'Total Posts', getTotalPosts(_exam).toString()),
+                          const SizedBox(height: 6),
+                          _detailsRow(
+                              '${_aspirantData.category?.optionName ?? 'N/A'} Category Posts',
+                              getTotalCategoryPosts(
+                                      _aspirantData.category?.optionId ?? 0,
+                                      _aspirantData.gender ?? 0,
+                                      _exam)
+                                  .toString()),
+                          const SizedBox(height: 6),
+                          _detailsRow(
+                              '${_aspirantData.category?.optionName ?? 'N/A'} ${Constants.genders[_aspirantData.gender ?? 0]} Fees',
+                              getExamFees(_aspirantData.category?.optionId ?? 0,
+                                      _aspirantData.gender ?? 0, _exam)
+                                  .toString()),
+                        ],
+                      ),
+                      _heading('Important Dates:'),
+                      Column(
+                        children: [
+                          _detailsRow('Application Start Date',
+                              _exam.formatAppStartDate?.toString() ?? ''),
+                          const SizedBox(height: 6),
+                          _detailsRow('Application End Date',
+                              _exam.formatAppEndDate?.toString() ?? ''),
+                          const SizedBox(height: 6),
+                        ],
+                      ),
+                      _heading('Important Links:'),
+                      ...getNotices(_exam).map((e) => _detailsLink(e))
                     ],
-                  ),
-                  _heading('Important Dates:'),
-                  Column(
-                    children: [
-                      _detailsRow('Application Start Date',
-                          _exam.formatAppStartDate?.toString() ?? ''),
-                      const SizedBox(height: 6),
-                      _detailsRow('Application End Date',
-                          _exam.formatAppEndDate?.toString() ?? ''),
-                      const SizedBox(height: 6),
-                    ],
-                  ),
-                  _heading('Important Links:'),
-                  ...getNotices(_exam).map((e) => _detailsLink(e))
-                ],
-              );
-            }));
+                  );
+                })));
   }
 }

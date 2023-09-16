@@ -1,5 +1,7 @@
-import 'package:exam_list/responseModels/login/Notify_me_response.dart';
-import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'dart:convert';
+
+import 'package:exam_list/responseModels/user/Notify_me_response.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,11 +9,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/global_response.dart';
-import 'package:exam_list/responseModels/login/member_fee_payments.dart'
+import 'package:exam_list/responseModels/user/member_fee_payments.dart'
     as fee_response;
-import 'package:exam_list/responseModels/login/aspirant_profile_response.dart'
+import 'package:exam_list/responseModels/user/aspirant_profile_response.dart'
     as aspirant_profile_response;
-import 'package:exam_list/responseModels/login/my_trips_response.dart'
+import 'package:exam_list/responseModels/user/my_trips_response.dart'
     as trips_response;
 import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart'
@@ -20,8 +22,7 @@ import 'package:exam_list/utils/preferences_data.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../responseModels/login/check_user_response.dart'
-    as check_user_response;
+import '../responseModels/user/check_user_response.dart' as check_user_response;
 
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -40,6 +41,7 @@ class UserProvider with ChangeNotifier {
   RequestData myUpTripsRequestData = RequestData();
   RequestData myCompTripsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  var isNotifying = false;
 
   /// 0-> Login Screen
   /// 1-> Not onBoarded
@@ -299,35 +301,67 @@ class UserProvider with ChangeNotifier {
     return response.message ?? 'Something went Wrong';
   }
 
-  Future<dynamic> notifyMe(String adNumber) async {
-    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
-        ?.httpPatchRequest(ApiEndPoints.notifyMe, {'adNumber': adNumber}));
+  Future<dynamic> editAspirantProfile(Map<String, dynamic> body) async {
+    final response = check_user_response.CheckUserResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpPutRequest(ApiEndPoints.editAspirantProfile, body));
     if (response.status == true) {
-      await checkSubscriptionsStatus(response.data);
-      // TODO: update local hive for get user
       _notifyListenersWithBinding();
       return true;
     }
     _notifyListenersWithBinding();
+    return response.message ?? 'Something went Wrong';
+  }
+
+  Future<dynamic> notifyMe(String slug) async {
+    isNotifying = true;
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpPatchRequest(ApiEndPoints.notifyMe, {'slug': slug}));
+    if (response.status == true) {
+      await checkSubscriptionsStatus(response.data);
+      updateHiveForUser(response.data ?? []);
+      _notifyListenersWithBinding();
+      isNotifying = false;
+      return true;
+    }
+    _notifyListenersWithBinding();
+    isNotifying = false;
+    return response.message;
+  }
+
+  Future<dynamic> removeNotifyMe(String slug) async {
+    isNotifying = true;
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpDeleteRequest(ApiEndPoints.notifyMe, {'slug': slug}));
+    if (response.status == true) {
+      await checkSubscriptionsStatus(response.data);
+      updateHiveForUser(response.data ?? []);
+      _notifyListenersWithBinding();
+      isNotifying = false;
+      return true;
+    }
+    _notifyListenersWithBinding();
+    isNotifying = false;
     return response.message;
   }
 
   Future<dynamic> updateHiveForUser(List<String> subsList) async {
-
-  }
-
-
-  Future<dynamic> removeNotifyMe(String adNumber) async {
-    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
-        ?.httpDeleteRequest(ApiEndPoints.notifyMe, {'ad_number': adNumber}));
-    if (response.status == true) {
-      await checkSubscriptionsStatus(response.data);
-      // TODO: update local hive for get user
-      _notifyListenersWithBinding();
+    try {
+      var cachePoint =
+      ApiEndPoints.getAspirant.split("?").first.replaceAll("/", "_");
+      var box = await Hive.openBox<dynamic>(cachePoint);
+      if (box.length != 4) {
+        return null;
+      }
+      var response = jsonDecode(box.get("response"));
+      var responseObj =
+      aspirant_profile_response.AspirantProfileResponse.fromJson(response);
+      responseObj.data?.setSubscribedChannels(subsList);
+      box.put("response", responseObj.toJson());
       return true;
+    } catch (e) {
+      return null;
     }
-    _notifyListenersWithBinding();
-    return response.message;
   }
 
   Future<void> checkSubscriptionsStatus(List<String>? subscriptions) async {
@@ -357,4 +391,6 @@ class UserProvider with ChangeNotifier {
       await PreferencesData.setNewSubsList(subscriptions);
     }
   }
+
+  void getNotifications() {}
 }

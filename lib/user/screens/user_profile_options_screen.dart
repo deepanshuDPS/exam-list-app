@@ -1,18 +1,15 @@
+import 'package:exam_list/user/screens/notification_listing_screen.dart';
+import 'package:exam_list/user/screens/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
-import 'package:exam_list/user/screens/change_password_screen.dart';
-import 'package:exam_list/user/screens/user_onboarding_screen.dart';
-import 'package:exam_list/user/screens/member_feedback_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
-import 'package:exam_list/styles/app_styles.dart';
-import 'package:exam_list/utils/preferences_data.dart';
 import 'package:exam_list/widgets/illustration_svg.dart';
 import 'package:provider/provider.dart';
 
-class YourProfileOptionsScreen extends StatelessWidget {
+class UserProfileOptionsScreen extends StatelessWidget {
   static const routeName = "/member-account";
 
-  const YourProfileOptionsScreen({Key? key}) : super(key: key);
+  const UserProfileOptionsScreen({Key? key}) : super(key: key);
 
   Widget _horizontalOption(String text, Function onClick) {
     return InkWell(
@@ -31,7 +28,7 @@ class YourProfileOptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      titleText: 'Your Profile',
+        titleText: 'Your Profile',
         isBackRequired: false,
         child: Container(
           color: Colors.white,
@@ -47,15 +44,15 @@ class YourProfileOptionsScreen extends StatelessWidget {
               _horizontalOption(
                   'Edit Profile',
                   () => Navigator.of(context)
-                      .pushNamed(UserOnBoardingScreen.routeName)),
+                      .pushNamed(UserEditProfileScreen.routeName)),
               _horizontalOption(
                   'Notifications',
                   () => Navigator.of(context)
-                      .pushNamed(ChangePasswordScreen.routeName)),
-              _horizontalOption('My Requests', () async {
+                      .pushNamed(NotificationListingScreen.routeName)),
+              /* _horizontalOption('My Requests', () async {
                 Navigator.of(context).pushNamed(MemberFeedbackScreen.routeName,
                     arguments: (await PreferencesData.getUserData())?.id);
-              }),
+              }),*/
               const Divider(
                 height: 1,
                 color: Colors.black,

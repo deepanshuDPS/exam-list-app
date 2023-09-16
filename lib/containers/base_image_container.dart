@@ -12,15 +12,17 @@ class BaseImageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      Container(
+        width: double.infinity,
+        height: double.infinity,
+        color : Colors.white,
+      ),
       SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Opacity(
             opacity: opacity,
-            child: cachedImage(
-              'https://thepacificholidayworld.com/assets/images/resource/model_img.jpg',
-              BoxFit.cover,
-            )),
+            child: Image.asset('assets/images/bg_app.png', fit: BoxFit.cover)),
       ),
       child
     ]);

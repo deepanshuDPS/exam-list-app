@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:exam_list/options/extras/voucher_sheet.dart';
-import 'package:exam_list/options/screens/get_in_touch_screen.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/image_handling.dart';
 import 'package:exam_list/utils/preferences_data.dart';
@@ -36,7 +34,7 @@ class OptionItem extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       builder: (BuildContext context) {
-                        return const VoucherSheet();
+                        return Container();
                       },
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
@@ -58,8 +56,8 @@ class OptionItem extends StatelessWidget {
                   Navigator.of(context).pushNamed(routeName!)
                 else if (tabPosition != null)
                   {
-                    Navigator.of(context).pushNamed(GetInTouchScreen.routeName,
-                        arguments: tabPosition)
+                    // Navigator.of(context).pushNamed(GetInTouchScreen.routeName,
+                    //     arguments: tabPosition)
                   }
               }
           : null,

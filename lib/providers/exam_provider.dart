@@ -1,8 +1,10 @@
 import 'package:exam_list/responseModels/home/exam_data.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/utils/preferences_data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/responseModels/home/exam_list_response.dart'
-    as exam_list_response;
+as exam_list_response;
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 
@@ -42,13 +44,17 @@ class ExamProvider with ChangeNotifier {
   }
 
   void notifyTheProvider() {
-    WidgetsBinding.instance.addPostFrameCallback((status) {
+    if(kDebugMode){
       notifyListeners();
-    });
+    }else{
+      WidgetsBinding.instance.addPostFrameCallback((status) {
+        notifyListeners();
+      });
+    }
   }
 
-  Future<RequestData> fetchExams(
-      int selectedIndex, Map<String, int> subscriptions) async {
+  Future<RequestData> fetchExams(int selectedIndex,
+      Map<String, int> subscriptions) async {
     _allExams.clear();
     _differentTypesExams.clear();
     _currentList.clear();
@@ -66,11 +72,11 @@ class ExamProvider with ChangeNotifier {
             .forEach((exam) {
           // filter child exams
           var listOfChild = response.data?.where((element) =>
-              element.parent == false && element.adNumber == exam.adNumber);
+          element.parent == false && element.adNumber == exam.adNumber);
           if (listOfChild != null && listOfChild.isNotEmpty) {
             exam.setChildExams(listOfChild.toList());
           }
-          exam.setNotifyStatus(subscriptions[exam.adNumber] ?? 0);
+          exam.setNotifyStatus(subscriptions[exam.slug] ?? 0);
           _allExams.add(exam);
         });
         printDebug(response.data?.length.toString() ?? '');
@@ -117,5 +123,14 @@ class ExamProvider with ChangeNotifier {
       examRequestData.setErrorData(resortResponse.toJson());
     }
     notifyWithRequest(examRequestData, false);
+  }
+
+  void refreshExams(String slug) async {
+    var subscriptions = await PreferencesData.getSubscriptions();
+    printDebug(subscriptions.toString());
+    for (var exam in _allExams) {
+      exam.setNotifyStatus(subscriptions.contains(exam.slug) ? 2 : 0);
+    }
+    notifyTheProvider();
   }
 }

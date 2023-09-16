@@ -1,5 +1,5 @@
 import 'package:exam_list/responseModels/home/exam_data.dart';
-import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/exam_utils.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +10,15 @@ class ExamListItem extends StatelessWidget {
   final AspirantData aspirant;
   final Function onClick;
   final Function onNotify;
+  final Function onRemoveNotify;
 
   const ExamListItem(
       {Key? key,
       required this.exam,
       required this.onClick,
       required this.aspirant,
-      required this.onNotify})
+      required this.onNotify,
+      required this.onRemoveNotify})
       : super(key: key);
 
   @override
@@ -79,7 +81,11 @@ class ExamListItem extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: InkWell(
-                  onTap: () => onNotify(exam.adNumber),
+                  onTap: () {
+                    exam.isNotify == 0
+                        ? onNotify(exam.slug)
+                        : onRemoveNotify(exam.slug);
+                  },
                   child: SvgPicture.asset(
                     exam.isNotify == 2
                         ? 'assets/svg/ic_notification_on.svg'

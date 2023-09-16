@@ -1,4 +1,4 @@
-import 'package:exam_list/responseModels/login/aspirant_data.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 
 /// status : 1
 /// code : 200

@@ -5,6 +5,7 @@ class ExamData {
       {String? id,
       String? examName,
       String? adNumber,
+      String? slug,
       List<num>? categoryTypes,
       String? applicationStartDate,
       String? applicationEndDate,
@@ -24,6 +25,7 @@ class ExamData {
     _id = id;
     _examName = examName;
     _adNumber = adNumber;
+    _slug = slug;
     _categoryTypes = categoryTypes;
     _applicationStartDate = applicationStartDate;
     _applicationEndDate = applicationEndDate;
@@ -46,6 +48,7 @@ class ExamData {
     _id = json['_id'];
     _examName = json['examName'];
     _adNumber = json['adNumber'];
+    _slug = json['slug'];
     _categoryTypes =
         json['categoryTypes'] != null ? json['categoryTypes'].cast<num>() : [];
     _applicationStartDate = json['applicationStartDate'];
@@ -85,6 +88,7 @@ class ExamData {
   String? _id;
   String? _examName;
   String? _adNumber;
+  String? _slug;
   List<num>? _categoryTypes;
   String? _applicationStartDate;
   String? _applicationEndDate;
@@ -108,6 +112,7 @@ class ExamData {
           {String? id,
           String? examName,
           String? adNumber,
+          String? slug,
           List<num>? categoryTypes,
           String? applicationStartDate,
           String? applicationEndDate,
@@ -128,6 +133,7 @@ class ExamData {
           id: id ?? _id,
           examName: examName ?? _examName,
           adNumber: adNumber ?? _adNumber,
+          slug: slug ?? _slug,
           categoryTypes: categoryTypes ?? _categoryTypes,
           applicationStartDate: applicationStartDate ?? _applicationStartDate,
           applicationEndDate: applicationEndDate ?? _applicationEndDate,
@@ -150,6 +156,8 @@ class ExamData {
   String? get examName => _examName;
 
   String? get adNumber => _adNumber;
+
+  String? get slug => _slug;
 
   List<num>? get categoryTypes => _categoryTypes;
 
@@ -215,6 +223,7 @@ class ExamData {
     map['_id'] = _id;
     map['examName'] = _examName;
     map['adNumber'] = _adNumber;
+    map['slug'] = _slug;
     map['categoryTypes'] = _categoryTypes;
     map['applicationStartDate'] = _applicationStartDate;
     map['applicationEndDate'] = _applicationEndDate;

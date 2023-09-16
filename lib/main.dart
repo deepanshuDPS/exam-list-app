@@ -1,34 +1,22 @@
-import 'dart:math';
 
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/launch_screen.dart';
+import 'package:exam_list/user/screens/user_edit_profile_screen.dart';
 import 'package:exam_list/user/screens/user_login_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:exam_list/user/screens/your_profile_options_screen.dart';
+import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/user/screens/user_onboarding_screen.dart';
-import 'package:exam_list/user/screens/member_feedback_screen.dart';
-import 'package:exam_list/options/screens/payment_screen.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
-import 'package:exam_list/options/screens/voucher_screen.dart';
-import 'package:exam_list/providers/download_provider.dart';
 import 'package:exam_list/providers/exam_provider.dart';
-import 'package:exam_list/providers/search_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_screen.dart';
-import 'package:exam_list/exams/screens/resorts_listing_screen.dart';
-import 'package:exam_list/search/search_screen.dart';
+import 'package:exam_list/user/screens/notification_listing_screen.dart';
 import 'package:exam_list/utils/colors.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-
-import 'user/screens/change_password_screen.dart';
-import 'user/screens/exam_listing_screen.dart';
-import 'user/screens/my_trips_screen.dart';
-import 'options/screens/downloads_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -85,9 +73,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (ctx) => ExamProvider()),
-        ChangeNotifierProvider(create: (ctx) => SearchProvider()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
-        ChangeNotifierProvider(create: (ctx)=> DownloadProvider())
       ],
       child: MaterialApp(
           title: 'Exam List',
@@ -98,24 +84,15 @@ class MyApp extends StatelessWidget {
                   .copyWith(secondary: appRed, secondaryContainer: appDarkBlue)),
           routes: {
             '/': (ctx) => const LaunchScreen(),
-            YourProfileOptionsScreen.routeName: (ctx) => const YourProfileOptionsScreen(),
+            UserProfileOptionsScreen.routeName: (ctx) => const UserProfileOptionsScreen(),
             UserLoginScreen.routeName: (ctx) => const UserLoginScreen(),
-            PaymentScreen.routeName: (ctx) => const PaymentScreen(),
+            UserEditProfileScreen.routeName: (ctx) => const UserEditProfileScreen(),
             HomeScreen.routeName: (ctx) => const HomeScreen(),
-            SearchScreen.routeName: (ctx) => const SearchScreen(),
-            MemberFeedbackScreen.routeName: (ctx) =>
-                const MemberFeedbackScreen(),
-            ChangePasswordScreen.routeName: (ctx) =>
-                const ChangePasswordScreen(),
-            MyTripsScreen.routeName: (ctx) => const MyTripsScreen(),
-            ResortsListingScreen.routeName: (ctx) =>
-                const ResortsListingScreen(),
+            NotificationListingScreen.routeName: (ctx) =>
+                const NotificationListingScreen(),
             ExamScreen.routeName: (ctx) => const ExamScreen(),
-            VoucherScreen.routeName: (ctx) => const VoucherScreen(),
             UserOnBoardingScreen.routeName: (ctx) => const UserOnBoardingScreen(),
-            ExamListingScreen.routeName: (ctx) => const ExamListingScreen(),
             TermsConditionsScreen.routeName: (ctx) => const TermsConditionsScreen(),
-            DownloadsScreen.routeName: (ctx) => const DownloadsScreen(),
           }),
     );
   }

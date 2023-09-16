@@ -203,6 +203,7 @@ class ApiEndPoints {
   static const signUpAspirant = "$authUser/signup";
   static const getAspirant = "$authUser/aspirant";
   static const notifyMe = "$authUser/notifyMe";
+  static const editAspirantProfile = "$authUser/editAspirantProfile";
   static const checkGuestUser = "anon/user/checkGuestUser";
 
   static const getExams = '$authExam/';
