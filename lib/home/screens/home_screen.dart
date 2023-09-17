@@ -22,15 +22,24 @@ class HomeScreen extends StatefulWidget {
   BaseState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends BaseState<HomeScreen> with SingleTickerProviderStateMixin {
-
+class _HomeScreenState extends BaseState<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late TabController _tabController; // Manages the tab index
+  List<Widget> tabScreens = const [
+    ExamListingScreen(),
+    // const ExamListingScreen(),
+    // const ResourcesScreen(),
+    UserProfileOptionsScreen()
+  ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, animationDuration: Duration.zero);
+    _tabController = TabController(
+        length: tabScreens.length,
+        vsync: this,
+        animationDuration: Duration.zero);
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('drawable/ic_launcher');
@@ -94,7 +103,7 @@ class _HomeScreenState extends BaseState<HomeScreen> with SingleTickerProviderSt
       color: Colors.white,
       child: Consumer<UserProvider>(
           child: const Center(
-              child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(),
           ),
           builder: (context, user, ch) {
             if (user.aspirantRequestData.isLoading) {
@@ -113,12 +122,7 @@ class _HomeScreenState extends BaseState<HomeScreen> with SingleTickerProviderSt
               body: TabBarView(
                 controller: _tabController,
                 physics: const NeverScrollableScrollPhysics(),
-                children: const [
-                  ExamListingScreen(),
-                  // const ExamListingScreen(),
-                  // const ResourcesScreen(),
-                  UserProfileOptionsScreen()
-                ],
+                children: tabScreens,
               ),
             );
           }),

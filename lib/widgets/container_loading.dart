@@ -11,7 +11,7 @@ class ContainerLoading extends StatelessWidget {
       color: Colors.white,
       child: Center(
         child: Image.asset(
-          'assets/images/gif_loading.gif',
+          'assets/images/gif_error.gif',
           width: 200,
           height: 200,
         ),

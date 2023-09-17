@@ -7,9 +7,8 @@ import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:exam_list/containers/base_state.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/src/widgets/automatic_keep_alive.dart';
 
 class ExamListingScreen extends StatefulWidget {
   static const routeName = "/exam-listing-screen";
@@ -21,7 +20,7 @@ class ExamListingScreen extends StatefulWidget {
 }
 
 class _ExamListingScreenState extends State<ExamListingScreen>
-    with AutomaticKeepAliveClientMixin<ExamListingScreen>{
+    with AutomaticKeepAliveClientMixin<ExamListingScreen> {
   int _selectedCategoryIndex = 0;
 
   @override
@@ -30,7 +29,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
   }
 
   final _searchTextController = TextEditingController();
-  String currentText = '';
+  String _currentText = '';
   bool isInit = false;
 
   ExamProvider _examProvider() {
@@ -44,14 +43,15 @@ class _ExamListingScreenState extends State<ExamListingScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if(!isInit){
+    if (!isInit) {
       isInit = true;
-      _examProvider().fetchExams(
-          _selectedCategoryIndex, _userProvider().subscriptionStatus);
+      _searchTextController.clear();
+      _currentText = "";
+      _examProvider().fetchExams(_selectedCategoryIndex,
+          _userProvider().aspirantDetails?.subscribedChannels ?? []);
       _searchTextController.addListener(() {
-        setState(() {
-          currentText = _searchTextController.value.text;
-        });
+        _currentText = _searchTextController.text;
+        _examProvider().filterList(_selectedCategoryIndex, query: _currentText);
       });
     }
   }
@@ -84,6 +84,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BaseImageContainer(
         opacity: 0.3,
         child: Scaffold(
@@ -167,7 +168,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 controller: _searchTextController,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.search),
-                                  suffixIcon: currentText.isNotEmpty
+                                  suffixIcon: _currentText.isNotEmpty
                                       ? IconButton(
                                           icon: const Icon(Icons.clear),
                                           onPressed: () {
@@ -202,7 +203,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                         setState(() {
                           _selectedCategoryIndex = index;
                         });
-                        _examProvider().setIndex(index);
+                        _examProvider().filterList(index, query: _currentText);
                       },
                       child: _examCategory(index),
                     );
@@ -230,8 +231,9 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 exam: exams.currentList[index],
                                 aspirant: _userProvider().aspirantDetails!,
                                 onNotify: (slug) {
-                                  if (_userProvider().isNotifying) return;
-                                  _userProvider().notifyMe(slug).then((value) {
+                                  if (exams.isNotifying) return;
+                                  Fluttertoast.showToast(msg: 'Subscribing');
+                                  exams.notifyMe(slug).then((value) {
                                     if (value is String) {
                                       showSnackBar(context, value);
                                     } else {
@@ -240,10 +242,9 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                   });
                                 },
                                 onRemoveNotify: (slug) {
-                                  if (_userProvider().isNotifying) return;
-                                  _userProvider()
-                                      .removeNotifyMe(slug)
-                                      .then((value) {
+                                  if (exams.isNotifying) return;
+                                  Fluttertoast.showToast(msg: 'Unsubscribing');
+                                  exams.removeNotifyMe(slug).then((value) {
                                     if (value is String) {
                                       showSnackBar(context, value);
                                     } else {

@@ -1,10 +1,7 @@
-import 'dart:convert';
 
-import 'package:exam_list/responseModels/user/Notify_me_response.dart';
 import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
@@ -22,7 +19,7 @@ import 'package:exam_list/utils/preferences_data.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../responseModels/user/check_user_response.dart' as check_user_response;
+import 'package:exam_list/responseModels/user/check_user_response.dart' as check_user_response;
 
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -32,7 +29,6 @@ class UserProvider with ChangeNotifier {
   final List<trips_response.Data> _comTripsList = [];
   final List<all_places_response.Data> _domesticList = [];
   final List<all_places_response.Data> _internationalList = [];
-  final Map<String, int> subscriptionStatus = {};
 
   AspirantData? _aspirantDetailsData;
   check_user_response.Data? _userDetailsData;
@@ -41,7 +37,6 @@ class UserProvider with ChangeNotifier {
   RequestData myUpTripsRequestData = RequestData();
   RequestData myCompTripsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  var isNotifying = false;
 
   /// 0-> Login Screen
   /// 1-> Not onBoarded
@@ -226,7 +221,6 @@ class UserProvider with ChangeNotifier {
             ?.httpGetRequest(ApiEndPoints.getAspirant));
     if (response.data != null) {
       _aspirantDetailsData = response.data;
-      checkSubscriptionsStatus(_aspirantDetailsData?.subscribedChannels);
     } else {
       aspirantRequestData.setErrorData(response.toJson());
     }
@@ -313,84 +307,6 @@ class UserProvider with ChangeNotifier {
     return response.message ?? 'Something went Wrong';
   }
 
-  Future<dynamic> notifyMe(String slug) async {
-    isNotifying = true;
-    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
-        ?.httpPatchRequest(ApiEndPoints.notifyMe, {'slug': slug}));
-    if (response.status == true) {
-      await checkSubscriptionsStatus(response.data);
-      updateHiveForUser(response.data ?? []);
-      _notifyListenersWithBinding();
-      isNotifying = false;
-      return true;
-    }
-    _notifyListenersWithBinding();
-    isNotifying = false;
-    return response.message;
-  }
-
-  Future<dynamic> removeNotifyMe(String slug) async {
-    isNotifying = true;
-    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
-        ?.httpDeleteRequest(ApiEndPoints.notifyMe, {'slug': slug}));
-    if (response.status == true) {
-      await checkSubscriptionsStatus(response.data);
-      updateHiveForUser(response.data ?? []);
-      _notifyListenersWithBinding();
-      isNotifying = false;
-      return true;
-    }
-    _notifyListenersWithBinding();
-    isNotifying = false;
-    return response.message;
-  }
-
-  Future<dynamic> updateHiveForUser(List<String> subsList) async {
-    try {
-      var cachePoint =
-      ApiEndPoints.getAspirant.split("?").first.replaceAll("/", "_");
-      var box = await Hive.openBox<dynamic>(cachePoint);
-      if (box.length != 4) {
-        return null;
-      }
-      var response = jsonDecode(box.get("response"));
-      var responseObj =
-      aspirant_profile_response.AspirantProfileResponse.fromJson(response);
-      responseObj.data?.setSubscribedChannels(subsList);
-      box.put("response", responseObj.toJson());
-      return true;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<void> checkSubscriptionsStatus(List<String>? subscriptions) async {
-    if (subscriptions == null) return;
-    var subsList = await PreferencesData.getSubscriptions();
-    if (subsList.length <= subscriptions.length) {
-      // 0 means not subscribed in local
-      for (var element in subscriptions) {
-        subscriptionStatus[element] = subsList.contains(element) ? 2 : 0;
-      }
-      subscriptionStatus.forEach((key, value) async {
-        if (value == 0) {
-          await FirebaseMessaging.instance.subscribeToTopic(key);
-          subscriptionStatus[key] = 2;
-          await PreferencesData.notifyAddNumber(key);
-        }
-      });
-    } else {
-      var removeSubs = Set.of(subsList).difference(Set.of(subscriptions));
-      for (var adNumber in subscriptions) {
-        subscriptionStatus[adNumber] = 2;
-      }
-      for (var topic in removeSubs) {
-        await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
-        subscriptionStatus[topic] = 0;
-      }
-      await PreferencesData.setNewSubsList(subscriptions);
-    }
-  }
 
   void getNotifications() {}
 }

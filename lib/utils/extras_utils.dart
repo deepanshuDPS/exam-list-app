@@ -1,3 +1,5 @@
+import 'package:exam_list/utils/preferences_data.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/utils/colors.dart';
@@ -17,7 +19,6 @@ void toLink(String link) async {
   if (await canLaunchUrl(parsedUrl)) {
     await launchUrl(parsedUrl);
   } else {
-    // TODO: Need Toast Message
     printDebug('Could not launch $parsedUrl');
   }
 }
@@ -82,7 +83,7 @@ Widget clickToAction(BuildContext context, String text, Function onClick) {
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:  [
+          children: [
             Text(
               text,
               style: const TextStyle(
@@ -103,4 +104,41 @@ Widget clickToAction(BuildContext context, String text, Function onClick) {
       ),
     ),
   );
+}
+
+bool isQueryExist(String? parent, String child){
+  return parent?.toLowerCase().contains(child.toLowerCase()) == true;
+}
+
+
+Future<void> checkSubscriptionsStatus(
+    List<String>? subscriptions, Map<String, int> subscriptionStatus) async {
+  if (subscriptions == null) return;
+  var subsList = await PreferencesData.getSubscriptions();
+  printDebug(subsList.toString());
+  printDebug(subscriptions.toString());
+  if (subsList.length <= subscriptions.length) {
+    // 0 means not subscribed in local
+    for (var element in subscriptions) {
+      subscriptionStatus[element] = subsList.contains(element) ? 2 : 0;
+    }
+    for (var entry in subscriptionStatus.entries) {
+      if (entry.value == 0) {
+        await FirebaseMessaging.instance.subscribeToTopic(entry.key);
+        subscriptionStatus[entry.key] = 2;
+        await PreferencesData.notifyAddNumber(entry.key);
+      }
+    }
+    printDebug(subscriptionStatus.toString());
+  } else {
+    var removeSubs = Set.of(subsList).difference(Set.of(subscriptions));
+    for (var adNumber in subscriptions) {
+      subscriptionStatus[adNumber] = 2;
+    }
+    for (var topic in removeSubs) {
+      await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+      subscriptionStatus[topic] = 0;
+    }
+    await PreferencesData.setNewSubsList(subscriptions);
+  }
 }

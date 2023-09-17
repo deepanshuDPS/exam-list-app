@@ -7,10 +7,8 @@ import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
-import 'package:exam_list/widgets/illustration_svg.dart';
 import 'package:provider/provider.dart';
 
 class UserLoginScreen extends StatefulWidget {
@@ -35,7 +33,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   void _verifyMobileNumber() async {
     String mobileNumber = _mobileController.text.trim();
 
-    if (kDebugMode && mobileNumber == '8800757476') {
+    if (kDebugMode && mobileNumber == '880075776') {
       _signInForGuest(mobileNumber);
       return;
     }
@@ -50,7 +48,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           // something went wrong
         } else if (phoneAuthCredential != null) {
           showSnackBar(context, message);
-          _signInForMobile(phoneAuthCredential);
+          _signInForMobile(context, phoneAuthCredential);
         }
       },
       (verificationId, resendToken) {
@@ -74,14 +72,18 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
       builder: (BuildContext context) {
         return OTPSheet(
-          confirmOTP: (smsCode) {
+          confirmOTP: (vContext, smsCode) {
             PhoneAuthCredential credential = PhoneAuthProvider.credential(
               verificationId: _verificationId!,
               smsCode: smsCode,
             );
-            _signInForMobile(credential);
+            _signInForMobile(vContext, credential);
+          },
+          resentOTP: () {
+            _verifyMobileNumber();
           },
         );
       },
@@ -94,12 +96,12 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     );
   }
 
-  void _signInForMobile(PhoneAuthCredential credential) {
+  void _signInForMobile(BuildContext vContext, PhoneAuthCredential credential) {
     showProgressDialog(context);
     userProvider.loginMobile(credential).then((value) {
       Navigator.of(context).pop();
       if (value is String) {
-        showSnackBar(context, value);
+        showSnackBar(vContext, value);
       } else {
         // successfully login toast
         // check on boarding and change screen
@@ -114,9 +116,9 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     }).onError((error, stackTrace) {
       Navigator.of(context).pop();
       if (error is FirebaseException) {
-        showSnackBar(context, (error).message!);
+        showSnackBar(vContext, (error).message!);
       } else {
-        showSnackBar(context, Constants.somethingWentWrong);
+        showSnackBar(vContext, Constants.somethingWentWrong);
       }
     });
   }
@@ -235,25 +237,17 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                             style: AppStyles.inputTextStyle(),
                             controller: _mobileController,
                             keyboardType: TextInputType.phone,
+                            validator: (input) => input?.isEmpty ?? true
+                                ? "Please Enter Mobile Number"
+                                : input?.length != 10
+                                    ? 'Please Enter a Valid Mobile Number'
+                                    : null,
                             maxLength: 10,
                             decoration: AppStyles.inputDecorationWithoutIcon(
                                     'Enter Mobile Number',
                                     prefixText: '+91 ')
                                 .copyWith(counterText: ""),
                           ),
-                          // TextFormField(
-                          //   style: AppStyles.inputTextStyle(),
-                          //   keyboardType: TextInputType.text,
-                          //   controller: _userIdController,
-                          //   onSaved: (input) => {
-                          //     /* loginRequestModel.email = input */
-                          //   },
-                          //   validator: (input) => input?.isEmpty ?? true
-                          //       ? "Please Enter Membership Id"
-                          //       : null,
-                          //   decoration: AppStyles.inputDecoration(
-                          //       "Membership Id", Icons.email),
-                          // ),
                           const SizedBox(height: 30),
                           ButtonFormSubmit(
                               onClick: () {

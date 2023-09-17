@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class OTPSheet extends StatefulWidget {
   final Function confirmOTP;
+  final Function resentOTP;
 
-  const OTPSheet(
-      {Key? key, required this.confirmOTP})
+  const OTPSheet({Key? key, required this.confirmOTP, required this.resentOTP})
       : super(key: key);
 
   @override
@@ -16,13 +18,45 @@ class OTPSheet extends StatefulWidget {
 }
 
 class _OTPSheetState extends State<OTPSheet> {
-  final _otpController = TextEditingController();
+  final List<TextEditingController> _otpControllers =
+      List.generate(6, (index) => TextEditingController());
   final _globalFormKey = GlobalKey<FormState>();
 
+  int _counter = 120; // Initial counter value (1 minute = 60 seconds)
+  Timer? _timer; // Timer object
+
+  void startTimer() {
+    const oneSecond = Duration(seconds: 1);
+    _timer = Timer.periodic(oneSecond, (timer) {
+      setState(() {
+        if (_counter > 0) {
+          _counter--;
+        } else {
+          // Timer has reached 0, you can enable the Resend OTP button here
+          timer.cancel(); // Cancel the timer when done
+        }
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    startTimer();
+  }
+
   void onSubmitClick() {
-    var enteredOTP = _otpController.text.trim();
+    String enteredOTP =
+        _otpControllers.map((controller) => controller.text).join();
+    if (enteredOTP.length != 6) {
+      Fluttertoast.showToast(
+        msg: 'Please enter valid OTP',
+      );
+      return;
+    }
     FocusScope.of(context).requestFocus(FocusNode());
-    widget.confirmOTP(enteredOTP);
+    widget.confirmOTP(context, enteredOTP);
     // showProgressDialog(context);
     // Provider.of<UserProvider>(context, listen: false)
     //     .bookingOfferOrHoliday(widget.bodyData, widget.isOffer)
@@ -36,104 +70,168 @@ class _OTPSheetState extends State<OTPSheet> {
     // });
   }
 
+  OutlineInputBorder _outLinedBorder() {
+    return OutlineInputBorder(
+      borderSide: const BorderSide(color: appRed, width: 2.0),
+      borderRadius: BorderRadius.circular(6.0),
+    );
+  }
+
+  String formatDuration(int seconds) {
+    int minutes = seconds ~/ 60; // Get the whole minutes
+    int remainingSeconds = seconds % 60; // Get the remaining seconds
+
+    String result = '';
+    result += '0$minutes:';
+    result += '${remainingSeconds < 10 ? '0' : ''}$remainingSeconds';
+
+    return result.trim(); // Remove trailing whitespace
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(30),
-                  bottomRight: Radius.circular(30))),
-          padding: const EdgeInsets.all(10),
-          height: 330,
-          child: SvgPicture.asset(
-            'assets/svg/bg_voucher.svg',
-            width: double.infinity,
-            fit: BoxFit.cover,
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(
+          top: 20,
+          right: 20,
+          left: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 40),
+      // padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 60,
+              height: 5,
+              decoration: const BoxDecoration(
+                  color: Color.fromRGBO(217, 217, 217, 1),
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(2.5),
+                      bottomRight: Radius.circular(2.5))),
+            ),
           ),
-        ),
-        Container(
-          color: Colors.transparent,
-          padding: EdgeInsets.only(
-              top: 20,
-              right: 20,
-              left: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom),
-          // padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 60,
-                height: 5,
-                decoration: const BoxDecoration(
-                    color: Color.fromRGBO(217, 217, 217, 1),
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(2.5),
-                        bottomRight: Radius.circular(2.5))),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Text(
-                'Booking',
-                style: AppStyles.robotoBlackText()
-                    .copyWith(fontSize: 20, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              const Text(
-                'Please enter OTP for Login',
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: appDarkBlue),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Form(
-                key: _globalFormKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _otpController,
-                      validator: (input) =>
-                          (input?.length ?? 0) < 6 && input != ''
-                              ? "Please Enter Valid OTP."
-                              : null,
-                      maxLength: 6,
-                      style: AppStyles.inputTextStyle(),
-                      keyboardType: TextInputType.phone,
-                      // onSaved: (input) => loginRequestModel.email = input,
-                      obscureText: false,
-                      decoration: AppStyles.inputDecoration(
-                              'Enter OTP', Icons.phone_android)
-                          .copyWith(counterText: ""),
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            'Enter OTP',
+            style: AppStyles.blackBoldText()
+                .copyWith(fontSize: 24, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          const Text(
+            'Enter the 6 digits code that you received on your Mobile No.',
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w600, color: sharpGrey),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          Form(
+            key: _globalFormKey,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    6,
+                    (index) => Container(
+                      width: 42,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 2),
+                      child: TextFormField(
+                        controller: _otpControllers[index],
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: "*",
+                          counterText: '',
+                          enabledBorder: _outLinedBorder(),
+                          focusedBorder: _outLinedBorder(),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                        ),
+                        maxLength: 1,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            if (index < 5) {
+                              FocusScope.of(context).nextFocus();
+                            }
+                          } else {
+                            if (index > 0) {
+                              FocusScope.of(context).previousFocus();
+                            }
+                          }
+                        },
+                      ),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    ButtonFormSubmit(
-                      text: 'Submit',
-                      onClick: () {
-                        if (_globalFormKey.currentState?.validate() == true) {
-                          onSubmitClick();
-                        }
-                      },
-                    )
-                  ],
+                  ),
                 ),
-              )
-            ],
-          ),
-        )
-      ],
+                const SizedBox(
+                  height: 8,
+                ),
+                TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: _counter > 0
+                        ? null
+                        : () {
+                            Navigator.of(context).pop();
+                            widget.resentOTP();
+                          },
+                    child: Text(
+                      _counter > 0
+                          ? '${formatDuration(_counter)} time left to resend OTP'
+                          : 'Resend OTP',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: _counter > 0 ? sharpGrey : appRed,
+                        decoration:
+                            _counter > 0 ? null : TextDecoration.underline,
+                      ),
+                    )),
+                const SizedBox(
+                  height: 16,
+                ),
+                ButtonFormSubmit(
+                  text: 'Continue',
+                  onClick: () {
+                    if (_globalFormKey.currentState?.validate() == true) {
+                      onSubmitClick();
+                    }
+                  },
+                ),
+                TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: appRed,
+                          fontWeight: FontWeight.w600),
+                    )),
+              ],
+            ),
+          )
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 }
