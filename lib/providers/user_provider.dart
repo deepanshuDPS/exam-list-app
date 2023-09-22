@@ -6,12 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/global_response.dart';
-import 'package:exam_list/responseModels/user/member_fee_payments.dart'
-    as fee_response;
 import 'package:exam_list/responseModels/user/aspirant_profile_response.dart'
     as aspirant_profile_response;
-import 'package:exam_list/responseModels/user/my_trips_response.dart'
-    as trips_response;
 import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/search/all_places_response.dart'
     as all_places_response;
@@ -24,9 +20,6 @@ import 'package:exam_list/responseModels/user/check_user_response.dart' as check
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
 
-  final List<fee_response.Data> _feesList = [];
-  final List<trips_response.Data> _upTripsList = [];
-  final List<trips_response.Data> _comTripsList = [];
   final List<all_places_response.Data> _domesticList = [];
   final List<all_places_response.Data> _internationalList = [];
 
@@ -195,18 +188,6 @@ class UserProvider with ChangeNotifier {
     return _userDetailsData;
   }
 
-  List<fee_response.Data> get feeList {
-    return _feesList;
-  }
-
-  List<trips_response.Data> get upTripsList {
-    return [..._upTripsList];
-  }
-
-  List<trips_response.Data> get comTripsList {
-    return [..._comTripsList];
-  }
-
   Future<void> logoutUser() async {
     await PreferencesData.clearOnLogOut();
     _isLoggedIn = false;
@@ -235,36 +216,6 @@ class UserProvider with ChangeNotifier {
       return {'errorMessage': response.message ?? 'Something Went Wrong'};
     }
     return response.message;
-  }
-
-  Future<void> getTrips(int type) async {
-    if (type == 0) {
-      notifyWithRequest(myUpTripsRequestData, true);
-      _upTripsList.clear();
-    } else {
-      notifyWithRequest(myCompTripsRequestData, true);
-      _comTripsList.clear();
-    }
-    final response = trips_response.MyTripsResponse.fromJson(
-        await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.memberTrips
-            .replaceAll('{trip_type}', type == 0 ? 'upcoming' : 'completed')));
-    if (type == 0) {
-      notifyWithRequest(myUpTripsRequestData, true);
-      _upTripsList.clear();
-      if (response.status == -1) {
-        myUpTripsRequestData.setErrorData(response.toJson());
-      } else {
-        _upTripsList.addAll(response.data!);
-      }
-      notifyWithRequest(myUpTripsRequestData, false);
-    } else {
-      if (response.status == -1) {
-        myCompTripsRequestData.setErrorData(response.toJson());
-      } else {
-        _comTripsList.addAll(response.data!);
-      }
-      notifyWithRequest(myCompTripsRequestData, false);
-    }
   }
 
   Future<dynamic> bookingOfferOrHoliday(

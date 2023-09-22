@@ -254,8 +254,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 },
                                 onClick: () {
                                   exams.setExam(exams.currentList[index]);
-                                  Navigator.of(context)
-                                      .pushNamed(ExamScreen.routeName);
+                                  Navigator.of(context).pushNamed(ExamScreen.routeName);
                                 },
                               );
                             }),

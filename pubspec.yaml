@@ -50,6 +50,9 @@ dependencies:
   hive: ^2.2.3
   flutter_local_notifications: ^15.1.1
   permission_handler: ^11.0.0
+  flutter_html: ^3.0.0-alpha.6
+  webview_flutter: ^4.2.2
+  flutter_inappwebview: ^5.7.2+3
 
 
 
@@ -80,6 +83,8 @@ flutter:
   assets:
     - assets/svg/
     - assets/images/
+    - assets/fonts/
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

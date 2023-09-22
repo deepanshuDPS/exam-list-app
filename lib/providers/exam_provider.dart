@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/utils/exam_utils.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/responseModels/home/exam_list_response.dart'
     as exam_list_response;
+import 'package:exam_list/responseModels/home/exam_pattern_list_response.dart'
+    as exam_pattern_list_response;
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/user/notify_me_response.dart';
@@ -20,6 +23,8 @@ class ExamProvider with ChangeNotifier {
   final List<ExamData> _currentList = [];
   RequestData examRequest = RequestData();
   final Map<String, int> subscriptionStatus = {};
+  final List<String> _htmlContents = [];
+  final List<String> _extraHtmlContents = [];
 
   late ExamData? _selectedExam;
   var isNotifying = false;
@@ -45,6 +50,14 @@ class ExamProvider with ChangeNotifier {
 
   List<ExamData> get currentList {
     return [..._currentList];
+  }
+
+  List<String> get htmlContents {
+    return [..._htmlContents];
+  }
+
+  List<String> get extraHtmlContents {
+    return [..._htmlContents];
   }
 
   void notifyWithRequest(RequestData data, bool isLoading) {
@@ -80,7 +93,13 @@ class ExamProvider with ChangeNotifier {
       if (response.data != null && response.data?.isNotEmpty == true) {
         // traverse parent exams
         await checkSubscriptionsStatus(userSubscriptions, subscriptionStatus);
-        printDebug(response.data?.where((element) => element.parent == null || element.parent == true).map((e) => e.parent).toList().toString()??"");
+        printDebug(response.data
+                ?.where((element) =>
+                    element.parent == null || element.parent == true)
+                .map((e) => e.parent)
+                .toList()
+                .toString() ??
+            "");
         response.data
             ?.where(
                 (element) => element.parent == null || element.parent == true)
@@ -119,6 +138,7 @@ class ExamProvider with ChangeNotifier {
 
   void setExam(ExamData exam) {
     _selectedExam = exam;
+    getExamPatternsById();
   }
 
   Future<void> getExams(String adNumber) async {
@@ -128,14 +148,14 @@ class ExamProvider with ChangeNotifier {
       _selectedExam = null;
       notifyWithRequest(examRequestData, true);
     }
-    final resortResponse = exam_list_response.ExamListResponse.fromJson(
+    final examResponse = exam_list_response.ExamListResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(adNumber));
 
-    if (resortResponse.status == true) {
-      _selectedExam = resortResponse.data?.first;
+    if (examResponse.status == true) {
+      _selectedExam = examResponse.data?.first;
       _openedExam = adNumber;
     } else {
-      examRequestData.setErrorData(resortResponse.toJson());
+      examRequestData.setErrorData(examResponse.toJson());
     }
     notifyWithRequest(examRequestData, false);
   }
@@ -199,5 +219,30 @@ class ExamProvider with ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<void> getExamPatternsById() async {
+    notifyWithRequest(examRequestData, true);
+    var idsList = fetchAllExamIds(_selectedExam!);
+    String examIds;
+    if (idsList.length == 1) {
+      examIds = idsList[0];
+    } else {
+      examIds = idsList.join("-");
+    }
+    final response = exam_pattern_list_response.ExamPatternListResponse
+        .fromJson(await HttpRequests.instance()?.httpGetRequest(
+            ApiEndPoints.getExamPatterByID.replaceAll('{examIds}', examIds)));
+    if (response.status == true) {
+      response.data?.forEach((examPattern) {
+        if (examPattern.htmlContent != null) {
+          _htmlContents.add(examPattern.htmlContent!);
+        }
+        if (examPattern.extraHtmlContent != null) {
+          _extraHtmlContents.add(examPattern.extraHtmlContent!);
+        }
+      });
+    }
+    notifyWithRequest(examRequestData, false);
   }
 }

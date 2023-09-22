@@ -17,7 +17,8 @@ class CardBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.symmetric(horizontal: containerMargin ?? 16,vertical: containerMargin??0),
+        margin: EdgeInsets.symmetric(
+            horizontal: containerMargin ?? 16, vertical: containerMargin ?? 0),
         width: double.infinity,
         child: Card(
             elevation: 10,

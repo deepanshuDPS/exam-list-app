@@ -76,7 +76,6 @@ String getExamFees(num categoryId, num gender, ExamData exam) {
   return examFees.isNotEmpty ? examFees : "₹ 0";
 }
 
-
 // fetch all notices whether exist or not
 List<Extras> getNotices(ExamData exam) {
   List<Extras> notices = [];
@@ -90,4 +89,19 @@ List<Extras> getNotices(ExamData exam) {
   notices.addAll(exam.notices ?? []);
 
   return notices;
+}
+
+// fetch all notices whether exist or not
+List<String> fetchAllExamIds(ExamData exam) {
+  List<String> examIds = [];
+
+  if (exam.childExams.isNotEmpty) {
+    for (var childExam in exam.childExams) {
+      examIds.add(childExam.id ?? '');
+    }
+  }
+
+  examIds.add(exam.id ?? '');
+
+  return examIds;
 }

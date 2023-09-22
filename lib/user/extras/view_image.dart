@@ -1,25 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/providers/exam_provider.dart';
-import 'package:exam_list/styles/app_styles.dart';
-import 'package:exam_list/utils/extras_utils.dart';
-import 'package:exam_list/utils/image_handling.dart';
-import 'package:exam_list/widgets/btn_form_submit.dart';
-import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class ViewImageSheet extends StatelessWidget {
-  final String imageUrl;
+class ViewImageSheet extends StatefulWidget {
+  final String htmlContent;
 
-  const ViewImageSheet({Key? key, required this.imageUrl}) : super(key: key);
+  const ViewImageSheet({Key? key, required this.htmlContent}) : super(key: key);
 
+  @override
+  State<ViewImageSheet> createState() => _ViewImageSheetState();
+}
+
+class _ViewImageSheetState extends State<ViewImageSheet> {
+
+
+  final WebViewController controller = WebViewController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    controller
+      ..enableZoom(true)
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith("https://")) {
+              // launchUrl(Uri.parse(request.url));
+              return NavigationDecision.navigate;
+            } else {
+              return NavigationDecision.prevent;
+            }
+          },
+        ),
+      )
+      ..loadHtmlString(widget.htmlContent);
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.transparent,
-        height: MediaQuery.of(context).size.height,
+        color: Colors.white,
+        height: MediaQuery.of(context).size.height/4 * 3,
         // padding: const EdgeInsets.all(20),
-        child: cachedImage(imageUrl, BoxFit.fitWidth));
+        child: WebViewWidget(
+          controller: controller,
+        ));
   }
 }

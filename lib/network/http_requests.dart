@@ -171,6 +171,7 @@ class HttpRequests {
         return cachedResponse;
       }
       final response = await http.get(Uri.parse(url), headers: headersToSend);
+      printDebug(response.statusCode.toString());
       if (response.statusCode < 300) {
         var responseAsString = utf8.decode(response.bodyBytes);
         await saveAuthCachedResponse(endPoint, headersToSend, response);
@@ -197,7 +198,7 @@ class HttpRequests {
 class ApiEndPoints {
   static const authUser = 'auth/user';
   static const authExam = 'auth/exam';
-  static const authExamPattern = '/auth/exam-pattern';
+  static const authExamPattern = 'auth/exam-pattern';
 
   static const checkUser = "$authUser/checkUser";
   static const signUpAspirant = "$authUser/signup";
@@ -208,7 +209,7 @@ class ApiEndPoints {
 
   static const getExams = '$authExam/';
   static const getExamByAdNumber = '$authExam/{adNumber}';
-  static const getExamPatterByID = '$authExamPattern/{examId}';
+  static const getExamPatterByID = '$authExamPattern/{examIds}';
 
   /////////////////////////////////////////////////////////////////////////////
   static const home = 'home';
