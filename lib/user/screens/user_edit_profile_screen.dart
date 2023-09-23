@@ -280,35 +280,36 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                         'Choose Qualification'),
                                   )),
                               const SizedBox(height: 12),
-                              // _buildFormField(
-                              //     'Additional Qualification',
-                              //     DropdownButtonFormField<String>(
-                              //       value:
-                              //           chosenQualificationAdd?['optionName'],
-                              //       onChanged: (value) {
-                              //         setState(() {
-                              //           chosenQualificationAdd = {
-                              //             'optionName': value,
-                              //             'id': Constants
-                              //                 .additionalQualifications[value]
-                              //           };
-                              //         });
-                              //       },
-                              //       items: Constants
-                              //           .additionalQualifications.keys
-                              //           .map((qualification) {
-                              //         return DropdownMenuItem<String>(
-                              //           value: qualification,
-                              //           child: Text(
-                              //             qualification,
-                              //             style: _textStyle(),
-                              //           ),
-                              //         );
-                              //       }).toList(),
-                              //       decoration: _inputDecoration(
-                              //           'Choose Additional Qualification'),
-                              //     )),
-                              // const SizedBox(height: 12),
+                              _buildFormField(
+                                  'Additional Qualification',
+                                  DropdownButtonFormField<String>(
+                                    value: _aspirantDetailsData
+                                        .addQualification?.optionName,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _aspirantDetailsData.setEduQualification(
+                                            EduQualification(
+                                                optionName: value!,
+                                                optionId: Constants
+                                                    .additionalQualifications[
+                                                value]!));
+                                      });
+                                    },
+                                    items: Constants
+                                        .additionalQualifications.keys
+                                        .map((qualification) {
+                                      return DropdownMenuItem<String>(
+                                        value: qualification,
+                                        child: Text(
+                                          qualification,
+                                          style: _textStyle(),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    decoration: _inputDecoration(
+                                        'Choose Additional Qualification'),
+                                  )),
+                              const SizedBox(height: 12),
                               _buildFormField(
                                   'Gender*',
                                   Row(

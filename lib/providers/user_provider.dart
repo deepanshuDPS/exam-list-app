@@ -1,5 +1,5 @@
-
 import 'package:exam_list/responseModels/user/aspirant_data.dart';
+import 'package:exam_list/responseModels/user/terms_policy_response.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +15,8 @@ import 'package:exam_list/utils/preferences_data.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:exam_list/responseModels/user/check_user_response.dart' as check_user_response;
+import 'package:exam_list/responseModels/user/check_user_response.dart'
+    as check_user_response;
 
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -258,6 +259,14 @@ class UserProvider with ChangeNotifier {
     return response.message ?? 'Something went Wrong';
   }
 
+  Future<dynamic> getTermsPolicy() async {
+    final response = TermsPolicyResponse.fromJson(await HttpRequests.instance()
+        ?.httpGetRequest(ApiEndPoints.infoTermsPolicy));
+    if (response.status == true) {
+      return response.data;
+    }
+    return response.message ?? 'Something went Wrong';
+  }
 
   void getNotifications() {}
 }

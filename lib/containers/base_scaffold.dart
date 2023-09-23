@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class BaseScaffold extends StatelessWidget {
   final Widget child;
@@ -8,6 +7,7 @@ class BaseScaffold extends StatelessWidget {
   final bool? isAppBarColored;
   final bool? isBackRequired;
   final PreferredSizeWidget? barBottom;
+  final Widget? action;
 
   const BaseScaffold(
       {Key? key,
@@ -16,7 +16,8 @@ class BaseScaffold extends StatelessWidget {
       this.elevation,
       this.barBottom,
       this.isAppBarColored,
-      this.isBackRequired})
+      this.isBackRequired,
+      this.action})
       : super(key: key);
 
   @override
@@ -24,7 +25,7 @@ class BaseScaffold extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        constraints: const BoxConstraints.expand(), // ← this guy
+        constraints: const BoxConstraints.expand(),
         color: Colors.transparent,
         child: child,
       ),
@@ -36,8 +37,10 @@ class BaseScaffold extends StatelessWidget {
               : const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
             titleText ?? "",
-            style: const TextStyle(
-                fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                fontSize: 20,
+                color: isAppBarColored == true ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w600),
           ),
         ),
         backgroundColor: isAppBarColored == true
@@ -45,9 +48,9 @@ class BaseScaffold extends StatelessWidget {
             : Colors.white,
         leading: isBackRequired == true
             ? IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
-                  color: Colors.black,
+                  color: isAppBarColored == true ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -57,6 +60,7 @@ class BaseScaffold extends StatelessWidget {
             : null,
         elevation: elevation ?? 0,
         bottom: barBottom,
+        actions: [action ?? const SizedBox()],
       ),
     );
   }

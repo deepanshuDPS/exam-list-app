@@ -199,6 +199,7 @@ class ApiEndPoints {
   static const authUser = 'auth/user';
   static const authExam = 'auth/exam';
   static const authExamPattern = 'auth/exam-pattern';
+  static const infoTermsPolicy = 'info/terms-policy';
 
   static const checkUser = "$authUser/checkUser";
   static const signUpAspirant = "$authUser/signup";

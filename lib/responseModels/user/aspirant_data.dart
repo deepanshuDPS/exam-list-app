@@ -15,7 +15,8 @@ class AspirantData {
       EduQualification? eduQualification, 
       num? gender,
       List<String>? subscribedChannels,
-      Category? diffAbleCategory}){
+      Category? diffAbleCategory,
+      EduQualification? addQualification,}){
     _id = id;
     _mobile = mobile;
     _onBoarded = onBoarded;
@@ -31,6 +32,7 @@ class AspirantData {
     _gender = gender;
     _subscribedChannels = subscribedChannels;
     _diffAbleCategory = diffAbleCategory;
+    _addQualification = addQualification;
 }
 
   AspirantData.fromJson(dynamic json) {
@@ -49,6 +51,7 @@ class AspirantData {
     _gender = json['gender'];
     _subscribedChannels = json['subscribedChannels'] != null ? json['subscribedChannels'].cast<String>() : [];
     _diffAbleCategory = json['diffAbleCategory'] != null ? Category.fromJson(json['diffAbleCategory']) : null;
+    _addQualification = json['addQualification'] != null ? EduQualification.fromJson(json['addQualification']) : null;
   }
   String? _id;
   String? _mobile;
@@ -65,6 +68,7 @@ class AspirantData {
   num? _gender;
   List<String>? _subscribedChannels;
   Category? _diffAbleCategory;
+  EduQualification? _addQualification;
 
 AspirantData copyWith({  String? id,
   String? mobile,
@@ -80,7 +84,8 @@ AspirantData copyWith({  String? id,
   EduQualification? eduQualification,
   num? gender,
   List<String>? subscribedChannels,
-  Category? diffAbleCategory
+  Category? diffAbleCategory,
+  EduQualification? addQualification,
 }) => AspirantData(  id: id ?? _id,
   mobile: mobile ?? _mobile,
   onBoarded: onBoarded ?? _onBoarded,
@@ -95,7 +100,8 @@ AspirantData copyWith({  String? id,
   eduQualification: eduQualification ?? _eduQualification,
   gender: gender ?? _gender,
   subscribedChannels: subscribedChannels ?? _subscribedChannels,
-    diffAbleCategory: diffAbleCategory ??_diffAbleCategory
+    diffAbleCategory: diffAbleCategory ??_diffAbleCategory,
+    addQualification: addQualification ?? _addQualification,
 );
   String? get id => _id;
   String? get mobile => _mobile;
@@ -112,6 +118,7 @@ AspirantData copyWith({  String? id,
   num? get gender => _gender;
   List<String>? get subscribedChannels => _subscribedChannels;
   Category? get diffAbleCategory => _diffAbleCategory;
+  EduQualification? get addQualification => _addQualification;
 
   void setGender(num gender) {
     _gender = gender;
@@ -142,6 +149,9 @@ AspirantData copyWith({  String? id,
     _onBoarded = onBoarded;
   }
 
+  void setAddQualification(EduQualification addQualification) {
+    _addQualification = addQualification;
+  }
 
   void setDiffAble(bool isDiffAble) {
     _isDiffAble = isDiffAble;
@@ -150,6 +160,7 @@ AspirantData copyWith({  String? id,
   void setDob(String dob) {
     _dob = dob;
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -172,6 +183,7 @@ AspirantData copyWith({  String? id,
     map['gender'] = _gender;
     map['subscribedChannels'] = _subscribedChannels;
     map['diffAbleCategory'] = _diffAbleCategory;
+    map['addQualification'] = _addQualification?.toJson();
     return map;
   }
 

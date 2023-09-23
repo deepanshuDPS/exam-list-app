@@ -49,7 +49,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.app.exams"
+        applicationId "com.dps.examu"
         minSdkVersion 21
         targetSdkVersion 33
         multiDexEnabled true

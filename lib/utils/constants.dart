@@ -63,41 +63,6 @@ class Constants {
   static String currentVersion = 'CURRENT_VERSION';
   static String subscriptions = 'SUBSCRIPTIONS';
 
-
-  static List<String> termsConditionsTitles = [
-    'Terms & Condition',
-    'Acceptance Of Agreement',
-    'Editing, Deleting And Modification',
-    'Copyright',
-    'Terms & conditions for contest participants'
-  ];
-
-  static List<String> termsConditions = [
-    'Welcome to The Pacific Holiday World (A Unit Of 4r Seasons Holidays Pvt. Ltd) computing device (the "Site"). '
-        'Please browse these Terms of Use rigorously before exploiting this website. '
-        'By exploiting this website you conform to go with and be sure of these Terms of Use. '
-        'If you do not conform to these terms, you want to not use this website. '
-        'You conform to the terms and conditions made public during this Terms of Use Agreement with reference to our website. '
-        'This Agreement constitutes the complete and solely agreement between us and you with reference to the positioning and supersedes all previous or contemporaneous agreements, representations, warranties and understandings with reference to the positioning, the content, product or services provided by or through the positioning, and also the subject material of this Agreement. '
-        'The newest Agreement are going to be denote on the positioning, and you want to review this Agreement before exploitation the positioning.',
-    "The Pacific Holiday World authorizes you to look at, print or transfer any content, graphic, kind or document from the positioning for your personal, non-commercial use and you want to not amendment or delete any such material or copyright notice showing on such material. "
-        "you'll not modify the materials at this website in any means or repost, republish, reproduce, publicly show, perform, assign, sublicense, sell or prepare spin-off works of or otherwise use the materials for any purpose except as expressly permissible beneath this Agreement. "
-        "Copyright within the materials at this website is closely-held by or used with permission and any unauthorized use of any materials at this website might violate copyright, trade mark and alternative proprietary (including however not restricted to intellectual property) legal rights of the corporate. "
-        "As a user of this computing device you're granted a nonexclusive, untransferable, revocable, restricted license to access and use this computing device and Content in accordance with these Terms of Use. "
-        "Supplier might terminate this license at any time for any reason.",
-    "All material offered on this computing device is protected by copyright laws. Distribution of the fabric from the net website, for business functions is prohibited. "
-        "'The house owners of the material possession, copyrights and logos or its affiliates or third party licensors'. "
-        "Domestic and International copyright and Trademark laws shield the complete Contents of the positioning. "
-        "You're expressly prohibited from modifying, copying, reproducing, publishing, uploading, posting, transmission or distributing any material on this website as well as text, graphics, code and/or package.",
-    "Welcome to the terms and conditions ('Terms') for The Pacific Holiday World (A Unit Of 4r Seasons Holidays Pvt. Ltd). "
-        "These Terms square measure between you and also the Pacific Holiday World and govern our individual rights and obligations. "
-        "Please note your use of the link, and by collaborating during this contest, you settle for these terms, conditions, limitations, and needs.",
-    "Welcome to the terms and conditions ('Terms') for The Pacific Holiday World (A Unit Of 4r Seasons Holidays Pvt. Ltd). "
-        "These Terms square measure between you and also the Pacific Holiday World and govern our individual rights and obligations. "
-        "Please note your use of the link, and by collaborating during this contest, you settle for these terms, conditions, limitations, and needs. "
-        "These Terms and Conditions govern the conduct of the contests under it hashtag #BlinkToBeThere delivered to you by The Pacific Holiday World and launched the terms and conditions on which you'll participate during this Contest."
-  ];
-
   static String apiKey =
       '122a3a8234a618432663194ba6116194970c116f4014feac40d215f9cee62a17';
 

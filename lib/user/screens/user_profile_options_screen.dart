@@ -1,4 +1,4 @@
-import 'package:exam_list/user/screens/notification_listing_screen.dart';
+import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/user/screens/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
@@ -6,9 +6,9 @@ import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/widgets/illustration_svg.dart';
 import 'package:provider/provider.dart';
 
-class UserProfileOptionsScreen extends StatelessWidget {
-  static const routeName = "/member-account";
+import 'notification_listing_screen.dart';
 
+class UserProfileOptionsScreen extends StatelessWidget {
   const UserProfileOptionsScreen({Key? key}) : super(key: key);
 
   Widget _horizontalOption(String text, Function onClick) {
@@ -30,6 +30,18 @@ class UserProfileOptionsScreen extends StatelessWidget {
     return BaseScaffold(
         titleText: 'Your Profile',
         isBackRequired: false,
+        action: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: IconButton(
+            icon: const Icon(
+              Icons.notifications_active_rounded,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed(NotificationListingScreen.routeName);
+            },
+          ),
+        ),
         child: Container(
           color: Colors.white,
           child: Column(
@@ -46,13 +58,15 @@ class UserProfileOptionsScreen extends StatelessWidget {
                   () => Navigator.of(context)
                       .pushNamed(UserEditProfileScreen.routeName)),
               _horizontalOption(
-                  'Notifications',
-                  () => Navigator.of(context)
-                      .pushNamed(NotificationListingScreen.routeName)),
-              /* _horizontalOption('My Requests', () async {
-                Navigator.of(context).pushNamed(MemberFeedbackScreen.routeName,
-                    arguments: (await PreferencesData.getUserData())?.id);
-              }),*/
+                  'Terms & Conditions',
+                  () => Navigator.of(context).pushNamed(
+                      TermsConditionsScreen.routeName,
+                      arguments: 0)),
+              _horizontalOption(
+                  'Privacy Policy',
+                  () => Navigator.of(context).pushNamed(
+                      TermsConditionsScreen.routeName,
+                      arguments: 1)),
               const Divider(
                 height: 1,
                 color: Colors.black,

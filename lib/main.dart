@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
       ],
       child: MaterialApp(
-          title: 'Exam List',
+          title: 'ExamU',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
               fontFamily: 'OpenSans',
@@ -84,7 +84,6 @@ class MyApp extends StatelessWidget {
                   .copyWith(secondary: appRed, secondaryContainer: appDarkBlue)),
           routes: {
             '/': (ctx) => const LaunchScreen(),
-            UserProfileOptionsScreen.routeName: (ctx) => const UserProfileOptionsScreen(),
             UserLoginScreen.routeName: (ctx) => const UserLoginScreen(),
             UserEditProfileScreen.routeName: (ctx) => const UserEditProfileScreen(),
             HomeScreen.routeName: (ctx) => const HomeScreen(),

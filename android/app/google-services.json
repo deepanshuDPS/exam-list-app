@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:50737212643:android:417e25635a1151cceee9d6",
+        "mobilesdk_app_id": "1:50737212643:android:52001d96aa0085b7eee9d6",
         "android_client_info": {
-          "package_name": "com.app.exams"
+          "package_name": "com.dps.examu"
         }
       },
       "oauth_client": [

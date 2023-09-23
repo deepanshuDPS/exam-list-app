@@ -9,7 +9,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Exam List"
+        android:label="ExamU"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_round_launcher"
         android:usesCleartextTraffic="true">
