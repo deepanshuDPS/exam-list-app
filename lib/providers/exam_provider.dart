@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/responseModels/exam/exam_data.dart';
 import 'package:exam_list/utils/exam_utils.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:exam_list/responseModels/home/exam_list_response.dart'
+import 'package:exam_list/responseModels/exam/exam_list_response.dart'
     as exam_list_response;
-import 'package:exam_list/responseModels/home/exam_pattern_list_response.dart'
+import 'package:exam_list/responseModels/exam/exam_pattern_list_response.dart'
     as exam_pattern_list_response;
 import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/responseModels/request_data.dart';
@@ -31,21 +31,30 @@ class ExamProvider with ChangeNotifier {
 
   // adNumber for opened exam
   String _openedExam = "";
+  int _currentFilterIndex = 0;
   RequestData examRequestData = RequestData();
 
-  void filterList(int index, {bool notify = true, String? query}) {
+  void filterList({int? index, bool notify = true, String? query}) {
+    if (index != null) {
+      _currentFilterIndex = index;
+      _notifyListenersWithBinding();
+    }
     _currentList.clear();
     if (query != null && query.length > 1) {
       _currentList.addAll(_allExams.where((exam) {
         return isQueryExist(exam.examName, query) ||
             isQueryExist(exam.adNumber, query);
       }));
-    } else if (index == 0) {
+    } else if (_currentFilterIndex == 0) {
       _currentList.addAll(_allExams);
     } else {
-      _currentList.addAll(_differentTypesExams[index] ?? []);
+      _currentList.addAll(_differentTypesExams[_currentFilterIndex] ?? []);
     }
     if (notify) _notifyListenersWithBinding();
+  }
+
+  int get currentFilterIndex {
+    return _currentFilterIndex;
   }
 
   List<ExamData> get currentList {
@@ -84,6 +93,7 @@ class ExamProvider with ChangeNotifier {
     _allExams.clear();
     _differentTypesExams.clear();
     _currentList.clear();
+    _currentFilterIndex = selectedIndex;
     notifyWithRequest(examRequest, true);
     final response = exam_list_response.ExamListResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.getExams));
@@ -125,7 +135,7 @@ class ExamProvider with ChangeNotifier {
             }
           });
         }
-        filterList(selectedIndex, notify: false);
+        filterList(notify: false);
       }
     }
     notifyWithRequest(examRequest, false);
@@ -139,25 +149,6 @@ class ExamProvider with ChangeNotifier {
   void setExam(ExamData exam) {
     _selectedExam = exam;
     getExamPatternsById();
-  }
-
-  Future<void> getExams(String adNumber) async {
-    if (_openedExam == adNumber) {
-      return;
-    } else {
-      _selectedExam = null;
-      notifyWithRequest(examRequestData, true);
-    }
-    final examResponse = exam_list_response.ExamListResponse.fromJson(
-        await HttpRequests.instance()?.httpGetRequest(adNumber));
-
-    if (examResponse.status == true) {
-      _selectedExam = examResponse.data?.first;
-      _openedExam = adNumber;
-    } else {
-      examRequestData.setErrorData(examResponse.toJson());
-    }
-    notifyWithRequest(examRequestData, false);
   }
 
   void refreshExams(String slug) async {
@@ -244,5 +235,9 @@ class ExamProvider with ChangeNotifier {
       });
     }
     notifyWithRequest(examRequestData, false);
+  }
+
+  ExamData? getAdNumberExam(String adNumber) {
+    return _allExams.firstWhere((element) => element.adNumber == adNumber);
   }
 }

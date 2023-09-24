@@ -21,7 +21,8 @@ class ExamListingScreen extends StatefulWidget {
 
 class _ExamListingScreenState extends State<ExamListingScreen>
     with AutomaticKeepAliveClientMixin<ExamListingScreen> {
-  int _selectedCategoryIndex = 0;
+
+  int? _selectedIndex;
 
   @override
   void initState() {
@@ -29,7 +30,6 @@ class _ExamListingScreenState extends State<ExamListingScreen>
   }
 
   final _searchTextController = TextEditingController();
-  String _currentText = '';
   bool isInit = false;
 
   ExamProvider _examProvider() {
@@ -46,13 +46,12 @@ class _ExamListingScreenState extends State<ExamListingScreen>
     if (!isInit) {
       isInit = true;
       _searchTextController.clear();
-      _currentText = "";
-      _examProvider().fetchExams(_selectedCategoryIndex,
-          _userProvider().aspirantDetails?.subscribedChannels ?? []);
+      _examProvider().fetchExams(
+          0, _userProvider().aspirantDetails?.subscribedChannels ?? []);
       _searchTextController.addListener(() {
-        _currentText = _searchTextController.text;
-        _examProvider().filterList(_selectedCategoryIndex, query: _currentText);
+        _examProvider().filterList(query: _searchTextController.text);
       });
+      _selectedIndex = _examProvider().currentFilterIndex;;
     }
   }
 
@@ -61,21 +60,20 @@ class _ExamListingScreenState extends State<ExamListingScreen>
       margin: const EdgeInsets.symmetric(horizontal: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: _selectedCategoryIndex == index ? Colors.red : Colors.white,
+        color: _selectedIndex == index ? Colors.red : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: _selectedCategoryIndex == index ? Colors.red : Colors.grey,
+          color: _selectedIndex == index ? Colors.red : Colors.grey,
         ),
       ),
       child: Center(
         child: Text(
           Constants.examCategories[index] ?? "All",
           style: TextStyle(
-            color: _selectedCategoryIndex == index ? Colors.white : Colors.grey,
+            color: _selectedIndex == index ? Colors.white : Colors.grey,
             fontSize: 14,
-            fontWeight: _selectedCategoryIndex == index
-                ? FontWeight.w500
-                : FontWeight.normal,
+            fontWeight:
+                _selectedIndex == index ? FontWeight.w500 : FontWeight.normal,
           ),
         ),
       ),
@@ -168,14 +166,15 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 controller: _searchTextController,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.search),
-                                  suffixIcon: _currentText.isNotEmpty
-                                      ? IconButton(
-                                          icon: const Icon(Icons.clear),
-                                          onPressed: () {
-                                            _searchTextController.clear();
-                                          },
-                                        )
-                                      : null,
+                                  suffixIcon:
+                                      _searchTextController.text.isNotEmpty
+                                          ? IconButton(
+                                              icon: const Icon(Icons.clear),
+                                              onPressed: () {
+                                                _searchTextController.clear();
+                                              },
+                                            )
+                                          : null,
                                   hintText: 'Search...',
                                   border: InputBorder.none,
                                 ),
@@ -200,12 +199,14 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                     return GestureDetector(
                       onTap: () {
                         // Update the selected index when an item is tapped
+                        _searchTextController.clear();
+                        _examProvider().filterList(index: index,query: "");
                         setState(() {
-                          _selectedCategoryIndex = index;
+                          _selectedIndex = _examProvider().currentFilterIndex;
                         });
-                        _examProvider().filterList(index, query: _currentText);
                       },
-                      child: _examCategory(index),
+                      child: _examCategory(
+                          index),
                     );
                   },
                 ),
@@ -254,7 +255,8 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 },
                                 onClick: () {
                                   exams.setExam(exams.currentList[index]);
-                                  Navigator.of(context).pushNamed(ExamScreen.routeName);
+                                  Navigator.of(context)
+                                      .pushNamed(ExamScreen.routeName);
                                 },
                               );
                             }),

@@ -1,4 +1,4 @@
-import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/responseModels/exam/exam_data.dart';
 import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/utils/exam_utils.dart';

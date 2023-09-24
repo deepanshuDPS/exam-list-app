@@ -198,6 +198,7 @@ class HttpRequests {
 class ApiEndPoints {
   static const authUser = 'auth/user';
   static const authExam = 'auth/exam';
+  static const authNotification = 'auth/notification';
   static const authExamPattern = 'auth/exam-pattern';
   static const infoTermsPolicy = 'info/terms-policy';
 
@@ -211,29 +212,6 @@ class ApiEndPoints {
   static const getExams = '$authExam/';
   static const getExamByAdNumber = '$authExam/{adNumber}';
   static const getExamPatterByID = '$authExamPattern/{examIds}';
+  static const getAspirantNotification = '$authNotification/aspirantNotifications';
 
-  /////////////////////////////////////////////////////////////////////////////
-  static const home = 'home';
-  static const domesticPlaces = 'destination?category=domestic';
-  static const internationalPlaces = 'destination?category=international';
-  static const exchangePlaces = 'destination?category=exchange';
-  static const destinationResorts = 'destination/{id}/resort';
-  static const getResort = 'destination/{dId}/resort/{rId}';
-  static const checkVoucher = 'voucher/{voucher_num}';
-  static const enquiry = 'enquiry';
-  static const testimonials = 'feedback';
-  static const searchPlaces = 'search?q=';
-  static const forgotPassword = 'forget_password';
-
-  // member login end points
-  static const login = 'login';
-  static const memberOffers = 'member/offers';
-  static const memberProfile = 'member/profile';
-  static const memberHolidays = 'member/holidays';
-  static const memberDocuments = 'member/documents';
-  static const memberFee = 'member/fee';
-  static const memberAMC = 'member/amc';
-  static const memberTrips = 'member/mytrips/{trip_type}';
-  static const memberChangePassword = 'member/change_password';
-  static const memberBook = 'member/book/{type}';
 }

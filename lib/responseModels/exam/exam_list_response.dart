@@ -1,4 +1,4 @@
-import 'package:exam_list/responseModels/home/exam_data.dart';
+import 'package:exam_list/responseModels/exam/exam_data.dart';
 
 /// totalItems : 1
 /// totalPages : 1

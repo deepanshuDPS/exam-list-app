@@ -1,4 +1,4 @@
-import 'package:exam_list/responseModels/home/exam_pattern_data.dart';
+import 'package:exam_list/responseModels/exam/exam_pattern_data.dart';
 
 class ExamPatternListResponse {
   ExamPatternListResponse({

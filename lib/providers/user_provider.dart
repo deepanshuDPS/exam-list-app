@@ -1,16 +1,15 @@
 import 'package:exam_list/responseModels/user/aspirant_data.dart';
+import 'package:exam_list/responseModels/user/notification_response.dart'
+    as notification_response;
 import 'package:exam_list/responseModels/user/terms_policy_response.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
-import 'package:exam_list/responseModels/global_response.dart';
 import 'package:exam_list/responseModels/user/aspirant_profile_response.dart'
     as aspirant_profile_response;
 import 'package:exam_list/responseModels/request_data.dart';
-import 'package:exam_list/responseModels/search/all_places_response.dart'
-    as all_places_response;
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,15 +20,12 @@ import 'package:exam_list/responseModels/user/check_user_response.dart'
 class UserProvider with ChangeNotifier {
   bool _isLoggedIn = false;
 
-  final List<all_places_response.Data> _domesticList = [];
-  final List<all_places_response.Data> _internationalList = [];
-
   AspirantData? _aspirantDetailsData;
   check_user_response.Data? _userDetailsData;
+  final List<notification_response.Notification> _notifications = [];
 
   RequestData aspirantRequestData = RequestData();
-  RequestData myUpTripsRequestData = RequestData();
-  RequestData myCompTripsRequestData = RequestData();
+  RequestData notificationsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// 0-> Login Screen
@@ -151,38 +147,16 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  List<all_places_response.Data> get allPlacesList {
-    return [..._domesticList, ..._internationalList];
-  }
-
-  bool isPlacesListNotEmpty() =>
-      _domesticList.isNotEmpty || _internationalList.isNotEmpty;
-
-  Future<bool> getAllPlaces() async {
-    if (_domesticList.isEmpty && _internationalList.isEmpty) {
-      final domesticRes = all_places_response.AllPlacesResponse.fromJson(
-          await HttpRequests.instance()
-              ?.httpGetRequest(ApiEndPoints.domesticPlaces));
-      final internationalRes = all_places_response.AllPlacesResponse.fromJson(
-          await HttpRequests.instance()
-              ?.httpGetRequest(ApiEndPoints.internationalPlaces));
-      if (domesticRes.data?.isNotEmpty == true) {
-        _domesticList.addAll(domesticRes.data!);
-      }
-      if (internationalRes.data?.isNotEmpty == true) {
-        _internationalList.addAll(internationalRes.data!);
-      }
-      return isPlacesListNotEmpty();
-    }
-    return true;
-  }
-
   bool get isLogin {
     return _isLoggedIn;
   }
 
   AspirantData? get aspirantDetails {
     return _aspirantDetailsData;
+  }
+
+  List<notification_response.Notification> get notifications {
+    return _notifications;
   }
 
   check_user_response.Data? get userDetails {
@@ -207,29 +181,6 @@ class UserProvider with ChangeNotifier {
       aspirantRequestData.setErrorData(response.toJson());
     }
     notifyWithRequest(aspirantRequestData, false);
-  }
-
-  Future<dynamic> changePassword(String oldPass, String newPass) async {
-    var body = {'old_pwd': oldPass, 'new_pwd': newPass, 'cnew_pwd': newPass};
-    final response = GlobalResponse.fromJson(await HttpRequests.instance()
-        ?.httpPutRequest(ApiEndPoints.memberChangePassword, body));
-    if (response.status == -1) {
-      return {'errorMessage': response.message ?? 'Something Went Wrong'};
-    }
-    return response.message;
-  }
-
-  Future<dynamic> bookingOfferOrHoliday(
-      Map<String, String?> bodyData, bool isOffer) async {
-    final response = GlobalResponse.fromJson(await HttpRequests.instance()
-        ?.httpPostRequest(
-            ApiEndPoints.memberBook
-                .replaceAll('{type}', isOffer ? 'offer' : 'holiday'),
-            bodyData));
-    if (response.status == -1) {
-      return {'errorMessage': response.message ?? 'Something Went Wrong'};
-    }
-    return response.message;
   }
 
   Future<dynamic> signUpAspirant(Map<String, dynamic> body) async {
@@ -268,5 +219,16 @@ class UserProvider with ChangeNotifier {
     return response.message ?? 'Something went Wrong';
   }
 
-  void getNotifications() {}
+  Future<void> getNotifications() async {
+    notifyWithRequest(notificationsRequestData, true);
+    final response = notification_response.NotificationResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpGetRequest(ApiEndPoints.getAspirantNotification));
+    if (response.data != null) {
+      _notifications.addAll(response.data ?? []);
+    } else {
+      notificationsRequestData.setErrorData(response.toJson());
+    }
+    notifyWithRequest(notificationsRequestData, false);
+  }
 }
