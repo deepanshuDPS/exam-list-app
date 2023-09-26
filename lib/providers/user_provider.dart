@@ -4,6 +4,7 @@ import 'package:exam_list/responseModels/user/notification_response.dart'
 import 'package:exam_list/responseModels/user/terms_policy_response.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/network/http_requests.dart';
@@ -164,9 +165,32 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> logoutUser() async {
+    await removeFcmDisableNotification();
+    await _auth.signOut();
     await PreferencesData.clearOnLogOut();
     _isLoggedIn = false;
-    _notifyListenersWithBinding();
+  }
+
+  Future<void> removeFcmDisableNotification() async {
+    String fcmTokenToRemove = await PreferencesData.getFCMToken();
+    try {
+      if (fcmTokenToRemove != "") {
+        await HttpRequests.instance()?.httpPatchRequest(ApiEndPoints.logoutUser,
+            {'fcmTokenToRemove': fcmTokenToRemove});
+      } else {
+        return;
+      }
+    } catch (e) {
+      e.toString();
+    } finally {
+      FirebaseMessaging.instance.deleteToken().then((value) {
+        PreferencesData.checkFCMToken();
+      });
+      var subsList = await PreferencesData.getSubscriptions();
+      for (var topic in subsList) {
+        FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+      }
+    }
   }
 
   Future<dynamic> getAspirantUser() async {

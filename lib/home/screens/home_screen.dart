@@ -4,6 +4,7 @@ import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:exam_list/utils/notification_instance.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:exam_list/widgets/container_error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,7 +25,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends BaseState<HomeScreen>
     with SingleTickerProviderStateMixin {
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late TabController _tabController; // Manages the tab index
   List<Widget> tabScreens = const [
     ExamListingScreen(),
@@ -40,11 +40,6 @@ class _HomeScreenState extends BaseState<HomeScreen>
         length: tabScreens.length,
         vsync: this,
         animationDuration: Duration.zero);
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('drawable/ic_launcher');
-    flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(android: initializationSettingsAndroid));
   }
 
   Future<PermissionStatus> requestNotificationPermissions() async {
@@ -68,31 +63,7 @@ class _HomeScreenState extends BaseState<HomeScreen>
       });
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.getAspirantUser();
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        printDebug('Got a message whilst in the foreground!');
-        printDebug('Message data: ${message.data}');
-        if (message.notification != null) {
-          printDebug(
-              'Message also contained a notification: ${message.notification}');
-          PreferencesData.setCurrentVersion();
-          const AndroidNotificationDetails androidPlatformChannelSpecifics =
-              AndroidNotificationDetails(
-            'exam_notifications',
-            'Exam Notifications',
-            styleInformation: BigTextStyleInformation(''),
-          );
-          const NotificationDetails platformChannelSpecifics =
-              NotificationDetails(android: androidPlatformChannelSpecifics);
-          flutterLocalNotificationsPlugin.show(
-            Random().nextInt(12345), // Notification ID
-            message.notification?.title ??
-                'Hey, aspirant Something new for you',
-            message.notification?.body ??
-                'Please, be updated with the latest news',
-            platformChannelSpecifics,
-          );
-        }
-      });
+      _setUpFirebaseMessaging();
     }
     super.didChangeDependencies();
   }
@@ -212,5 +183,11 @@ class _HomeScreenState extends BaseState<HomeScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _setUpFirebaseMessaging() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+         NotificationInstance.instance()?.onNotificationMessage(message);
+    });
   }
 }

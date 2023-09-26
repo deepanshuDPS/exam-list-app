@@ -33,7 +33,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   void _verifyMobileNumber() async {
     String mobileNumber = _mobileController.text.trim();
 
-    if (kDebugMode && mobileNumber == '880075776') {
+    if (kDebugMode && mobileNumber == '8800757476') {
       _signInForGuest(mobileNumber);
       return;
     }

@@ -1,5 +1,6 @@
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/user/screens/user_edit_profile_screen.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/providers/user_provider.dart';
@@ -38,7 +39,8 @@ class UserProfileOptionsScreen extends StatelessWidget {
               color: Colors.black,
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(NotificationListingScreen.routeName);
+              Navigator.of(context)
+                  .pushNamed(NotificationListingScreen.routeName);
             },
           ),
         ),
@@ -74,9 +76,19 @@ class UserProfileOptionsScreen extends StatelessWidget {
                 endIndent: 24,
               ),
               _horizontalOption('Logout', () {
-                Provider.of<UserProvider>(context, listen: false).logoutUser();
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed("/");
+                showProgressDialog(context);
+                Provider.of<UserProvider>(context, listen: false)
+                    .logoutUser()
+                    .then((value) {
+                  // for progress dialog
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed("/");
+                }).onError((error, stackTrace) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed("/");
+                });
               }),
             ],
           ),

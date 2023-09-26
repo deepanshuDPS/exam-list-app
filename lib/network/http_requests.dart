@@ -84,12 +84,12 @@ class HttpRequests {
     }
   }
 
-  Future<dynamic> httpPatchRequest(String endPoint, Map<String, dynamic> request,
+  Future<dynamic> httpPatchRequest(
+      String endPoint, Map<String, dynamic> request,
       {bool includeAuthHeader = true}) async {
     try {
       var url = "${Constants.baseURL}$endPoint";
       var headersToSend = await getHeaders(includeAuthHeader);
-
       final response = await http.patch(Uri.parse(url),
           headers: headersToSend, body: jsonEncode(request));
 
@@ -107,7 +107,8 @@ class HttpRequests {
     }
   }
 
-  Future<dynamic> httpDeleteRequest(String endPoint, Map<String, dynamic> request,
+  Future<dynamic> httpDeleteRequest(
+      String endPoint, Map<String, dynamic> request,
       {bool includeAuthHeader = true}) async {
     try {
       var url = "${Constants.baseURL}$endPoint";
@@ -130,13 +131,11 @@ class HttpRequests {
     }
   }
 
-
   Future<dynamic> httpGetQueryRequest(String endPoint,
       {bool includeAuthHeader = true, Map<String, String>? queryParams}) async {
     try {
       var headersToSend = await getHeaders(includeAuthHeader);
-      var cachedResponse =
-      await getAuthCachedResponse(endPoint, headersToSend);
+      var cachedResponse = await getAuthCachedResponse(endPoint, headersToSend);
       if (cachedResponse != null) {
         return cachedResponse;
       }
@@ -164,8 +163,7 @@ class HttpRequests {
     try {
       var url = "${Constants.baseURL}$endPoint";
       var headersToSend = await getHeaders(includeAuthHeader);
-      var cachedResponse =
-          await getAuthCachedResponse(endPoint, headersToSend);
+      var cachedResponse = await getAuthCachedResponse(endPoint, headersToSend);
       if (cachedResponse != null) {
         printDebug("here cached");
         return cachedResponse;
@@ -181,12 +179,12 @@ class HttpRequests {
         if (response.statusCode == 404) {
           return getErrorResponse(response.statusCode, _emptyError);
         }
-        printDebug("here error"+response.statusCode.toString());
+        printDebug("here error" + response.statusCode.toString());
         return getErrorResponse(
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
       }
     } catch (error) {
-      printDebug("here error: "+error.runtimeType.toString());
+      printDebug("here error: " + error.runtimeType.toString());
       if (error is SocketException) {
         return getErrorResponse(1, _emptyError);
       }
@@ -208,10 +206,11 @@ class ApiEndPoints {
   static const notifyMe = "$authUser/notifyMe";
   static const editAspirantProfile = "$authUser/editAspirantProfile";
   static const checkGuestUser = "anon/user/checkGuestUser";
+  static const logoutUser = "$authUser/logOutUser";
 
   static const getExams = '$authExam/';
   static const getExamByAdNumber = '$authExam/{adNumber}';
   static const getExamPatterByID = '$authExamPattern/{examIds}';
-  static const getAspirantNotification = '$authNotification/aspirantNotifications';
-
+  static const getAspirantNotification =
+      '$authNotification/aspirantNotifications';
 }
