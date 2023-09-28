@@ -28,6 +28,7 @@ class UserProvider with ChangeNotifier {
   RequestData aspirantRequestData = RequestData();
   RequestData notificationsRequestData = RequestData();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  var _currentVersion = -1;
 
   /// 0-> Login Screen
   /// 1-> Not onBoarded
@@ -175,8 +176,8 @@ class UserProvider with ChangeNotifier {
     String fcmTokenToRemove = await PreferencesData.getFCMToken();
     try {
       if (fcmTokenToRemove != "") {
-        await HttpRequests.instance()?.httpPatchRequest(ApiEndPoints.logoutUser,
-            {'fcmTokenToRemove': fcmTokenToRemove});
+        await HttpRequests.instance()?.httpPatchRequest(
+            ApiEndPoints.logoutUser, {'fcmTokenToRemove': fcmTokenToRemove});
       } else {
         return;
       }
@@ -202,6 +203,7 @@ class UserProvider with ChangeNotifier {
     if (response.data != null) {
       _aspirantDetailsData = response.data;
     } else {
+      printDebug("hello here");
       aspirantRequestData.setErrorData(response.toJson());
     }
     notifyWithRequest(aspirantRequestData, false);
@@ -254,5 +256,18 @@ class UserProvider with ChangeNotifier {
       notificationsRequestData.setErrorData(response.toJson());
     }
     notifyWithRequest(notificationsRequestData, false);
+  }
+
+  void setCurrentVersion() async {
+    _currentVersion = await PreferencesData.getCurrentVersion();
+  }
+
+  Future<bool> isNewVersionAvailable() async {
+    var newVersion = await PreferencesData.getCurrentVersion();
+    if (_currentVersion != newVersion) {
+      _currentVersion = newVersion;
+      return true;
+    }
+    return false;
   }
 }

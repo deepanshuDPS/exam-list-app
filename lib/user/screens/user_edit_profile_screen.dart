@@ -38,13 +38,13 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
-      _userProvider().getAspirantUser().then((value){
+      _userProvider().getAspirantUser().then((value) {
         setState(() {
           _aspirantDetailsData = _userProvider().aspirantDetails!.copyWith();
           selectedDate = DateTime.parse(_aspirantDetailsData.dob ?? "");
+          printDebug(_aspirantDetailsData.toJson().toString());
         });
       });
-
     }
     super.didChangeDependencies();
   }
@@ -99,7 +99,8 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                     onChanged: (value) {
                                       setState(() {
                                         _aspirantDetailsData.setName(value);
-                                        printDebug(_aspirantDetailsData.name.toString());
+                                        printDebug(_aspirantDetailsData.name
+                                            .toString());
                                       });
                                     },
                                     initialValue: _aspirantDetailsData.name,
@@ -207,7 +208,8 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                       Radio<bool>(
                                         value: false,
                                         groupValue:
-                                            _aspirantDetailsData.isDiffAble == true,
+                                            _aspirantDetailsData.isDiffAble ==
+                                                true,
                                         onChanged: (value) {
                                           setState(() {
                                             _aspirantDetailsData
@@ -224,7 +226,8 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                     'Differently Able Category',
                                     DropdownButtonFormField<String>(
                                       value: _aspirantDetailsData
-                                          .diffAbleCategory?.optionName,
+                                              .diffAbleCategory?.optionName ??
+                                          "None",
                                       onChanged: (value) {
                                         setState(() {
                                           _aspirantDetailsData
@@ -284,15 +287,20 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                   'Additional Qualification',
                                   DropdownButtonFormField<String>(
                                     value: _aspirantDetailsData
-                                        .addQualification?.optionName,
+                                        .addQualification?.optionName??'None',
                                     onChanged: (value) {
                                       setState(() {
-                                        _aspirantDetailsData.setEduQualification(
-                                            EduQualification(
-                                                optionName: value!,
-                                                optionId: Constants
-                                                    .additionalQualifications[
-                                                value]!));
+                                        if (value == "None") {
+                                          _aspirantDetailsData
+                                              .setAddQualification(null);
+                                        } else {
+                                          _aspirantDetailsData.setAddQualification(
+                                              EduQualification(
+                                                  optionName: value!,
+                                                  optionId: Constants
+                                                          .additionalQualifications[
+                                                      value]!));
+                                        }
                                       });
                                     },
                                     items: Constants

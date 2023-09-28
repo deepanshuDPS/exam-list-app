@@ -1,16 +1,13 @@
-import 'dart:math';
 
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/notification_instance.dart';
-import 'package:exam_list/utils/preferences_data.dart';
 import 'package:exam_list/widgets/container_error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends BaseState<HomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin  {
   late TabController _tabController; // Manages the tab index
   List<Widget> tabScreens = const [
     ExamListingScreen(),
@@ -61,8 +58,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
           // await openAppSettings();
         }
       });
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.getAspirantUser();
+      _userProvider().setCurrentVersion();
+      _userProvider().getAspirantUser();
       _setUpFirebaseMessaging();
     }
     super.didChangeDependencies();
@@ -179,6 +176,10 @@ class _HomeScreenState extends BaseState<HomeScreen>
     );
   }
 
+  UserProvider _userProvider() {
+    return Provider.of<UserProvider>(context, listen: false);
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -191,3 +192,5 @@ class _HomeScreenState extends BaseState<HomeScreen>
     });
   }
 }
+
+
