@@ -42,7 +42,6 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
         setState(() {
           _aspirantDetailsData = _userProvider().aspirantDetails!.copyWith();
           selectedDate = DateTime.parse(_aspirantDetailsData.dob ?? "");
-          printDebug(_aspirantDetailsData.toJson().toString());
         });
       });
     }
@@ -230,12 +229,16 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                           "None",
                                       onChanged: (value) {
                                         setState(() {
-                                          _aspirantDetailsData
-                                              .setDiffAbleCategory(Category(
-                                                  optionName: value!,
-                                                  optionId: Constants
-                                                          .disabilityCategories[
-                                                      value]!));
+                                          if(value == "None"){
+                                            _aspirantDetailsData.setDiffAbleCategory(null);
+                                          }else{
+                                            _aspirantDetailsData
+                                                .setDiffAbleCategory(Category(
+                                                optionName: value!,
+                                                optionId: Constants
+                                                    .disabilityCategories[
+                                                value]!));
+                                          }
                                         });
                                       },
                                       items: Constants.disabilityCategories.keys
@@ -287,7 +290,8 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                   'Additional Qualification',
                                   DropdownButtonFormField<String>(
                                     value: _aspirantDetailsData
-                                        .addQualification?.optionName??'None',
+                                            .addQualification?.optionName ??
+                                        'None',
                                     onChanged: (value) {
                                       setState(() {
                                         if (value == "None") {
@@ -402,8 +406,11 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
       return;
     }
 
+    if(_aspirantDetailsData.isDiffAble == false) {
+      _aspirantDetailsData.setDiffAbleCategory(null);
+    }
+
     _aspirantDetailsData.setDob(selectedDate!.toIso8601String());
-    printDebug(_aspirantDetailsData.name.toString());
     showProgressDialog(context);
     userProvider
         .editAspirantProfile(_aspirantDetailsData.toJson())
@@ -415,7 +422,7 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
         // successfully login toast
         // check on boarding and change screen
         if (value == true) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
         } else {
           showSnackBar(context, 'Something went Wrong');
         }

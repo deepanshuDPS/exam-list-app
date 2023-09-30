@@ -1,12 +1,14 @@
 import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
+import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/container_error.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/widgets/container_loading.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class NotificationListingScreen extends StatefulWidget {
@@ -21,7 +23,6 @@ class NotificationListingScreen extends StatefulWidget {
 
 class _NotificationListingScreenState
     extends BaseState<NotificationListingScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -33,6 +34,15 @@ class _NotificationListingScreenState
       _fetchData();
     }
     super.didChangeDependencies();
+  }
+
+  Widget _trailingIcon(String asset) {
+    return Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: appRed.withOpacity(0.2)),
+        child: SvgPicture.asset(asset, width: 24, height: 24));
   }
 
   @override
@@ -57,15 +67,33 @@ class _NotificationListingScreenState
                 itemBuilder: (_, index) {
                   var item = itemList[index];
                   return ListTile(
-                    leading: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Image.asset('assets/images/img_rect_phw.png'),
+                    tileColor: Colors.white,
+                    leading: Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(13),
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          child: Image.asset('assets/images/img_rect_phw.png'),
+                        ),
+                      ),
                     ),
-                    title: Text(item.title ?? "..."),
-                    subtitle: Text(item.description ?? "..."),
+                    title: Text(item.title ?? "...",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w200,
+                        )),
+                    subtitle: Text(item.description ?? "...",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w200,
+                        )),
                     trailing: item.notificationType != 1
-                        ? const Icon(Icons.notifications_active_rounded)
-                        : const Icon(Icons.notification_add),
+                        ? _trailingIcon("assets/svg/ic_exam_update.svg")
+                        : _trailingIcon("assets/svg/ic_new_exam.svg"),
                     onTap: () {
                       var examToOpen = _examProvider()
                           .getAdNumberExam(item.adNumber ?? "..");

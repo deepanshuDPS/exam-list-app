@@ -10,7 +10,10 @@ import 'package:provider/provider.dart';
 import 'notification_listing_screen.dart';
 
 class UserProfileOptionsScreen extends StatelessWidget {
-  const UserProfileOptionsScreen({Key? key}) : super(key: key);
+
+  final Function onRefresh;
+
+  const UserProfileOptionsScreen({Key? key, required this.onRefresh}) : super(key: key);
 
   Widget _horizontalOption(String text, Function onClick) {
     return InkWell(
@@ -55,10 +58,13 @@ class UserProfileOptionsScreen extends StatelessWidget {
               const SizedBox(
                 height: 24,
               ),
-              _horizontalOption(
-                  'Edit Profile',
-                  () => Navigator.of(context)
-                      .pushNamed(UserEditProfileScreen.routeName)),
+              _horizontalOption('Edit Profile', () async {
+                var result = await Navigator.of(context)
+                    .pushNamed(UserEditProfileScreen.routeName);
+                if (result != null) {
+                  onRefresh();
+                }
+              }),
               _horizontalOption(
                   'Terms & Conditions',
                   () => Navigator.of(context).pushNamed(

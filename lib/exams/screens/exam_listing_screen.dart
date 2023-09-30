@@ -7,6 +7,7 @@ import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,6 @@ class ExamListingScreen extends StatefulWidget {
 
 class _ExamListingScreenState extends State<ExamListingScreen>
     with AutomaticKeepAliveClientMixin<ExamListingScreen> {
-
   int? _selectedIndex;
 
   @override
@@ -51,7 +51,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
       _searchTextController.addListener(() {
         _examProvider().filterList(query: _searchTextController.text);
       });
-      _selectedIndex = _examProvider().currentFilterIndex;;
+      _selectedIndex = _examProvider().currentFilterIndex;
     }
   }
 
@@ -200,13 +200,12 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                       onTap: () {
                         // Update the selected index when an item is tapped
                         _searchTextController.clear();
-                        _examProvider().filterList(index: index,query: "");
+                        _examProvider().filterList(index: index, query: "");
                         setState(() {
                           _selectedIndex = _examProvider().currentFilterIndex;
                         });
                       },
-                      child: _examCategory(
-                          index),
+                      child: _examCategory(index),
                     );
                   },
                 ),
@@ -215,52 +214,78 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                 height: 8,
               ),
               Consumer<ExamProvider>(
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height / 2,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                   builder: (context, exams, child) {
                     if (exams.examRequest.isLoading) {
                       return child!;
                     } else {
-                      return Expanded(
-                        child: ListView.builder(
-                            physics: const ClampingScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            itemCount: exams.currentList.length,
-                            itemBuilder: (context, index) {
-                              return ExamListItem(
-                                exam: exams.currentList[index],
-                                aspirant: _userProvider().aspirantDetails!,
-                                onNotify: (slug) {
-                                  if (exams.isNotifying) return;
-                                  Fluttertoast.showToast(msg: 'Subscribing');
-                                  exams.notifyMe(slug).then((value) {
-                                    if (value is String) {
-                                      showSnackBar(context, value);
-                                    } else {
-                                      _examProvider().refreshExams(slug);
-                                    }
-                                  });
-                                },
-                                onRemoveNotify: (slug) {
-                                  if (exams.isNotifying) return;
-                                  Fluttertoast.showToast(msg: 'Unsubscribing');
-                                  exams.removeNotifyMe(slug).then((value) {
-                                    if (value is String) {
-                                      showSnackBar(context, value);
-                                    } else {
-                                      _examProvider().refreshExams(slug);
-                                    }
-                                  });
-                                },
-                                onClick: () {
-                                  exams.setExam(exams.currentList[index]);
-                                  Navigator.of(context)
-                                      .pushNamed(ExamScreen.routeName);
-                                },
-                              );
-                            }),
-                      );
+                      var list = exams.currentList;
+                      if (list.isEmpty) {
+                        return Expanded(
+                          child: Center(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset('assets/svg/ic_no_results.svg'),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'No exams',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: sharpGrey),
+                                  )
+                                ]),
+                          ),
+                        );
+                      } else {
+                        return Expanded(
+                          child: ListView.builder(
+                              physics: const ClampingScrollPhysics(),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              itemCount: list.length,
+                              itemBuilder: (context, index) {
+                                return ExamListItem(
+                                  exam: list[index],
+                                  aspirant: _userProvider().aspirantDetails!,
+                                  onNotify: (slug) {
+                                    if (exams.isNotifying) return;
+                                    Fluttertoast.showToast(msg: 'Subscribing');
+                                    exams.notifyMe(slug).then((value) {
+                                      if (value is String) {
+                                        showSnackBar(context, value);
+                                      } else {
+                                        _examProvider().refreshExams(slug);
+                                      }
+                                    });
+                                  },
+                                  onRemoveNotify: (slug) {
+                                    if (exams.isNotifying) return;
+                                    Fluttertoast.showToast(
+                                        msg: 'Unsubscribing');
+                                    exams.removeNotifyMe(slug).then((value) {
+                                      if (value is String) {
+                                        showSnackBar(context, value);
+                                      } else {
+                                        _examProvider().refreshExams(slug);
+                                      }
+                                    });
+                                  },
+                                  onClick: () {
+                                    exams.setExam(list[index]);
+                                    Navigator.of(context)
+                                        .pushNamed(ExamScreen.routeName);
+                                  },
+                                );
+                              }),
+                        );
+                      }
                     }
                   })
             ],

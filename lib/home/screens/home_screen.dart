@@ -1,4 +1,3 @@
-
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
@@ -21,20 +20,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends BaseState<HomeScreen>
-    with SingleTickerProviderStateMixin  {
+    with SingleTickerProviderStateMixin {
   late TabController _tabController; // Manages the tab index
-  List<Widget> tabScreens = const [
-    ExamListingScreen(),
-    // const ExamListingScreen(),
-    // const ResourcesScreen(),
-    UserProfileOptionsScreen()
-  ];
+
+  void _refreshUser() {
+    _userProvider().getAspirantUser();
+  }
+
+  late List<Widget> _tabScreens ;
 
   @override
   void initState() {
     super.initState();
+    _tabScreens = [
+      const ExamListingScreen(),
+      // const ExamListingScreen(),
+      // const ResourcesScreen(),
+      UserProfileOptionsScreen(onRefresh: _refreshUser),
+    ];
     _tabController = TabController(
-        length: tabScreens.length,
+        length: _tabScreens.length,
         vsync: this,
         animationDuration: Duration.zero);
   }
@@ -90,7 +95,7 @@ class _HomeScreenState extends BaseState<HomeScreen>
               body: TabBarView(
                 controller: _tabController,
                 physics: const NeverScrollableScrollPhysics(),
-                children: tabScreens,
+                children: _tabScreens,
               ),
             );
           }),
@@ -188,9 +193,7 @@ class _HomeScreenState extends BaseState<HomeScreen>
 
   void _setUpFirebaseMessaging() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-         NotificationInstance.instance()?.onNotificationMessage(message);
+      NotificationInstance.instance()?.onNotificationMessage(message);
     });
   }
 }
-
-

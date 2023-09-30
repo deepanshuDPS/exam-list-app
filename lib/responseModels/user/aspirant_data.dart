@@ -161,7 +161,7 @@ class AspirantData {
     _category = category;
   }
 
-  void setDiffAbleCategory(Category diffAbleCategory) {
+  void setDiffAbleCategory(Category? diffAbleCategory) {
     _diffAbleCategory = diffAbleCategory;
   }
 

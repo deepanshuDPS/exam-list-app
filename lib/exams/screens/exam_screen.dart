@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ExamScreen extends StatefulWidget {
-  static const routeName = "/resort-screen";
+  static const routeName = "/exam-screen";
 
   const ExamScreen({Key? key}) : super(key: key);
 

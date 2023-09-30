@@ -213,6 +213,8 @@ class ExamProvider with ChangeNotifier {
   }
 
   Future<void> getExamPatternsById() async {
+    _htmlContents.clear();
+    _extraHtmlContents.clear();
     notifyWithRequest(examRequestData, true);
     var idsList = fetchAllExamIds(_selectedExam!);
     String examIds;

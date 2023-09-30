@@ -44,12 +44,14 @@ class Constants {
   };
 
   static Map<String, int> additionalQualifications = {
+    'None':-1,
     'JBT': 20,
     'D Ed': 21,
     'B Ed': 22,
   };
 
   static Map<String, int> disabilityCategories = {
+    'None':-1,
     'OD-Orthopedic Disability': 20,
     'VI-Visual Impairment': 21,
     'HI-Hearing Impairment': 22,

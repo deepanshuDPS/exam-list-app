@@ -230,6 +230,7 @@ class UserProvider with ChangeNotifier {
             ?.httpPutRequest(ApiEndPoints.editAspirantProfile, body));
     if (response.status == true) {
       _notifyListenersWithBinding();
+      await PreferencesData.setCurrentVersion();
       return true;
     }
     _notifyListenersWithBinding();
@@ -246,6 +247,7 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> getNotifications() async {
+    _notifications.clear();
     notifyWithRequest(notificationsRequestData, true);
     final response = notification_response.NotificationResponse.fromJson(
         await HttpRequests.instance()
