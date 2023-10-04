@@ -1,6 +1,5 @@
-import 'package:exam_list/containers/base_image_container.dart';
-import 'package:exam_list/containers/base_scaffold.dart';
-import 'package:exam_list/home/widgets/card_bg.dart';
+import 'package:exam_list/exams/screens/html_tab_screen.dart';
+import 'package:exam_list/exams/screens/notices_tab_screen.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/responseModels/exam/exam_data.dart';
@@ -9,13 +8,11 @@ import 'package:exam_list/user/extras/view_image.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/exam_utils.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/widgets/container_loading.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class ExamScreen extends StatefulWidget {
   static const routeName = "/exam-screen";
@@ -26,11 +23,15 @@ class ExamScreen extends StatefulWidget {
   BaseState<ExamScreen> createState() => _ExamScreenState();
 }
 
-class _ExamScreenState extends BaseState<ExamScreen> {
+class _ExamScreenState extends BaseState<ExamScreen>
+    with TickerProviderStateMixin {
   // String _adNumber = "";
   String _examName = "";
   late ExamData _exam;
   late AspirantData _aspirantData;
+  final GlobalKey _examDetailsKey = GlobalKey();
+  late double _columnHeight = 350;
+  TabController? tabController;
 
   @override
   void initState() {
@@ -51,6 +52,15 @@ class _ExamScreenState extends BaseState<ExamScreen> {
       _examName = _examProvider().exam?.examName ?? 'N/A';
       _exam = _examProvider().exam!;
       _aspirantData = _userProvider().aspirantDetails!;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final RenderBox renderBox =
+            _examDetailsKey.currentContext?.findRenderObject() as RenderBox;
+        setState(() {
+          _columnHeight = renderBox.size.height + 48;
+          printDebug(_columnHeight.toString());
+        });
+      });
     }
     super.didChangeDependencies();
   }
@@ -91,6 +101,7 @@ class _ExamScreenState extends BaseState<ExamScreen> {
     );
   }
 
+/*
   Widget _webViewData(String htmlContent) {
     final WebViewController controller = WebViewController();
     controller
@@ -151,46 +162,179 @@ class _ExamScreenState extends BaseState<ExamScreen> {
       ]),
     );
   }
+*/
 
-  Widget _detailsLink(Extras linkDetails) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: lightPink,
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              linkDetails.name ?? "Notice",
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14),
-            ),
-            if (linkDetails.formattedDate.isNotEmpty)
-              Text(
-                linkDetails.formattedDate,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w200,
-                    fontSize: 9),
-              ),
-          ]),
-          const Icon(
-            Icons.open_in_new_rounded,
-            size: 24,
-            color: Colors.white,
-          ),
-        ],
+  Widget _tabBarView(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Tab(
+        text: title,
       ),
     );
   }
 
   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Consumer<ExamProvider>(
+            child: const ContainerLoading(),
+            builder: (ctx, exams, ch) {
+              List<Widget> tabList = [];
+              List<Widget> tabScreens = [];
+              if (getNotices(_exam).isNotEmpty) {
+                tabList.add(_tabBarView('Notices'));
+                tabScreens.add(NoticesTabScreen(
+                  examData: _exam,
+                ));
+              }
+              if (exams.htmlContents.isNotEmpty) {
+                for (var htmlContent in exams.htmlContents) {
+                  tabList.add(_tabBarView('Info'));
+                  tabScreens.add(HtmlTabScreen(
+                    htmlContent: htmlContent,
+                  ));
+                }
+              }
+              if (exams.extraHtmlContents.isNotEmpty) {
+                for (var htmlContent in exams.htmlContents) {
+                  tabList.add(_tabBarView('Extra Info'));
+                  tabScreens.add(HtmlTabScreen(
+                    htmlContent: htmlContent,
+                  ));
+                }
+              }
+              tabController =
+                  TabController(length: tabList.length, vsync: this);
+              return CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  SliverAppBar(
+                    expandedHeight: _columnHeight,
+                    floating: true,
+                    toolbarHeight: 48.0,
+                    title: const Padding(
+                      padding: EdgeInsets.all(0),
+                      child: Text(
+                        'Exam Details',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: sharpGrey,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    backgroundColor: Colors.white,
+                    pinned: true,
+                    centerTitle: false,
+                    leading: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: sharpGrey,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        padding: EdgeInsets.only(
+                            top: (MediaQuery.of(context).padding.top + 50)),
+                        child: Center(
+                          child: Column(
+                            key: _examDetailsKey,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8),
+                                  child: Text(
+                                    _examName,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: sharpGrey),
+                                  )),
+                              _heading('General Details:'),
+                              Column(
+                                children: [
+                                  _detailsRow('Total Posts',
+                                      getTotalPosts(_exam).toString()),
+                                  const SizedBox(height: 6),
+                                  _detailsRow(
+                                      '${_aspirantData.category?.optionName ?? 'N/A'} Category Posts',
+                                      getTotalCategoryPosts(
+                                              _aspirantData
+                                                      .category?.optionId ??
+                                                  0,
+                                              _aspirantData.gender ?? 0,
+                                              _exam)
+                                          .toString()),
+                                  const SizedBox(height: 6),
+                                  _detailsRow(
+                                      '${_aspirantData.category?.optionName ?? 'N/A'} ${Constants.genders[_aspirantData.gender ?? 0]} Fees',
+                                      getExamFees(
+                                              _aspirantData
+                                                      .category?.optionId ??
+                                                  0,
+                                              _aspirantData.gender ?? 0,
+                                              _exam)
+                                          .toString()),
+                                ],
+                              ),
+                              _heading('Important Dates:'),
+                              Column(
+                                children: [
+                                  _detailsRow(
+                                      'Application Start Date',
+                                      _exam.formatAppStartDate?.toString() ??
+                                          ''),
+                                  const SizedBox(height: 6),
+                                  _detailsRow('Application End Date',
+                                      _exam.formatAppEndDate?.toString() ?? ''),
+                                  const SizedBox(height: 6),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(kToolbarHeight),
+                      // Height of the TabBar
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TabBar(
+                            indicatorColor: Colors.red,
+                            indicatorPadding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                            ),
+                            indicatorSize: TabBarIndicatorSize.label,
+                            isScrollable: true,
+                            tabs: tabList,
+                            labelColor: Colors.red,
+                            unselectedLabelColor: sharpGrey,
+                            labelStyle: const TextStyle(
+                                fontWeight:  FontWeight.w600,
+                                fontSize: 16),
+                            unselectedLabelStyle: const TextStyle(
+                                fontWeight:  FontWeight.w500,
+                                fontSize: 16),
+                            controller: tabController,
+                          )),
+                    ),
+                  ),
+                  SliverFillRemaining(
+                      hasScrollBody: true,
+                      child: TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          controller: tabController,
+                          children: tabScreens))
+                ],
+              );
+            }));
+  }
+
+  /* @override
   Widget build(BuildContext context) {
     return BaseScaffold(
         titleText: "Exam Details",
@@ -249,21 +393,12 @@ class _ExamScreenState extends BaseState<ExamScreen> {
                             const SizedBox(height: 6),
                           ],
                         ),
-                        if (getNotices(_exam).isNotEmpty)
-                          _heading('Important Links:'),
-                        ...getNotices(_exam).map((e) => _detailsLink(e)),
-                        if (exams.extraHtmlContents.isNotEmpty ||
-                            exams.htmlContents.isNotEmpty)
-                          _heading('More Information:'),
-                        if (exams.htmlContents.isNotEmpty)
-                          ...exams.htmlContents
-                              .map((content) => _webViewData(content)),
                       ],
                     ),
                   );
                 })));
   }
-
+*/
   void showViewImage(String content) {
     showModalBottomSheet(
       context: context,
