@@ -1,3 +1,4 @@
+import 'package:exam_list/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -16,7 +17,7 @@ class _HtmlTabScreen extends State<HtmlTabScreen> {
   @override
   void initState() {
     super.initState();
-    if(widget.htmlContent.isNotEmpty){
+    if (widget.htmlContent.isNotEmpty) {
       controller
         ..enableZoom(true)
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -39,11 +40,48 @@ class _HtmlTabScreen extends State<HtmlTabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        // padding: const EdgeInsets.all(20),
-        child: WebViewWidget(
-          controller: controller,
-        ));
+    return Stack(children: [
+      Container(
+          color: Colors.white,
+          // padding: const EdgeInsets.all(20),
+          child: WebViewWidget(
+            controller: controller,
+          )),
+      Positioned(
+        right: 32,
+        bottom: 14,
+        left: 32,
+        child: Card(
+          elevation: 1,
+          color: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            decoration:  BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(20),
+              ),
+              color: const Color(0xffECECEC).withOpacity(0.9),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.zoom_in,
+                  size: 24,
+                  color: sharpGrey,
+                ),
+                SizedBox(
+                  width: 4,
+                ),
+                Text('Zoom In and Out by Pinching', style: TextStyle(color: sharpGrey, fontSize: 16, fontWeight: FontWeight.w600),)
+              ],
+            ),
+          ),
+        ),
+      )
+    ]);
   }
 }

@@ -168,6 +168,7 @@ class ExamProvider with ChangeNotifier {
       await checkSubscriptionsStatus(response.data, subscriptionStatus);
       updateHiveForUser(response.data ?? []);
       isNotifying = false;
+      refreshExams(slug);
       _notifyListenersWithBinding();
       return true;
     }
@@ -185,6 +186,7 @@ class ExamProvider with ChangeNotifier {
       await checkSubscriptionsStatus(response.data, subscriptionStatus);
       updateHiveForUser(response.data ?? []);
       isNotifying = false;
+      refreshExams(slug);
       _notifyListenersWithBinding();
       return true;
     }

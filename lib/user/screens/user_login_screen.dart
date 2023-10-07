@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class UserLoginScreen extends StatefulWidget {
@@ -101,7 +102,13 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     userProvider.loginMobile(credential).then((value) {
       Navigator.of(context).pop();
       if (value is String) {
-        showSnackBar(vContext, value);
+        if (vContext != context) {
+          Fluttertoast.showToast(
+            msg: value,
+          );
+        } else {
+          showSnackBar(context, value);
+        }
       } else {
         // successfully login toast
         // check on boarding and change screen
@@ -115,10 +122,16 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
       }
     }).onError((error, stackTrace) {
       Navigator.of(context).pop();
+      var value = Constants.somethingWentWrong;
       if (error is FirebaseException) {
-        showSnackBar(vContext, (error).message!);
+        value = (error).message ?? Constants.somethingWentWrong;
+      }
+      if (vContext != context) {
+        Fluttertoast.showToast(
+          msg: value,
+        );
       } else {
-        showSnackBar(vContext, Constants.somethingWentWrong);
+        showSnackBar(context, value);
       }
     });
   }

@@ -1,5 +1,6 @@
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/exams/screens/exam_screen.dart';
+import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
@@ -8,7 +9,6 @@ import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class ExamListingScreen extends StatefulWidget {
@@ -231,7 +231,8 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset('assets/svg/ic_no_results.svg'),
+                                  SvgPicture.asset(
+                                      'assets/svg/ic_no_results.svg'),
                                   const SizedBox(height: 8),
                                   const Text(
                                     'No exams',
@@ -255,27 +256,52 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                   exam: list[index],
                                   aspirant: _userProvider().aspirantDetails!,
                                   onNotify: (slug) {
-                                    if (exams.isNotifying) return;
-                                    Fluttertoast.showToast(msg: 'Subscribing');
-                                    exams.notifyMe(slug).then((value) {
-                                      if (value is String) {
-                                        showSnackBar(context, value);
-                                      } else {
-                                        _examProvider().refreshExams(slug);
-                                      }
-                                    });
+                                    showDialog<void>(
+                                        context: context,
+                                        builder: (BuildContext dContext) {
+                                          return ConfirmationDialog(
+                                              forSubscribe: true,
+                                              yes: () {
+                                                if (exams.isNotifying) return;
+                                                showProgressDialog(context);
+                                                exams
+                                                    .notifyMe(slug)
+                                                    .then((value) {
+                                                  Navigator.of(context).pop();
+                                                  if (value is String) {
+                                                    showSnackBar(
+                                                        context, value);
+                                                  }
+                                                }).onError((error, stackTrace) {
+                                                  Navigator.of(context).pop();
+                                                  showSnackBar(context,
+                                                      'Something went wrong');
+                                                });
+                                              });
+                                        });
                                   },
                                   onRemoveNotify: (slug) {
-                                    if (exams.isNotifying) return;
-                                    Fluttertoast.showToast(
-                                        msg: 'Unsubscribing');
-                                    exams.removeNotifyMe(slug).then((value) {
-                                      if (value is String) {
-                                        showSnackBar(context, value);
-                                      } else {
-                                        _examProvider().refreshExams(slug);
-                                      }
-                                    });
+                                    showDialog<void>(
+                                        context: context,
+                                        builder: (BuildContext dContext) {
+                                          return ConfirmationDialog(
+                                              forSubscribe: false,
+                                              yes: () {
+                                                if (exams.isNotifying) return;
+                                                showProgressDialog(context);
+                                                exams
+                                                    .removeNotifyMe(slug)
+                                                    .then((value) {
+                                                  Navigator.of(context).pop();
+                                                  if (value is String) {
+                                                    showSnackBar(context, value);
+                                                  }
+                                                }).onError((error, stackTrace) {
+                                                  Navigator.of(context).pop();
+                                                  showSnackBar(context, 'Something went wrong');
+                                                });
+                                              });
+                                        });
                                   },
                                   onClick: () {
                                     exams.setExam(list[index]);

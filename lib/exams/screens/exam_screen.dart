@@ -1,5 +1,6 @@
 import 'package:exam_list/exams/screens/html_tab_screen.dart';
 import 'package:exam_list/exams/screens/notices_tab_screen.dart';
+import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/responseModels/exam/exam_data.dart';
@@ -57,7 +58,7 @@ class _ExamScreenState extends BaseState<ExamScreen>
         final RenderBox renderBox =
             _examDetailsKey.currentContext?.findRenderObject() as RenderBox;
         setState(() {
-          _columnHeight = renderBox.size.height + 48;
+          _columnHeight = renderBox.size.height + 56;
           printDebug(_columnHeight.toString());
         });
       });
@@ -179,6 +180,9 @@ class _ExamScreenState extends BaseState<ExamScreen>
         body: Consumer<ExamProvider>(
             child: const ContainerLoading(),
             builder: (ctx, exams, ch) {
+              var subscriptionData = exams.subscriptionStatus[_exam.slug];
+              var isSubscribed =
+                  subscriptionData != null && subscriptionData == 2;
               List<Widget> tabList = [];
               List<Widget> tabScreens = [];
               if (getNotices(_exam).isNotEmpty) {
@@ -211,7 +215,7 @@ class _ExamScreenState extends BaseState<ExamScreen>
                   SliverAppBar(
                     expandedHeight: _columnHeight,
                     floating: true,
-                    toolbarHeight: 48.0,
+                    toolbarHeight: 56.0,
                     title: const Padding(
                       padding: EdgeInsets.all(0),
                       child: Text(
@@ -222,6 +226,83 @@ class _ExamScreenState extends BaseState<ExamScreen>
                             fontWeight: FontWeight.w600),
                       ),
                     ),
+                    actions: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 16),
+                        child: UnconstrainedBox(
+                          child: MaterialButton(
+                            elevation: 1,
+                            onPressed: () {
+                              var slug = _exam.slug ?? "";
+                              if (isSubscribed) {
+                                showDialog<void>(
+                                    context: context,
+                                    builder: (BuildContext dContext) {
+                                      return ConfirmationDialog(
+                                          forSubscribe: false,
+                                          yes: () {
+                                            if (exams.isNotifying) return;
+                                            showProgressDialog(context);
+                                            exams
+                                                .removeNotifyMe(slug)
+                                                .then((value) {
+                                              Navigator.of(context).pop();
+                                              if (value is String) {
+                                                showSnackBar(context, value);
+                                              }
+                                            }).onError((error, stackTrace) {
+                                              Navigator.of(context).pop();
+                                              showSnackBar(context, 'Something went wrong');
+                                            });
+                                          });
+                                    });
+                              } else {
+                                showDialog<void>(
+                                    context: context,
+                                    builder: (BuildContext dContext) {
+                                      return ConfirmationDialog(
+                                          forSubscribe: true,
+                                          yes: () {
+                                            if (exams.isNotifying) return;
+                                            showProgressDialog(context);
+                                            exams.notifyMe(slug).then((value) {
+                                              Navigator.of(context).pop();
+                                              if (value is String) {
+                                                showSnackBar(context, value);
+                                              }
+                                            }).onError((error, stackTrace) {
+                                              Navigator.of(context).pop();
+                                              showSnackBar(context, 'Something went wrong');
+                                            });
+                                          });
+                                    });
+                              }
+                            },
+                            color: isSubscribed ? sharpGrey : appRed,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  12.0), // Adjust the radius here
+                            ),
+                            child: Row(children: [
+                              Icon(
+                                isSubscribed
+                                    ? Icons.notifications_active
+                                    : Icons.notifications,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(isSubscribed ? 'Subscribed' : 'Subscribe',
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600))
+                            ]),
+                          ),
+                        ),
+                      )
+                    ],
                     backgroundColor: Colors.white,
                     pinned: true,
                     centerTitle: false,
@@ -314,11 +395,9 @@ class _ExamScreenState extends BaseState<ExamScreen>
                             labelColor: Colors.red,
                             unselectedLabelColor: sharpGrey,
                             labelStyle: const TextStyle(
-                                fontWeight:  FontWeight.w600,
-                                fontSize: 16),
+                                fontWeight: FontWeight.w600, fontSize: 16),
                             unselectedLabelStyle: const TextStyle(
-                                fontWeight:  FontWeight.w500,
-                                fontSize: 16),
+                                fontWeight: FontWeight.w500, fontSize: 16),
                             controller: tabController,
                           )),
                     ),
