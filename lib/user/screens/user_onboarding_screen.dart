@@ -29,7 +29,6 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
   int? gender;
   final _globalFormKey = GlobalKey<FormState>();
 
-
   @override
   void didChangeDependencies() {
     if (isFirstTime) {
@@ -144,15 +143,16 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                   setState(() {
                                     chosenCategory = {
                                       'optionName': value,
-                                      'id': Constants.reservationCategories[value]
+                                      'optionId':
+                                          Constants.reservationCategories[value]
                                     };
                                   });
                                 },
                                 validator: (input) => chosenCategory == null
                                     ? "Please Enter Valid Category"
                                     : null,
-                                items:
-                                Constants.reservationCategories.keys.map((category) {
+                                items: Constants.reservationCategories.keys
+                                    .map((category) {
                                   return DropdownMenuItem<String>(
                                     value: category,
                                     child: Text(
@@ -191,33 +191,39 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                 ],
                               )),
                           const SizedBox(height: 12),
-                          if(diffAble)
-                          _buildFormField(
-                              'Differently Able Category',
-                              DropdownButtonFormField<String>(
-                                value: chosenCategoryDisabled?['optionName'],
-                                onChanged: (value) {
-                                  setState(() {
-                                    chosenCategory = {
-                                      'optionName': value,
-                                      'id': Constants.disabilityCategories[value]
-                                    };
-                                  });
-                                },
-                                items:
-                                Constants.disabilityCategories.keys.map((category) {
-                                  return DropdownMenuItem<String>(
-                                    value: category,
-                                    child: Text(
-                                      category,
-                                      style: _textStyle(),
-                                    ),
-                                  );
-                                }).toList(),
-                                decoration: _inputDecoration('Select Option'),
-                              )),
-                          if(diffAble)
-                          const SizedBox(height: 12),
+                          if (diffAble)
+                            _buildFormField(
+                                'Differently Able Category',
+                                DropdownButtonFormField<String>(
+                                  value:
+                                      chosenCategoryDisabled?['optionName'] ??
+                                          "None",
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value == "None") {
+                                        chosenCategoryDisabled = null;
+                                      } else {
+                                        chosenCategoryDisabled = {
+                                          'optionName': value,
+                                          'optionId': Constants
+                                              .disabilityCategories[value]
+                                        };
+                                      }
+                                    });
+                                  },
+                                  items: Constants.disabilityCategories.keys
+                                      .map((category) {
+                                    return DropdownMenuItem<String>(
+                                      value: category,
+                                      child: Text(
+                                        category,
+                                        style: _textStyle(),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  decoration: _inputDecoration('Select Option'),
+                                )),
+                          if (diffAble) const SizedBox(height: 12),
                           _buildFormField(
                               'Qualification*',
                               DropdownButtonFormField<String>(
@@ -226,7 +232,8 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                   setState(() {
                                     chosenQualification = {
                                       'optionName': value,
-                                      'id': Constants.educationalQualifications[value]
+                                      'optionId': Constants
+                                          .educationalQualifications[value]
                                     };
                                   });
                                 },
@@ -247,13 +254,19 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                           _buildFormField(
                               'Additional Qualification',
                               DropdownButtonFormField<String>(
-                                value: chosenQualificationAdd?['optionName'],
+                                value: chosenQualificationAdd?['optionName'] ??
+                                    "None",
                                 onChanged: (value) {
                                   setState(() {
-                                    chosenQualificationAdd = {
-                                      'optionName': value,
-                                      'id': Constants.additionalQualifications[value]
-                                    };
+                                    if (value == "None") {
+                                      chosenQualificationAdd = null;
+                                    } else {
+                                      chosenQualificationAdd = {
+                                        'optionName': value,
+                                        'optionId': Constants
+                                            .additionalQualifications[value]
+                                      };
+                                    }
                                   });
                                 },
                                 items: Constants.additionalQualifications.keys
@@ -266,8 +279,8 @@ class _UserOnBoardingScreenState extends BaseState<UserOnBoardingScreen> {
                                     ),
                                   );
                                 }).toList(),
-                                decoration:
-                                _inputDecoration('Choose Additional Qualification'),
+                                decoration: _inputDecoration(
+                                    'Choose Additional Qualification'),
                               )),
                           const SizedBox(height: 12),
                           _buildFormField(

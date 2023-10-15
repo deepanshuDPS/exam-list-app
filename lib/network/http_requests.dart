@@ -23,8 +23,10 @@ class HttpRequests {
   Future<Map<String, String>> getHeaders(bool isAuthHeader) async {
     Map<String, String> headersToSend = {
       'Content-Type': 'application/json',
-      'x-api-key': Constants.apiKey
+      'x-api-key': Constants.apiKey,
+      'ngrok-skip-browser-warning': '*'
     };
+
     var authUser = FirebaseAuth.instance.currentUser;
     if (authUser != null) {
       headersToSend['id-token'] = (await authUser.getIdToken()) ?? "";
@@ -171,7 +173,10 @@ class HttpRequests {
       final response = await http.get(Uri.parse(url), headers: headersToSend);
       printDebug(response.statusCode.toString());
       if (response.statusCode < 300) {
-        var responseAsString = utf8.decode(response.bodyBytes);
+        var responseAsString = "{}";
+        if (response.statusCode != 204) {
+          responseAsString = utf8.decode(response.bodyBytes);
+        }
         await saveAuthCachedResponse(endPoint, headersToSend, response);
         printDebug(responseAsString);
         return jsonDecode(responseAsString);
@@ -179,7 +184,6 @@ class HttpRequests {
         if (response.statusCode == 404) {
           return getErrorResponse(response.statusCode, _emptyError);
         }
-        printDebug("here error" + response.statusCode.toString());
         return getErrorResponse(
             response.statusCode, jsonDecode(utf8.decode(response.bodyBytes)));
       }

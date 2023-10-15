@@ -41,7 +41,7 @@ class ContainerError extends StatelessWidget {
                 const SizedBox(
                   height: 8,
                 ),
-                if (jsonData['code'] != 404)
+                if (jsonData['code'] != 404 && jsonData['code'] != 204)
                   ElevatedButton(
                       onPressed: () => {onTryAgain()},
                       style: ElevatedButton.styleFrom(

@@ -1,3 +1,5 @@
+import 'package:exam_list/utils/extras_utils.dart';
+
 dynamic getErrorResponse(int errorCode, dynamic bodyContent) {
   if(bodyContent['message'] == '') {
     switch (errorCode) {
@@ -8,6 +10,7 @@ dynamic getErrorResponse(int errorCode, dynamic bodyContent) {
       case 400:
         bodyContent['message'] = 'Something wrong with the request';
         break;
+      case 204:
       case 404:
         bodyContent['message'] = 'No Data Found';
         break;

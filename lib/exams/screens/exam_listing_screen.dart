@@ -46,8 +46,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
     if (!isInit) {
       isInit = true;
       _searchTextController.clear();
-      _examProvider().fetchExams(
-          0, _userProvider().aspirantDetails?.subscribedChannels ?? []);
+      _refreshData();
       _searchTextController.addListener(() {
         _examProvider().filterList(query: _searchTextController.text);
       });
@@ -227,89 +226,104 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                       var list = exams.currentList;
                       if (list.isEmpty) {
                         return Expanded(
-                          child: Center(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                      'assets/svg/ic_no_results.svg'),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'No exams',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: sharpGrey),
-                                  )
-                                ]),
+                          child: RefreshIndicator(
+                            onRefresh: _refreshData,
+                            child: ListView(
+                              children:[ SizedBox(
+                                height: (MediaQuery.of(context).size.height - 230) / 2,
+                                child: Center(
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                            'assets/svg/ic_no_results.svg'),
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          'No exams',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: sharpGrey),
+                                        )
+                                      ]),
+                                ),
+                              ),]
+                            ),
                           ),
                         );
                       } else {
                         return Expanded(
-                          child: ListView.builder(
-                              physics: const ClampingScrollPhysics(),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              itemCount: list.length,
-                              itemBuilder: (context, index) {
-                                return ExamListItem(
-                                  exam: list[index],
-                                  aspirant: _userProvider().aspirantDetails!,
-                                  onNotify: (slug) {
-                                    showDialog<void>(
-                                        context: context,
-                                        builder: (BuildContext dContext) {
-                                          return ConfirmationDialog(
-                                              forSubscribe: true,
-                                              yes: () {
-                                                if (exams.isNotifying) return;
-                                                showProgressDialog(context);
-                                                exams
-                                                    .notifyMe(slug)
-                                                    .then((value) {
-                                                  Navigator.of(context).pop();
-                                                  if (value is String) {
-                                                    showSnackBar(
-                                                        context, value);
-                                                  }
-                                                }).onError((error, stackTrace) {
-                                                  Navigator.of(context).pop();
-                                                  showSnackBar(context,
-                                                      'Something went wrong');
+                          child: RefreshIndicator(
+                            onRefresh: _refreshData,
+                            child: ListView.builder(
+                                // physics: const ClampingScrollPhysics(),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                itemCount: list.length,
+                                itemBuilder: (context, index) {
+                                  return ExamListItem(
+                                    exam: list[index],
+                                    aspirant: _userProvider().aspirantDetails!,
+                                    onNotify: (slug) {
+                                      showDialog<void>(
+                                          context: context,
+                                          builder: (BuildContext dContext) {
+                                            return ConfirmationDialog(
+                                                forSubscribe: true,
+                                                yes: () {
+                                                  if (exams.isNotifying) return;
+                                                  showProgressDialog(context);
+                                                  exams
+                                                      .notifyMe(slug)
+                                                      .then((value) {
+                                                    Navigator.of(context).pop();
+                                                    if (value is String) {
+                                                      showSnackBar(
+                                                          context, value);
+                                                    }
+                                                  }).onError(
+                                                          (error, stackTrace) {
+                                                    Navigator.of(context).pop();
+                                                    showSnackBar(context,
+                                                        'Something went wrong');
+                                                  });
                                                 });
-                                              });
-                                        });
-                                  },
-                                  onRemoveNotify: (slug) {
-                                    showDialog<void>(
-                                        context: context,
-                                        builder: (BuildContext dContext) {
-                                          return ConfirmationDialog(
-                                              forSubscribe: false,
-                                              yes: () {
-                                                if (exams.isNotifying) return;
-                                                showProgressDialog(context);
-                                                exams
-                                                    .removeNotifyMe(slug)
-                                                    .then((value) {
-                                                  Navigator.of(context).pop();
-                                                  if (value is String) {
-                                                    showSnackBar(context, value);
-                                                  }
-                                                }).onError((error, stackTrace) {
-                                                  Navigator.of(context).pop();
-                                                  showSnackBar(context, 'Something went wrong');
+                                          });
+                                    },
+                                    onRemoveNotify: (slug) {
+                                      showDialog<void>(
+                                          context: context,
+                                          builder: (BuildContext dContext) {
+                                            return ConfirmationDialog(
+                                                forSubscribe: false,
+                                                yes: () {
+                                                  if (exams.isNotifying) return;
+                                                  showProgressDialog(context);
+                                                  exams
+                                                      .removeNotifyMe(slug)
+                                                      .then((value) {
+                                                    Navigator.of(context).pop();
+                                                    if (value is String) {
+                                                      showSnackBar(
+                                                          context, value);
+                                                    }
+                                                  }).onError(
+                                                          (error, stackTrace) {
+                                                    Navigator.of(context).pop();
+                                                    showSnackBar(context,
+                                                        'Something went wrong');
+                                                  });
                                                 });
-                                              });
-                                        });
-                                  },
-                                  onClick: () {
-                                    exams.setExam(list[index]);
-                                    Navigator.of(context)
-                                        .pushNamed(ExamScreen.routeName);
-                                  },
-                                );
-                              }),
+                                          });
+                                    },
+                                    onClick: () {
+                                      exams.setExam(list[index]);
+                                      Navigator.of(context)
+                                          .pushNamed(ExamScreen.routeName);
+                                    },
+                                  );
+                                }),
+                          ),
                         );
                       }
                     }
@@ -321,4 +335,9 @@ class _ExamListingScreenState extends State<ExamListingScreen>
 
   @override
   bool get wantKeepAlive => true;
+
+  Future<void> _refreshData() async {
+    _examProvider().fetchExams(
+        0, _userProvider().aspirantDetails?.subscribedChannels ?? []);
+  }
 }

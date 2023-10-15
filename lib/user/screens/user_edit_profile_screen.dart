@@ -291,7 +291,7 @@ class _UserEditProfileScreenState extends BaseState<UserEditProfileScreen> {
                                   DropdownButtonFormField<String>(
                                     value: _aspirantDetailsData
                                             .addQualification?.optionName ??
-                                        'None',
+                                        "None",
                                     onChanged: (value) {
                                       setState(() {
                                         if (value == "None") {

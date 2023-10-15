@@ -1,6 +1,6 @@
-
 class Constants {
-  static String baseURL = 'http://192.168.29.174:8080/';
+  static String baseURL =
+      'http://192.168.29.174:8080/'; // 'https://skilled-officially-squirrel.ngrok-free.app/v1/'; //
 
   static Map<int, String> genders = {
     0: 'Others',
@@ -44,14 +44,14 @@ class Constants {
   };
 
   static Map<String, int> additionalQualifications = {
-    'None':-1,
+    'None': -1,
     'JBT': 20,
     'D Ed': 21,
     'B Ed': 22,
   };
 
   static Map<String, int> disabilityCategories = {
-    'None':-1,
+    'None': -1,
     'OD-Orthopedic Disability': 20,
     'VI-Visual Impairment': 21,
     'HI-Hearing Impairment': 22,
@@ -69,6 +69,4 @@ class Constants {
       '122a3a8234a618432663194ba6116194970c116f4014feac40d215f9cee62a17';
 
   static String somethingWentWrong = 'Something went wrong';
-
-
 }

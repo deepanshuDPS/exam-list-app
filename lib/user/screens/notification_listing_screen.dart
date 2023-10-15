@@ -92,7 +92,7 @@ class _NotificationListingScreenState
                           fontWeight: FontWeight.w200,
                         )),
                     trailing: item.notificationType != 1
-                        ? _trailingIcon("assets/svg/ic_exam_update.svg")
+                        ? _trailingIcon("assets/svg/ic_update_exam.svg")
                         : _trailingIcon("assets/svg/ic_new_exam.svg"),
                     onTap: () {
                       var examToOpen = _examProvider()
