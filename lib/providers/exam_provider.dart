@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:exam_list/responseModels/exam/exam_data.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/utils/exam_utils.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
@@ -25,12 +26,13 @@ class ExamProvider with ChangeNotifier {
   final Map<String, int> subscriptionStatus = {};
   final List<String> _htmlContents = [];
   final List<String> _extraHtmlContents = [];
+  final Map<String, String> examToExamPattern = {};
 
   late ExamData? _selectedExam;
   var isNotifying = false;
 
   // adNumber for opened exam
-  String _openedExam = "";
+  late AspirantData updatedAspirantData;
   int _currentFilterIndex = 0;
   RequestData examRequestData = RequestData();
 
@@ -94,6 +96,7 @@ class ExamProvider with ChangeNotifier {
     _differentTypesExams.clear();
     _currentList.clear();
     _currentFilterIndex = selectedIndex;
+    subscriptionStatus.clear();
     notifyWithRequest(examRequest, true);
     final response = exam_list_response.ExamListResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.getExams));
@@ -207,9 +210,12 @@ class ExamProvider with ChangeNotifier {
       var responseObj =
           aspirant_profile_response.AspirantProfileResponse.fromJson(response);
       responseObj.data?.setSubscribedChannels(subsList);
-      box.put("response", responseObj.toJson());
+      printDebug(jsonEncode(responseObj.toJson()));
+      box.put("response", jsonEncode(responseObj.toJson()));
+      updatedAspirantData = responseObj.data!;
       return true;
     } catch (e) {
+      printDebug(e.toString());
       return null;
     }
   }
@@ -217,6 +223,7 @@ class ExamProvider with ChangeNotifier {
   Future<void> getExamPatternsById() async {
     _htmlContents.clear();
     _extraHtmlContents.clear();
+    examToExamPattern.clear();
     notifyWithRequest(examRequestData, true);
     var idsList = fetchAllExamIds(_selectedExam!);
     String examIds;
@@ -230,6 +237,8 @@ class ExamProvider with ChangeNotifier {
             ApiEndPoints.getExamPatterByID.replaceAll('{examIds}', examIds)));
     if (response.status == true) {
       response.data?.forEach((examPattern) {
+        examToExamPattern[examPattern.examId ?? "N/A"] =
+            examPattern.id ?? "N/A";
         if (examPattern.htmlContent != null) {
           _htmlContents.add(examPattern.htmlContent!);
         }

@@ -1,3 +1,4 @@
+import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
@@ -27,7 +28,7 @@ class _HomeScreenState extends BaseState<HomeScreen>
     _userProvider().getAspirantUser();
   }
 
-  late List<Widget> _tabScreens ;
+  late List<Widget> _tabScreens;
 
   @override
   void initState() {
@@ -89,6 +90,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
                   onTryAgain: () => user.getAspirantUser());
             }
 
+            Provider.of<ExamProvider>(context, listen: false)
+                .updatedAspirantData = user.aspirantDetails!;
             return Scaffold(
               backgroundColor: Colors.transparent,
               bottomNavigationBar: _buildBottomNavigationBar(),

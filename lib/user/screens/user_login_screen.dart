@@ -1,7 +1,9 @@
 import 'package:exam_list/home/screens/home_screen.dart';
+import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/extras/otp_sheet.dart';
 import 'package:exam_list/user/screens/user_onboarding_screen.dart';
+import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,6 +26,7 @@ class UserLoginScreen extends StatefulWidget {
 class _UserLoginScreenState extends State<UserLoginScreen> {
   final _globalFormKey = GlobalKey<FormState>();
   final _mobileController = TextEditingController();
+  bool _agreedToTerms = false;
   String? _verificationId;
 
   UserProvider get userProvider {
@@ -32,6 +35,10 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   }
 
   void _verifyMobileNumber() async {
+    if (!_agreedToTerms) {
+      showSnackBar(context, 'Please Agree to Terms');
+      return;
+    }
     String mobileNumber = _mobileController.text.trim();
 
     if (kDebugMode && mobileNumber == '8800757476') {
@@ -261,7 +268,44 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                                     prefixText: '+91 ')
                                 .copyWith(counterText: ""),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Checkbox(
+                                value: _agreedToTerms,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    _agreedToTerms = value ?? false;
+                                  });
+                                },
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, TermsConditionsScreen.routeName);
+                                },
+                                child: RichText(
+                                    text: const TextSpan(
+                                        text: 'Please, agree with our ',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400),
+                                        children: [
+                                      TextSpan(
+                                          text: 'Terms & Conditions',
+                                          style: TextStyle(
+                                              color: appRed,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600))
+                                    ])),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 8),
                           ButtonFormSubmit(
                               onClick: () {
                                 if (_globalFormKey.currentState?.validate() ==

@@ -3,6 +3,7 @@ import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
+import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
@@ -22,6 +23,7 @@ class ExamListingScreen extends StatefulWidget {
 
 class _ExamListingScreenState extends State<ExamListingScreen>
     with AutomaticKeepAliveClientMixin<ExamListingScreen> {
+
   int? _selectedIndex;
 
   @override
@@ -34,10 +36,6 @@ class _ExamListingScreenState extends State<ExamListingScreen>
 
   ExamProvider _examProvider() {
     return Provider.of<ExamProvider>(context, listen: false);
-  }
-
-  UserProvider _userProvider() {
-    return Provider.of<UserProvider>(context, listen: false);
   }
 
   @override
@@ -263,7 +261,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 itemBuilder: (context, index) {
                                   return ExamListItem(
                                     exam: list[index],
-                                    aspirant: _userProvider().aspirantDetails!,
+                                    aspirant: _examProvider().updatedAspirantData,
                                     onNotify: (slug) {
                                       showDialog<void>(
                                           context: context,
@@ -338,6 +336,6 @@ class _ExamListingScreenState extends State<ExamListingScreen>
 
   Future<void> _refreshData() async {
     _examProvider().fetchExams(
-        0, _userProvider().aspirantDetails?.subscribedChannels ?? []);
+        0, _examProvider().updatedAspirantData.subscribedChannels ?? []);
   }
 }

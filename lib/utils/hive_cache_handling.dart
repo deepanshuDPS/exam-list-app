@@ -44,6 +44,7 @@ Future<void> saveAuthCachedResponse(
     var cachePoint = endPoint.split("?").first.replaceAll("/", "_");
 
     var box = await Hive.openBox<dynamic>(cachePoint);
+    box.clear();
     box.put("response", utf8.decode(response.bodyBytes));
     box.put("id-token", headers['id-token']);
     box.put("current-version", await PreferencesData.getCurrentVersion());

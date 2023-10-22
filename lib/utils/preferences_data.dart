@@ -77,5 +77,6 @@ class PreferencesData {
     prefs.remove(Constants.userData);
     prefs.remove(Constants.isFcmTokenSent);
     prefs.remove(Constants.currentVersion);
+    prefs.remove(Constants.subscriptions);
   }
 }

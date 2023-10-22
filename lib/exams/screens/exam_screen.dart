@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:exam_list/exams/screens/html_tab_screen.dart';
 import 'package:exam_list/exams/screens/notices_tab_screen.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
@@ -10,9 +11,11 @@ import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/exam_utils.dart';
 import 'package:exam_list/utils/extras_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_state.dart';
 import 'package:exam_list/widgets/container_loading.dart';
+import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 class ExamScreen extends StatefulWidget {
@@ -30,8 +33,9 @@ class _ExamScreenState extends BaseState<ExamScreen>
   String _examName = "";
   late ExamData _exam;
   late AspirantData _aspirantData;
-  final GlobalKey _examDetailsKey = GlobalKey();
-  late double _columnHeight = 350;
+
+  // final GlobalKey _examDetailsKey = GlobalKey();
+  // late double _columnHeight = 350;
   TabController? tabController;
 
   @override
@@ -53,15 +57,6 @@ class _ExamScreenState extends BaseState<ExamScreen>
       _examName = _examProvider().exam?.examName ?? 'N/A';
       _exam = _examProvider().exam!;
       _aspirantData = _userProvider().aspirantDetails!;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final RenderBox renderBox =
-            _examDetailsKey.currentContext?.findRenderObject() as RenderBox;
-        setState(() {
-          _columnHeight = renderBox.size.height + 56;
-          printDebug(_columnHeight.toString());
-        });
-      });
     }
     super.didChangeDependencies();
   }
@@ -102,75 +97,52 @@ class _ExamScreenState extends BaseState<ExamScreen>
     );
   }
 
-/*
-  Widget _webViewData(String htmlContent) {
-    final WebViewController controller = WebViewController();
-    controller
-      ..enableZoom(true)
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith("https://")) {
-              // launchUrl(Uri.parse(request.url));
-              return NavigationDecision.navigate;
-            } else {
-              return NavigationDecision.prevent;
-            }
-          },
-        ),
-      )
-      ..loadHtmlString(htmlContent);
-    return Container(
-      width: double.infinity,
-      height: 100,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey, width: 2),
-      ),
-      child: Stack(children: [
-        GestureDetector(
-            onVerticalDragUpdate: (updateDetails) {},
-            child: WebViewWidget(
-              controller: controller,
-              gestureRecognizers: Set()
-                ..add(Factory<OneSequenceGestureRecognizer>(
-                    () => EagerGestureRecognizer())),
-            )),
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.white60,
-          margin: const EdgeInsets.all(2),
-        ),
-        Align(
-          alignment: Alignment.center,
-          child: TextButton(
-              style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                  backgroundColor: const Color(0xFFDFDFDF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    side: const BorderSide(color: Colors.black54, width: 1),
-                  )),
-              onPressed: () => {showViewImage(htmlContent)},
-              child: const Text('Read More', style: TextStyle(color: sharpGrey, fontWeight: FontWeight.w500, fontSize: 14),)),
-        )
-      ]),
-    );
-  }
-*/
-
   Widget _tabBarView(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Tab(
         text: title,
       ),
+    );
+  }
+
+  // void afterOneSecond() {
+  //   Future.delayed(const Duration(milliseconds: 500), () {
+  //     final RenderBox renderBox =
+  //     _examDetailsKey.currentContext?.findRenderObject() as RenderBox;
+  //     setState(() {
+  //       _columnHeight = renderBox.size.height + 56;
+  //       printDebug(_columnHeight.toString());
+  //     });
+  //   });
+  // }
+
+  Widget _onlyMarqueOnLines(
+      BuildContext context, String examName, TextStyle style) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final textPainter = TextPainter(
+          text: TextSpan(text: examName, style: style),
+          textDirection: TextDirection.ltr,
+          maxLines: 1,
+        );
+
+        textPainter.layout(maxWidth: constraints.maxWidth);
+
+        if (textPainter.didExceedMaxLines) {
+          return Marquee(
+            text: examName,
+            style: style,
+            scrollAxis: Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            blankSpace: 30.0,
+            velocity: 40.0,
+            pauseAfterRound: const Duration(seconds: 4),
+          );
+        } else {
+          return Text(examName, style: style);
+        }
+      },
     );
   }
 
@@ -213,7 +185,7 @@ class _ExamScreenState extends BaseState<ExamScreen>
                 physics: const NeverScrollableScrollPhysics(),
                 slivers: <Widget>[
                   SliverAppBar(
-                    expandedHeight: _columnHeight,
+                    expandedHeight: 350,
                     floating: true,
                     toolbarHeight: 56.0,
                     title: const Padding(
@@ -232,6 +204,16 @@ class _ExamScreenState extends BaseState<ExamScreen>
                         child: UnconstrainedBox(
                           child: MaterialButton(
                             elevation: 1,
+                            onLongPress: kDebugMode
+                                ? () {
+                                    FlutterClipboard.copy(
+                                            "examId: ${_exam.id},\nexamName: ${_exam.examName},\nexamId - examPatternId: \n${_examProvider().examToExamPattern.toString()}")
+                                        .then((value) => showSnackBar(
+                                            context, "Exam Details Copied"))
+                                        .catchError((error) => showSnackBar(
+                                            context, "Error in copying"));
+                                  }
+                                : null,
                             onPressed: () {
                               var slug = _exam.slug ?? "";
                               if (isSubscribed) {
@@ -252,7 +234,8 @@ class _ExamScreenState extends BaseState<ExamScreen>
                                               }
                                             }).onError((error, stackTrace) {
                                               Navigator.of(context).pop();
-                                              showSnackBar(context, 'Something went wrong');
+                                              showSnackBar(context,
+                                                  'Something went wrong');
                                             });
                                           });
                                     });
@@ -272,7 +255,8 @@ class _ExamScreenState extends BaseState<ExamScreen>
                                               }
                                             }).onError((error, stackTrace) {
                                               Navigator.of(context).pop();
-                                              showSnackBar(context, 'Something went wrong');
+                                              showSnackBar(context,
+                                                  'Something went wrong');
                                             });
                                           });
                                     });
@@ -318,21 +302,25 @@ class _ExamScreenState extends BaseState<ExamScreen>
                     flexibleSpace: FlexibleSpaceBar(
                       background: Container(
                         padding: EdgeInsets.only(
-                            top: (MediaQuery.of(context).padding.top + 50)),
+                            top: (MediaQuery.of(context).padding.top)),
                         child: Center(
+                          // key: _examDetailsKey,
                           child: Column(
-                            key: _examDetailsKey,
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0, vertical: 8),
-                                  child: Text(
-                                    _examName,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: sharpGrey),
+                                  child: SizedBox(
+                                    height: 26,
+                                    child: _onlyMarqueOnLines(
+                                        context,
+                                        _examName,
+                                        const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                            color: sharpGrey)),
                                   )),
                               _heading('General Details:'),
                               Column(

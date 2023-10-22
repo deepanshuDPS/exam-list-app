@@ -115,8 +115,8 @@ Future<void> checkSubscriptionsStatus(
     List<String>? subscriptions, Map<String, int> subscriptionStatus) async {
   if (subscriptions == null) return;
   var subsList = await PreferencesData.getSubscriptions();
-  printDebug(subsList.toString());
-  printDebug(subscriptions.toString());
+  printDebug("local"+subsList.toString());
+  printDebug("response"+subscriptions.toString());
   if (subsList.length <= subscriptions.length) {
     // 0 means not subscribed in local
     for (var element in subscriptions) {
