@@ -1,6 +1,6 @@
 class Constants {
   static String baseURL =
-      'http://192.168.29.174:8080/'; //'https://skilled-officially-squirrel.ngrok-free.app/v1/'; //
+      'http://192.168.29.174:8080/'; // 'https://skilled-officially-squirrel.ngrok-free.app/v1/'; //
 
   static Map<int, String> genders = {
     0: 'Others',
@@ -12,11 +12,14 @@ class Constants {
   static Map<int, String> examCategories = {
     0: 'All',
     1: 'All India',
-    2: 'Banks',
+    2: 'State',
     3: 'Railways',
     4: 'Police/Defence',
-    5: 'Teaching'
+    5: 'Banks',
+    6: 'Teaching',
   };
+
+  static List examCatIndexPriority = [0, 1, 6, 2, 3, 4, 5];
 
   // Filters for the resources list
   static Map<int, String> resourcesCategories = {

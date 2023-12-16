@@ -217,4 +217,8 @@ class ApiEndPoints {
   static const getExamPatterByID = '$authExamPattern/{examIds}';
   static const getAspirantNotification =
       '$authNotification/aspirantNotifications';
+
+  // admin endpoints
+  static const deleteExam = "$authExam/delete-exam";
+  static const liveExam = "$authExam/live-exam";
 }

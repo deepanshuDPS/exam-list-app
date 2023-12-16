@@ -1,6 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:exam_list/exams/screens/html_tab_screen.dart';
 import 'package:exam_list/exams/screens/notices_tab_screen.dart';
+import 'package:exam_list/exams/widgets/admin_confirmation_dialog.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
@@ -198,95 +199,129 @@ class _ExamScreenState extends BaseState<ExamScreen>
                             fontWeight: FontWeight.w600),
                       ),
                     ),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 16),
-                        child: UnconstrainedBox(
-                          child: MaterialButton(
-                            elevation: 1,
-                            onLongPress: kDebugMode
-                                ? () {
-                                    FlutterClipboard.copy(
-                                            "examId: ${_exam.id},\nexamName: ${_exam.examName},\nexamId - examPatternId: \n${_examProvider().examToExamPattern.toString()}")
-                                        .then((value) => showSnackBar(
-                                            context, "Exam Details Copied"))
-                                        .catchError((error) => showSnackBar(
-                                            context, "Error in copying"));
-                                  }
-                                : null,
-                            onPressed: () {
-                              var slug = _exam.slug ?? "";
-                              if (isSubscribed) {
-                                showDialog<void>(
-                                    context: context,
-                                    builder: (BuildContext dContext) {
-                                      return ConfirmationDialog(
-                                          forSubscribe: false,
-                                          yes: () {
-                                            if (exams.isNotifying) return;
-                                            showProgressDialog(context);
-                                            exams
-                                                .removeNotifyMe(slug)
-                                                .then((value) {
-                                              Navigator.of(context).pop();
-                                              if (value is String) {
-                                                showSnackBar(context, value);
-                                              }
-                                            }).onError((error, stackTrace) {
-                                              Navigator.of(context).pop();
-                                              showSnackBar(context,
-                                                  'Something went wrong');
-                                            });
+                    actions: _aspirantData.mobile?.contains("9896147495") ==
+                                true &&
+                            kDebugMode
+                        ? [
+                            IconButton(
+                                onPressed: () {
+                                  confirm(context, false);
+                                },
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.black,
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  FlutterClipboard.copy(
+                                          "examId: ${_exam.id},\nexamName: ${_exam.examName},\nexamId - examPatternId: \n${_examProvider().examToExamPattern.toString()}")
+                                      .then((value) => showSnackBar(
+                                          context, "Exam Details Copied"))
+                                      .catchError((error) => showSnackBar(
+                                          context, "Error in copying"));
+                                },
+                                icon: const Icon(
+                                  Icons.copy,
+                                  color: Colors.black,
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  confirm(context, true);
+                                },
+                                icon: const Icon(
+                                  Icons.send,
+                                  color: Colors.black,
+                                ))
+                          ]
+                        : [
+                            Container(
+                              margin: const EdgeInsets.only(right: 16),
+                              child: UnconstrainedBox(
+                                child: MaterialButton(
+                                  elevation: 1,
+                                  onPressed: () {
+                                    var slug = _exam.slug ?? "";
+                                    if (isSubscribed) {
+                                      showDialog<void>(
+                                          context: context,
+                                          builder: (BuildContext dContext) {
+                                            return ConfirmationDialog(
+                                                forSubscribe: false,
+                                                yes: () {
+                                                  if (exams.isNotifying) return;
+                                                  showProgressDialog(context);
+                                                  exams
+                                                      .removeNotifyMe(slug)
+                                                      .then((value) {
+                                                    Navigator.of(context).pop();
+                                                    if (value is String) {
+                                                      showSnackBar(
+                                                          context, value);
+                                                    }
+                                                  }).onError(
+                                                          (error, stackTrace) {
+                                                    Navigator.of(context).pop();
+                                                    showSnackBar(context,
+                                                        'Something went wrong');
+                                                  });
+                                                });
                                           });
-                                    });
-                              } else {
-                                showDialog<void>(
-                                    context: context,
-                                    builder: (BuildContext dContext) {
-                                      return ConfirmationDialog(
-                                          forSubscribe: true,
-                                          yes: () {
-                                            if (exams.isNotifying) return;
-                                            showProgressDialog(context);
-                                            exams.notifyMe(slug).then((value) {
-                                              Navigator.of(context).pop();
-                                              if (value is String) {
-                                                showSnackBar(context, value);
-                                              }
-                                            }).onError((error, stackTrace) {
-                                              Navigator.of(context).pop();
-                                              showSnackBar(context,
-                                                  'Something went wrong');
-                                            });
+                                    } else {
+                                      showDialog<void>(
+                                          context: context,
+                                          builder: (BuildContext dContext) {
+                                            return ConfirmationDialog(
+                                                forSubscribe: true,
+                                                yes: () {
+                                                  if (exams.isNotifying) return;
+                                                  showProgressDialog(context);
+                                                  exams
+                                                      .notifyMe(slug)
+                                                      .then((value) {
+                                                    Navigator.of(context).pop();
+                                                    if (value is String) {
+                                                      showSnackBar(
+                                                          context, value);
+                                                    }
+                                                  }).onError(
+                                                          (error, stackTrace) {
+                                                    Navigator.of(context).pop();
+                                                    showSnackBar(context,
+                                                        'Something went wrong');
+                                                  });
+                                                });
                                           });
-                                    });
-                              }
-                            },
-                            color: isSubscribed ? sharpGrey : appRed,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  12.0), // Adjust the radius here
-                            ),
-                            child: Row(children: [
-                              Icon(
-                                isSubscribed
-                                    ? Icons.notifications_active
-                                    : Icons.notifications,
-                                size: 14,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(isSubscribed ? 'Subscribed' : 'Subscribe',
-                                  style: const TextStyle(
-                                      fontSize: 12,
+                                    }
+                                  },
+                                  color: isSubscribed ? sharpGrey : appRed,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        12.0), // Adjust the radius here
+                                  ),
+                                  child: Row(children: [
+                                    Icon(
+                                      isSubscribed
+                                          ? Icons.notifications_active
+                                          : Icons.notifications,
+                                      size: 14,
                                       color: Colors.white,
-                                      fontWeight: FontWeight.w600))
-                            ]),
-                          ),
-                        ),
-                      )
-                    ],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                        isSubscribed
+                                            ? 'Subscribed'
+                                            : 'Subscribe',
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600))
+                                  ]),
+                                ),
+                              ),
+                            )
+                          ],
                     backgroundColor: Colors.white,
                     pinned: true,
                     centerTitle: false,
@@ -485,5 +520,35 @@ class _ExamScreenState extends BaseState<ExamScreen>
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
     );
+  }
+
+  void confirm(BuildContext context, bool toLive) {
+    showDialog<void>(
+        context: context,
+        builder: (BuildContext dContext) {
+          return AdminConfirmationDialog(
+              message: toLive
+                  ? "Do Live this Whole Exam?"
+                  : "Delete Live this Whole Exam?",
+              yes: () {
+                showProgressDialog(context);
+                Future<dynamic> future = toLive
+                    ? _examProvider().doExamLive(_exam.adNumber ?? '')
+                    : _examProvider().deleteExam(_exam.adNumber ?? '');
+
+                future.then((value) {
+                  Navigator.of(context).pop();
+                  if (value is String) {
+                    showSnackBar(context, value);
+                  } else {
+                    // go to back screen
+                    Navigator.of(context).pop();
+                  }
+                }).onError((error, stackTrace) {
+                  Navigator.of(context).pop();
+                  showSnackBar(context, 'Something went wrong');
+                });
+              });
+        });
   }
 }

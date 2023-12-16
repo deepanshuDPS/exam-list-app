@@ -253,4 +253,24 @@ class ExamProvider with ChangeNotifier {
   ExamData? getAdNumberExam(String adNumber) {
     return _allExams.firstWhere((element) => element.adNumber == adNumber);
   }
+
+  Future<dynamic> doExamLive(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpPutRequest(ApiEndPoints.liveExam, {'adNumber': adNumber}));
+    if (response.status == true) {
+      await PreferencesData.setCurrentVersion();
+      return true;
+    }
+    return response.message;
+  }
+
+  Future<dynamic> deleteExam(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpDeleteRequest(ApiEndPoints.deleteExam, {'adNumber': adNumber}));
+    if (response.status == true) {
+      await PreferencesData.setCurrentVersion();
+      return true;
+    }
+    return response.message;
+  }
 }

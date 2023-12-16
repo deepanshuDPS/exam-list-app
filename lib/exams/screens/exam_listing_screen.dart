@@ -3,7 +3,6 @@ import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
-import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/user/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
@@ -23,7 +22,6 @@ class ExamListingScreen extends StatefulWidget {
 
 class _ExamListingScreenState extends State<ExamListingScreen>
     with AutomaticKeepAliveClientMixin<ExamListingScreen> {
-
   int? _selectedIndex;
 
   @override
@@ -65,7 +63,8 @@ class _ExamListingScreenState extends State<ExamListingScreen>
       ),
       child: Center(
         child: Text(
-          Constants.examCategories[index] ?? "All",
+          Constants.examCategories[index] ??
+              "All",
           style: TextStyle(
             color: _selectedIndex == index ? Colors.white : Colors.grey,
             fontSize: 14,
@@ -226,12 +225,15 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                         return Expanded(
                           child: RefreshIndicator(
                             onRefresh: _refreshData,
-                            child: ListView(
-                              children:[ SizedBox(
-                                height: (MediaQuery.of(context).size.height - 230) / 2,
+                            child: ListView(children: [
+                              SizedBox(
+                                height:
+                                    (MediaQuery.of(context).size.height - 230) /
+                                        2,
                                 child: Center(
                                   child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         SvgPicture.asset(
                                             'assets/svg/ic_no_results.svg'),
@@ -245,8 +247,8 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                         )
                                       ]),
                                 ),
-                              ),]
-                            ),
+                              ),
+                            ]),
                           ),
                         );
                       } else {
@@ -261,7 +263,8 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                                 itemBuilder: (context, index) {
                                   return ExamListItem(
                                     exam: list[index],
-                                    aspirant: _examProvider().updatedAspirantData,
+                                    aspirant:
+                                        _examProvider().updatedAspirantData,
                                     onNotify: (slug) {
                                       showDialog<void>(
                                           context: context,
@@ -335,7 +338,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
   bool get wantKeepAlive => true;
 
   Future<void> _refreshData() async {
-    _examProvider().fetchExams(
-        0, _examProvider().updatedAspirantData.subscribedChannels ?? []);
+    _examProvider().fetchExams(_selectedIndex ?? 0,
+        _examProvider().updatedAspirantData.subscribedChannels ?? []);
   }
 }
