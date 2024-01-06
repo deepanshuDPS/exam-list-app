@@ -41,7 +41,6 @@ class _OTPSheetState extends State<OTPSheet> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     startTimer();
   }
@@ -57,17 +56,6 @@ class _OTPSheetState extends State<OTPSheet> {
     }
     FocusScope.of(context).requestFocus(FocusNode());
     widget.confirmOTP(context, enteredOTP);
-    // showProgressDialog(context);
-    // Provider.of<UserProvider>(context, listen: false)
-    //     .bookingOfferOrHoliday(widget.bodyData, widget.isOffer)
-    //     .then((value) {
-    //   Navigator.of(context).pop();
-    //   Fluttertoast.showToast(
-    //       msg: value is String ? value : value['errorMessage']);
-    //   if (value is String) {
-    //     Navigator.of(context).pop();
-    //   }
-    // });
   }
 
   OutlineInputBorder _outLinedBorder() {
@@ -92,11 +80,11 @@ class _OTPSheetState extends State<OTPSheet> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
           top: 20,
           right: 20,
           left: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 40),
+          bottom: /*MediaQuery.of(context).viewInsets.bottom +*/ 40),
       // padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -211,7 +199,7 @@ class _OTPSheetState extends State<OTPSheet> {
                 ),
                 TextButton(
                     style: TextButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text(

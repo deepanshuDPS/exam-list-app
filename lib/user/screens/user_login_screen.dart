@@ -1,6 +1,6 @@
+import 'package:exam_list/controllers/auth_user_controller.dart';
 import 'package:exam_list/home/screens/home_screen.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
-import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/user/extras/otp_sheet.dart';
 import 'package:exam_list/user/screens/user_onboarding_screen.dart';
 import 'package:exam_list/utils/colors.dart';
@@ -12,31 +12,21 @@ import 'package:flutter/material.dart';
 import 'package:exam_list/styles/app_styles.dart';
 import 'package:exam_list/widgets/btn_form_submit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class UserLoginScreen extends StatefulWidget {
+class UserLoginScreen extends GetWidget<AuthUserController> {
   static const routeName = "/user-login";
 
-  const UserLoginScreen({Key? key}) : super(key: key);
-
-  @override
-  State<UserLoginScreen> createState() => _UserLoginScreenState();
-}
-
-class _UserLoginScreenState extends State<UserLoginScreen> {
   final _globalFormKey = GlobalKey<FormState>();
   final _mobileController = TextEditingController();
-  bool _agreedToTerms = false;
-  String? _verificationId;
 
-  UserProvider get userProvider {
-    // Initialize the property only when accessed for the first time
-    return Provider.of<UserProvider>(context, listen: false);
-  }
+  // String? _verificationId;
+
+  UserLoginScreen({Key? key}) : super(key: key);
 
   void _verifyMobileNumber() async {
-    if (!_agreedToTerms) {
-      showSnackBar(context, 'Please Agree to Terms');
+    if (!controller.agreedToTerms.value) {
+      showGetSnackBar('Please Agree to Terms');
       return;
     }
     String mobileNumber = _mobileController.text.trim();
@@ -46,27 +36,29 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
       return;
     }
 
-    _verificationId = null;
+    // _verificationId = null;
     // switch to otp dialog here
-    showProgressDialog(context);
-    userProvider.verifyMobileNumber(
+    setProgressState(true);
+    controller.verifyMobileNumber(
       '+91$mobileNumber',
       (dynamic message, PhoneAuthCredential? phoneAuthCredential) {
+        setProgressState(false);
         if (message is FirebaseAuthException) {
           // something went wrong
         } else if (phoneAuthCredential != null) {
-          showSnackBar(context, message);
-          _signInForMobile(context, phoneAuthCredential);
+          showGetSnackBar(message);
+          _signInForMobile(phoneAuthCredential);
         }
       },
       (verificationId, resendToken) {
-        Navigator.of(context).pop();
-        _verificationId = verificationId;
-        showGetOTPSheet();
+        setProgressState(false);
+        // _verificationId = verificationId;
+        showGetOTPSheet(verificationId);
         // switch to otp screen with verificationId
       },
       (verificationId) {
-        _verificationId = verificationId;
+        setProgressState(false);
+        // _verificationId = verificationId;
         // code auto retrieval timeout
         // request for otp && switch to otp screen with verificationId
         // again verify mobile
@@ -76,102 +68,101 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     );
   }
 
-  void showGetOTPSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: false,
-      builder: (BuildContext context) {
-        return OTPSheet(
-          confirmOTP: (vContext, smsCode) {
-            PhoneAuthCredential credential = PhoneAuthProvider.credential(
-              verificationId: _verificationId!,
-              smsCode: smsCode,
-            );
-            _signInForMobile(vContext, credential);
-          },
-          resentOTP: () {
-            _verifyMobileNumber();
-          },
-        );
-      },
+  void showGetOTPSheet(verificationId) {
+    Get.bottomSheet(
+      OTPSheet(
+        confirmOTP: (vContext, smsCode) {
+          PhoneAuthCredential credential = PhoneAuthProvider.credential(
+            verificationId: verificationId,
+            smsCode: smsCode,
+          );
+          _signInForMobile(credential);
+        },
+        resentOTP: () {
+          _verifyMobileNumber();
+        },
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10),
         ),
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
+      isScrollControlled: false,
+      isDismissible: false,
     );
   }
+  
+  void setProgressState(bool progress){
+    controller.isProgress.value = progress;
+  }
 
-  void _signInForMobile(BuildContext vContext, PhoneAuthCredential credential) {
-    showProgressDialog(context);
-    userProvider.loginMobile(credential).then((value) {
-      Navigator.of(context).pop();
+  void _signInForMobile(PhoneAuthCredential credential) {
+    setProgressState(true);
+    controller.loginMobile(credential).then((value) {
+      setProgressState(false);
       if (value is String) {
-        if (vContext != context) {
-          Fluttertoast.showToast(
-            msg: value,
-          );
-        } else {
-          showSnackBar(context, value);
-        }
-      } else {
-        // successfully login toast
-        // check on boarding and change screen
-        if (value == true) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, HomeScreen.routeName, (route) => false);
-        } else {
-          Navigator.pushNamedAndRemoveUntil(
-              context, UserOnBoardingScreen.routeName, (route) => false);
-        }
-      }
-    }).onError((error, stackTrace) {
-      Navigator.of(context).pop();
-      var value = Constants.somethingWentWrong;
-      if (error is FirebaseException) {
-        value = (error).message ?? Constants.somethingWentWrong;
-      }
-      if (vContext != context) {
         Fluttertoast.showToast(
           msg: value,
         );
       } else {
-        showSnackBar(context, value);
+        // successfully login toast
+        // check on boarding and change screen
+        if (value == true) {
+          Get.offAll(HomeScreen.routeName);
+        } else {
+          Get.offAll(UserOnBoardingScreen.routeName);
+        }
       }
+    }).onError((error, stackTrace) {
+      setProgressState(false);
+      var value = Constants.somethingWentWrong;
+      if (error is FirebaseException) {
+        value = (error).message ?? Constants.somethingWentWrong;
+      }
+      Fluttertoast.showToast(
+        msg: value,
+      );
     });
   }
 
   void _signInForGuest(String mobile) {
-    showProgressDialog(context);
-    userProvider.loginGuest(mobile).then((value) {
-      Navigator.of(context).pop();
+    setProgressState(true);
+    controller.loginGuest(mobile).then((value) {
+      setProgressState(false);
       if (value is String) {
-        showSnackBar(context, value);
+        showGetSnackBar(value);
       } else {
         // successfully login toast
         // check on boarding and change screen
         if (value == true) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, HomeScreen.routeName, (route) => false);
+          Get.offAll(HomeScreen.routeName);
         } else {
-          Navigator.pushNamedAndRemoveUntil(
-              context, UserOnBoardingScreen.routeName, (route) => false);
+          Get.offAll(UserOnBoardingScreen.routeName);
         }
       }
     }).onError((error, stackTrace) {
-      Navigator.of(context).pop();
+      setProgressState(false);
       if (error is FirebaseException) {
-        showSnackBar(context, (error).message!);
+        showGetSnackBar((error).message!);
       } else {
-        showSnackBar(context, Constants.somethingWentWrong);
+        showGetSnackBar(Constants.somethingWentWrong);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    controller.isProgress.listen((bool progress) {
+      if (progress) {
+        showGetProgressDialog();
+      } else {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
@@ -272,19 +263,16 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Checkbox(
-                                value: _agreedToTerms,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    _agreedToTerms = value ?? false;
-                                  });
-                                },
-                              ),
+                              Obx(() => Checkbox(
+                                    value: controller.agreedToTerms.value,
+                                    onChanged: (bool? value) {
+                                      controller.agreedToTerms.value =
+                                          value ?? false;
+                                    },
+                                  )),
                               InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, TermsConditionsScreen.routeName);
-                                },
+                                onTap: () => Get.toNamed(
+                                    TermsConditionsScreen.routeName),
                                 child: RichText(
                                     text: const TextSpan(
                                         text: 'Please, agree with our ',

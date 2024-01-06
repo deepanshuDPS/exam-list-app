@@ -3,7 +3,7 @@ import 'package:exam_list/exams/screens/exam_screen.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
 import 'package:exam_list/providers/exam_provider.dart';
 import 'package:exam_list/providers/user_provider.dart';
-import 'package:exam_list/user/widgets/exam_list_item.dart';
+import 'package:exam_list/exams/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';

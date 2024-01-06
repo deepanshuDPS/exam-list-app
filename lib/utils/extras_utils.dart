@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 
 void printDebug(String message) {
   if (kDebugMode) {
@@ -21,6 +22,38 @@ void toLink(String link) async {
   } else {
     printDebug('Could not launch $parsedUrl');
   }
+}
+
+void showGetProgressDialog({String loadingText = ''}) {
+  if (Get.isDialogOpen ?? false) {
+    Get.back();
+  }
+  Get.dialog(
+    Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  Get.theme.colorScheme.secondary)),
+          if (loadingText != '')
+            const SizedBox(
+              height: 16,
+            ),
+          if (loadingText != '')
+            Text(
+              loadingText,
+              style: TextStyle(
+                  color: Get.theme.colorScheme.secondary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16),
+            )
+        ],
+      ),
+    ),
+    barrierDismissible: false,
+  );
 }
 
 void showProgressDialog(BuildContext context, {String loadingText = ''}) {
@@ -57,6 +90,23 @@ void showProgressDialog(BuildContext context, {String loadingText = ''}) {
 void showSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(makeSnackBar(message));
+}
+
+void showGetSnackBar(String message) {
+  Get.isSnackbarOpen ? Get.closeAllSnackbars() : null;
+  Get.snackbar('', '',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: appRed,
+      colorText: Colors.white,
+      titleText: Container(),
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.only(left: 16, right: 16,bottom: 8),
+      borderRadius: 8,
+      messageText: Text(
+        message,
+        style: const TextStyle(
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
+      ));
 }
 
 SnackBar makeSnackBar(String message) {
@@ -106,17 +156,16 @@ Widget clickToAction(BuildContext context, String text, Function onClick) {
   );
 }
 
-bool isQueryExist(String? parent, String child){
+bool isQueryExist(String? parent, String child) {
   return parent?.toLowerCase().contains(child.toLowerCase()) == true;
 }
-
 
 Future<void> checkSubscriptionsStatus(
     List<String>? subscriptions, Map<String, int> subscriptionStatus) async {
   if (subscriptions == null) return;
   var subsList = await PreferencesData.getSubscriptions();
-  printDebug("local"+subsList.toString());
-  printDebug("response"+subscriptions.toString());
+  // printDebug("local" + subsList.toString());
+  // printDebug("response" + subscriptions.toString());
   if (subsList.length <= subscriptions.length) {
     // 0 means not subscribed in local
     for (var element in subscriptions) {

@@ -21,7 +21,8 @@ class ExamData {
       List<num>? addQualifications,
       num? maxQualification,
       bool? filtered,
-      bool? parent}) {
+      bool? parent,
+      String? imgUrl}) {
     _id = id;
     _examName = examName;
     _adNumber = adNumber;
@@ -42,6 +43,7 @@ class ExamData {
     _maxQualification = maxQualification;
     _filtered = filtered;
     _parent = parent;
+    _imgUrl = imgUrl;
   }
 
   ExamData.fromJson(dynamic json) {
@@ -83,6 +85,7 @@ class ExamData {
     _maxQualification = json['maxQualification'];
     _filtered = json['filtered'];
     _parent = json['parent'];
+    _imgUrl = json['imgUrl'];
   }
 
   String? _id;
@@ -107,6 +110,7 @@ class ExamData {
   bool? _parent;
   List<ExamData> _childExams = [];
   int _isNotify = 0;
+  String? _imgUrl;
 
   ExamData copyWith(
           {String? id,
@@ -128,7 +132,8 @@ class ExamData {
           List<num>? addQualifications,
           num? maxQualification,
           bool? filtered,
-          bool? parent}) =>
+          bool? parent,
+          String? imgUrl}) =>
       ExamData(
           id: id ?? _id,
           examName: examName ?? _examName,
@@ -149,7 +154,8 @@ class ExamData {
           addQualifications: addQualifications ?? _addQualifications,
           maxQualification: maxQualification ?? _maxQualification,
           filtered: filtered ?? _filtered,
-          parent: parent ?? _parent);
+          parent: parent ?? _parent,
+          imgUrl: imgUrl ?? _imgUrl);
 
   String? get id => _id;
 
@@ -218,6 +224,8 @@ class ExamData {
 
   int get isNotify => _isNotify;
 
+  String? get imgUrl => _imgUrl;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['_id'] = _id;
@@ -246,6 +254,7 @@ class ExamData {
     map['maxQualification'] = _maxQualification;
     map['filtered'] = _filtered;
     map['parent'] = _parent;
+    map['imgUrl'] = _imgUrl;
     return map;
   }
 

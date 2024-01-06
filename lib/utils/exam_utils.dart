@@ -56,7 +56,7 @@ String getExamFees(num categoryId, num gender, ExamData exam) {
       childExam.categoryFees?.forEach((element) {
         if (element.categoryIds?.contains(categoryId) == true &&
             element.gender?.contains(genderType) == true) {
-          if (examFees.isEmpty) {
+          if (examFees == "") {
             examFees = "₹ ${element.fee ?? 0}";
           } else {
             examFees += "/${element.fee ?? 0}";
@@ -68,7 +68,7 @@ String getExamFees(num categoryId, num gender, ExamData exam) {
     exam.categoryFees?.forEach((element) {
       if (element.categoryIds?.contains(categoryId) == true &&
           element.gender?.contains(genderType) == true) {
-        examFees = "${examFees.isEmpty ? '' : '/'}₹ ${element.fee ?? 0}";
+        examFees = "${examFees == "" ? '' : '/'}₹ ${element.fee ?? 0}";
       }
     });
   }

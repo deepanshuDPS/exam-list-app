@@ -1,60 +1,16 @@
-import 'package:exam_list/containers/base_state.dart';
-import 'package:exam_list/providers/user_provider.dart';
+import 'package:exam_list/controllers/info_controller.dart';
 import 'package:exam_list/responseModels/user/terms_policy_response.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_image_container.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
 import 'package:exam_list/styles/app_styles.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class TermsConditionsScreen extends StatefulWidget {
-  static String routeName = 'terms-conditions-screen';
+class TermsConditionsScreen extends GetWidget<InfoController> {
+  static String routeName = '/terms-conditions-screen';
 
   const TermsConditionsScreen({Key? key}) : super(key: key);
-
-  @override
-  BaseState<TermsConditionsScreen> createState() =>
-      _TermsConditionsScreenState();
-}
-
-class _TermsConditionsScreenState extends BaseState<TermsConditionsScreen> {
-  bool _isShowTerms = false;
-
-  final List<String> _titles = [];
-  final List<String> _information = [];
-  bool _isLoading = true;
-
-  @override
-  void didChangeDependencies() {
-    if (isFirstTime) {
-      _isShowTerms =
-          (ModalRoute.of(context)?.settings.arguments ?? 0) as int == 0;
-      Provider.of<UserProvider>(context, listen: false)
-          .getTermsPolicy()
-          .then((value) {
-        if (value is String) {
-          setState(() {
-            _isLoading = false;
-          });
-          showSnackBar(context, value);
-        } else {
-          setState(() {
-            value as Data;
-            _isLoading = false;
-            if (_isShowTerms) {
-              _titles.addAll(value.termsTitles ?? []);
-              _information.addAll(value.termsConditions ?? []);
-            } else {
-              _titles.addAll(value.policyTitles ?? []);
-              _information.addAll(value.privacyPolicy ?? []);
-            }
-          });
-        }
-      });
-    }
-    super.didChangeDependencies();
-  }
 
   Widget _contentWiseTerms(String title, String text) {
     return Column(
@@ -79,39 +35,65 @@ class _TermsConditionsScreenState extends BaseState<TermsConditionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.getTermsPolicy();
+    var isShowTerms =
+        (ModalRoute.of(context)?.settings.arguments ?? 0) as int == 0;
+    controller.data.listen((value) {
+      if (value != 0 && value is String) {
+        showGetSnackBar(value);
+      }
+    });
     return BaseScaffold(
-      isAppBarColored: true,
-      titleText: _isShowTerms ? 'Terms & Conditions' : 'Privacy Policy',
-      child: BaseImageContainer(
-        opacity: 0.7,
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white.withAlpha(220)),
-                  child: Column(
-                    children: [
-                      ..._titles.map((e) {
-                        return Column(children: [
-                          _contentWiseTerms(
-                              e, _information[_titles.indexOf(e)]),
-                          const SizedBox(
-                            height: 8,
-                          )
-                        ]);
-                      })
-                    ],
-                  ),
-                ),
-              ),
-      ),
-    );
+        isAppBarColored: true,
+        titleText: isShowTerms ? 'Terms & Conditions' : 'Privacy Policy',
+        child: BaseImageContainer(
+            opacity: 0.7,
+            child: Obx(
+              () {
+                var titles = [];
+                var information = [];
+                if (controller.data.value != 0 &&
+                    controller.data.value is Data) {
+                  var data = controller.data.value as Data;
+                  titles =
+                      (isShowTerms ? data.termsTitles : data.policyTitles) ??
+                          [];
+                  information = (isShowTerms
+                          ? data.termsConditions
+                          : data.privacyPolicy) ??
+                      [];
+                }
+                if (controller.isProgress.isTrue) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 20),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                          color: Colors.white.withAlpha(220)),
+                      child: Column(
+                        children: [
+                          ...titles.map((e) {
+                            return Column(children: [
+                              _contentWiseTerms(
+                                  e, information[titles.indexOf(e)]),
+                              const SizedBox(
+                                height: 8,
+                              )
+                            ]);
+                          })
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
+            )));
   }
 }
