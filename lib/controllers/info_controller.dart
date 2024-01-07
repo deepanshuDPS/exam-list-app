@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class InfoController extends GetxController {
   var isProgress = false.obs;
-  Rx<dynamic> data = Rx<dynamic>(0);
+  Rx<dynamic> data = Rx<dynamic>(null);
 
   void getTermsPolicy() async {
     isProgress.value = true;
@@ -13,7 +13,8 @@ class InfoController extends GetxController {
     isProgress.value = false;
     if (response.status == true) {
       data.value = response.data;
+    }else{
+      data.value = response.message ?? 'Something went Wrong';
     }
-    data.value = response.message ?? 'Something went Wrong';
   }
 }

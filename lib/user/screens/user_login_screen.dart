@@ -109,9 +109,9 @@ class UserLoginScreen extends GetWidget<AuthUserController> {
         // successfully login toast
         // check on boarding and change screen
         if (value == true) {
-          Get.offAll(HomeScreen.routeName);
+          Get.offAllNamed(HomeScreen.routeName);
         } else {
-          Get.offAll(UserOnBoardingScreen.routeName);
+          Get.offAllNamed(UserOnBoardingScreen.routeName);
         }
       }
     }).onError((error, stackTrace) {
@@ -120,6 +120,7 @@ class UserLoginScreen extends GetWidget<AuthUserController> {
       if (error is FirebaseException) {
         value = (error).message ?? Constants.somethingWentWrong;
       }
+      printDebug('here$error');
       Fluttertoast.showToast(
         msg: value,
       );
@@ -136,9 +137,9 @@ class UserLoginScreen extends GetWidget<AuthUserController> {
         // successfully login toast
         // check on boarding and change screen
         if (value == true) {
-          Get.offAll(HomeScreen.routeName);
+          Get.offAllNamed(HomeScreen.routeName);
         } else {
-          Get.offAll(UserOnBoardingScreen.routeName);
+          Get.offAllNamed(UserOnBoardingScreen.routeName);
         }
       }
     }).onError((error, stackTrace) {

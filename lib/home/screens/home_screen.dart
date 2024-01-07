@@ -1,117 +1,69 @@
-import 'package:exam_list/providers/exam_provider.dart';
-import 'package:exam_list/providers/user_provider.dart';
+import 'package:exam_list/controllers/aspirant_user_controller.dart';
+import 'package:exam_list/controllers/home_tab_controller.dart';
 import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
-import 'package:exam_list/utils/notification_instance.dart';
 import 'package:exam_list/widgets/container_error.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:exam_list/containers/base_state.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
-  static const routeName = '/home-screen';
+class HomeScreen extends StatelessWidget {
+  static const routeName = '/home-screen'; // Manages the tab index
 
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  BaseState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends BaseState<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController; // Manages the tab index
+  final AspirantUserController _userController = Get.find();
 
   void _refreshUser() {
-    _userProvider().getAspirantUser();
+    _userController.getAspirantUser();
   }
 
-  late List<Widget> _tabScreens;
+  final HomeTabController homeTabController = Get.find();
 
-  @override
-  void initState() {
-    super.initState();
-    _tabScreens = [
-      const ExamListingScreen(),
-      // const ExamListingScreen(),
-      // const ResourcesScreen(),
-      UserProfileOptionsScreen(onRefresh: _refreshUser),
-    ];
-    _tabController = TabController(
-        length: _tabScreens.length,
-        vsync: this,
-        animationDuration: Duration.zero);
-  }
-
-  Future<PermissionStatus> requestNotificationPermissions() async {
-    final PermissionStatus status = await Permission.notification.request();
-    return status;
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (isFirstTime) {
-      requestNotificationPermissions().then((status) async {
-        if (status.isGranted) {
-          // showSnackBar(context, "Permission Granted");
-        } else if (status.isDenied) {
-          showSnackBar(context, "Permission Denied for Notifications");
-        } else if (status.isPermanentlyDenied) {
-          showSnackBar(
-              context, "Permission Denied Permanently for Notifications");
-          // await openAppSettings();
-        }
-      });
-      _userProvider().setCurrentVersion();
-      _userProvider().getAspirantUser();
-      _setUpFirebaseMessaging();
-    }
-    super.didChangeDependencies();
+  HomeScreen({Key? key}) : super(key: key) {
+    checkAndRequestPermission();
+    setUpFirebaseMessaging();
+    _refreshUser();
+    // _userProvider().setCurrentVersion();
+    // _userProvider().getAspirantUser();
   }
 
   @override
   Widget build(BuildContext context) {
+    homeTabController.setTabs([
+      ExamListingScreen(),
+      // const ExamListingScreen(),
+      // const ResourcesScreen(),
+      UserProfileOptionsScreen(onRefresh: _refreshUser),
+    ]);
+
     return Container(
       color: Colors.white,
-      child: Consumer<UserProvider>(
-          child: const Center(
+      child: Obx(() {
+        if (_userController.aspirantRequestData.value.isLoading) {
+          return const Center(
             child: CircularProgressIndicator(),
+          );
+        }
+
+        if (_userController.aspirantRequestData.value.isError) {
+          return ContainerError(
+              jsonData: _userController.aspirantRequestData.value.data,
+              onTryAgain: () => _userController.getAspirantUser());
+        }
+
+        // Provider.of<ExamProvider>(context, listen: false).updatedAspirantData =
+        //     user.aspirantDetails!;
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          bottomNavigationBar: _buildBottomNavigationBar(),
+          body: TabBarView(
+            controller: homeTabController.controller,
+            physics: const NeverScrollableScrollPhysics(),
+            children: homeTabController.tabScreens,
           ),
-          builder: (context, user, ch) {
-            if (user.aspirantRequestData.isLoading) {
-              return ch!;
-            }
-
-            if (user.aspirantRequestData.isError) {
-              return ContainerError(
-                  jsonData: user.aspirantRequestData.data,
-                  onTryAgain: () => user.getAspirantUser());
-            }
-
-            Provider.of<ExamProvider>(context, listen: false)
-                .updatedAspirantData = user.aspirantDetails!;
-            return Scaffold(
-              backgroundColor: Colors.transparent,
-              bottomNavigationBar: _buildBottomNavigationBar(),
-              body: TabBarView(
-                controller: _tabController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _tabScreens,
-              ),
-            );
-          }),
+        );
+      }),
     );
-  }
-
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _tabController.index = index;
-    });
   }
 
   Widget _buildBottomNavigationBar() {
@@ -134,33 +86,37 @@ class _HomeScreenState extends BaseState<HomeScreen>
           topLeft: Radius.circular(20.0),
           topRight: Radius.circular(20.0),
         ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          items: [
-            BottomNavigationBarItem(
-              icon: _buildNavItemIcon(Icons.home, _selectedIndex == 0),
-              label: '',
-            ),
-            // BottomNavigationBarItem(
-            //   icon: _buildNavItemIcon(Icons.location_on, _selectedIndex == 1),
-            //   label: '',
-            // ),
-            // BottomNavigationBarItem(
-            //   icon: _buildNavItemIcon(Icons.menu_book, _selectedIndex == 2),
-            //   label: '',
-            // ),
-            BottomNavigationBarItem(
-              icon: _buildNavItemIcon(Icons.person, _selectedIndex == 1),
-              label: '',
-            ),
-          ],
+        child: Obx(
+          () => BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.grey,
+            currentIndex: homeTabController.selectedIndex.value,
+            onTap: homeTabController.onItemSelected,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildNavItemIcon(
+                    Icons.home, homeTabController.selectedIndex.value == 0),
+                label: '',
+              ),
+              // BottomNavigationBarItem(
+              //   icon: _buildNavItemIcon(Icons.location_on, _selectedIndex == 1),
+              //   label: '',
+              // ),
+              // BottomNavigationBarItem(
+              //   icon: _buildNavItemIcon(Icons.menu_book, _selectedIndex == 2),
+              //   label: '',
+              // ),
+              BottomNavigationBarItem(
+                icon: _buildNavItemIcon(
+                    Icons.person, homeTabController.selectedIndex.value == 1),
+                label: '',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -172,9 +128,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
           isSelected ? const EdgeInsets.all(7.0) : const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isSelected
-            ? Theme.of(context).colorScheme.secondary
-            : Colors.transparent,
+        color:
+            isSelected ? Get.theme.colorScheme.secondary : Colors.transparent,
       ),
       child: Icon(
         iconData,
@@ -182,21 +137,5 @@ class _HomeScreenState extends BaseState<HomeScreen>
         size: isSelected ? 26.0 : 24.0,
       ),
     );
-  }
-
-  UserProvider _userProvider() {
-    return Provider.of<UserProvider>(context, listen: false);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _setUpFirebaseMessaging() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      NotificationInstance.instance()?.onNotificationMessage(message);
-    });
   }
 }

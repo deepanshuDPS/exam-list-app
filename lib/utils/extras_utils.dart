@@ -1,8 +1,11 @@
+import 'package:exam_list/responseModels/request_data.dart';
+import 'package:exam_list/utils/notification_instance.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/utils/colors.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 
@@ -100,7 +103,7 @@ void showGetSnackBar(String message) {
       colorText: Colors.white,
       titleText: Container(),
       margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.only(left: 16, right: 16,bottom: 8),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
       borderRadius: 8,
       messageText: Text(
         message,
@@ -191,3 +194,42 @@ Future<void> checkSubscriptionsStatus(
     await PreferencesData.setNewSubsList(subscriptions);
   }
 }
+
+Future<PermissionStatus> requestNotificationPermissions() async {
+  final PermissionStatus status = await Permission.notification.request();
+  return status;
+}
+
+void checkAndRequestPermission() {
+  requestNotificationPermissions().then((status) async {
+    if (status.isGranted) {
+      // showSnackBar(context, "Permission Granted");
+    } else if (status.isDenied) {
+      showGetSnackBar("Permission Denied for Notifications");
+    } else if (status.isPermanentlyDenied) {
+      showGetSnackBar("Permission Denied Permanently for Notifications");
+      // await openAppSettings();
+    }
+  });
+}
+
+void setUpFirebaseMessaging() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    NotificationInstance.instance()?.onNotificationMessage(message);
+  });
+}
+
+void notifyWithRequest(Rx<RequestData> rxRequestData, bool isLoading,
+    [Map<String, dynamic>? error]) {
+  var newData = RequestData();
+  newData.isLoading = isLoading;
+  if (isLoading) {
+    newData.data = null;
+    newData.isError = false;
+  }
+  if (error != null) {
+    newData.setErrorData(error);
+  }
+  rxRequestData.value = newData;
+}
+

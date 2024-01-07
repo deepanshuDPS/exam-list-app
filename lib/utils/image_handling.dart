@@ -67,20 +67,20 @@ Widget imageIcon(String image, double size) {
   }
 }
 
-Widget imageNetworkIcon(String imageUrl,double size) {
+Widget imageNetworkIcon(String imageUrl,double size, {BoxFit? fit}) {
   if (imageUrl.isNotEmpty && imageUrl.contains(".svg")) {
     return SvgPicture.network(
       imageUrl,
       width: size,
       height: size,
-      fit: BoxFit.cover,
+      fit: fit?? BoxFit.cover,
     );
   } else {
     return Image.network(
       imageUrl,
       width: size,
       height: size,
-      fit: BoxFit.cover,
+      fit: fit?? BoxFit.cover,
     );
   }
 }

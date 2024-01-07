@@ -1,15 +1,15 @@
+import 'package:exam_list/controllers/auth_user_controller.dart';
 import 'package:exam_list/options/screens/terms_conditions_screen.dart';
 import 'package:exam_list/user/screens/user_edit_profile_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:exam_list/containers/base_scaffold.dart';
-import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/widgets/illustration_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 import 'notification_listing_screen.dart';
 
-class UserProfileOptionsScreen extends StatelessWidget {
+class UserProfileOptionsScreen extends GetWidget<AuthUserController> {
 
   final Function onRefresh;
 
@@ -42,8 +42,7 @@ class UserProfileOptionsScreen extends StatelessWidget {
               color: Colors.black,
             ),
             onPressed: () {
-              Navigator.of(context)
-                  .pushNamed(NotificationListingScreen.routeName);
+              Get.toNamed(NotificationListingScreen.routeName);
             },
           ),
         ),
@@ -59,20 +58,19 @@ class UserProfileOptionsScreen extends StatelessWidget {
                 height: 24,
               ),
               _horizontalOption('Edit Profile', () async {
-                var result = await Navigator.of(context)
-                    .pushNamed(UserEditProfileScreen.routeName);
+                var result = await Get.toNamed(UserEditProfileScreen.routeName);
                 if (result != null) {
                   onRefresh();
                 }
               }),
               _horizontalOption(
                   'Terms & Conditions',
-                  () => Navigator.of(context).pushNamed(
+                  () => Get.toNamed(
                       TermsConditionsScreen.routeName,
                       arguments: 0)),
               _horizontalOption(
                   'Privacy Policy',
-                  () => Navigator.of(context).pushNamed(
+                  () => Get.toNamed(
                       TermsConditionsScreen.routeName,
                       arguments: 1)),
               const Divider(
@@ -82,18 +80,12 @@ class UserProfileOptionsScreen extends StatelessWidget {
                 endIndent: 24,
               ),
               _horizontalOption('Logout', () {
-                showProgressDialog(context);
-                Provider.of<UserProvider>(context, listen: false)
-                    .logoutUser()
+                showGetProgressDialog();
+                controller.logoutUser()
                     .then((value) {
-                  // for progress dialog
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed("/");
+                  Get.offAllNamed("/");
                 }).onError((error, stackTrace) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed("/");
+                  Get.offAllNamed("/");
                 });
               }),
             ],

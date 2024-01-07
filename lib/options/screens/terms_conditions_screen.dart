@@ -38,62 +38,55 @@ class TermsConditionsScreen extends GetWidget<InfoController> {
     controller.getTermsPolicy();
     var isShowTerms =
         (ModalRoute.of(context)?.settings.arguments ?? 0) as int == 0;
-    controller.data.listen((value) {
-      if (value != 0 && value is String) {
-        showGetSnackBar(value);
-      }
-    });
     return BaseScaffold(
         isAppBarColored: true,
         titleText: isShowTerms ? 'Terms & Conditions' : 'Privacy Policy',
         child: BaseImageContainer(
             opacity: 0.7,
-            child: Obx(
-              () {
-                var titles = [];
-                var information = [];
-                if (controller.data.value != 0 &&
-                    controller.data.value is Data) {
-                  var data = controller.data.value as Data;
-                  titles =
-                      (isShowTerms ? data.termsTitles : data.policyTitles) ??
-                          [];
-                  information = (isShowTerms
-                          ? data.termsConditions
-                          : data.privacyPolicy) ??
-                      [];
-                }
-                if (controller.isProgress.isTrue) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return SingleChildScrollView(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 20),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                          color: Colors.white.withAlpha(220)),
-                      child: Column(
-                        children: [
-                          ...titles.map((e) {
-                            return Column(children: [
-                              _contentWiseTerms(
-                                  e, information[titles.indexOf(e)]),
-                              const SizedBox(
-                                height: 8,
-                              )
-                            ]);
-                          })
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              },
-            )));
+            child: SingleChildScrollView(
+                child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: Colors.white.withAlpha(220)),
+              child: Obx(
+                () {
+                  var value = controller.data.value;
+                  var titles = [];
+                  var information = [];
+                  if (value != null && value is Data) {
+                    var data = value;
+                    titles =
+                        (isShowTerms ? data.termsTitles : data.policyTitles) ??
+                            [];
+                    information = (isShowTerms
+                            ? data.termsConditions
+                            : data.privacyPolicy) ??
+                        [];
+                    return Column(
+                      children: [
+                        ...titles.map((e) {
+                          return Column(children: [
+                            _contentWiseTerms(
+                                e, information[titles.indexOf(e)]),
+                            const SizedBox(
+                              height: 8,
+                            )
+                          ]);
+                        })
+                      ],
+                    );
+                  } else if (value != null && value is String) {
+                    showGetSnackBar(value);
+                    return const SizedBox();
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            ))));
   }
 }

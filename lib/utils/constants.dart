@@ -19,8 +19,6 @@ class Constants {
     6: 'Teaching',
   };
 
-  static List examCatIndexPriority = [0, 1, 6, 2, 3, 4, 5];
-
   // Filters for the resources list
   static Map<int, String> resourcesCategories = {
     0: 'All',

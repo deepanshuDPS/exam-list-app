@@ -38,7 +38,7 @@ class ExamListItem extends StatelessWidget {
                 child: ListTile(
                   leading: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: imageIcon(exam.imgUrl ?? '', 50),
+                    child: imageNetworkIcon(exam.imgUrl ?? '', 50,fit: BoxFit.fitWidth),
                   ),
                   title: Padding(
                     padding: const EdgeInsets.only(right: 26),

@@ -1,75 +1,45 @@
 import 'package:exam_list/containers/base_image_container.dart';
-import 'package:exam_list/exams/screens/exam_screen.dart';
+import 'package:exam_list/controllers/aspirant_exam_controller.dart';
+import 'package:exam_list/controllers/aspirant_user_controller.dart';
 import 'package:exam_list/exams/widgets/confirmation_dialog.dart';
-import 'package:exam_list/providers/exam_provider.dart';
-import 'package:exam_list/providers/user_provider.dart';
 import 'package:exam_list/exams/widgets/exam_list_item.dart';
 import 'package:exam_list/utils/colors.dart';
 import 'package:exam_list/utils/constants.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class ExamListingScreen extends StatefulWidget {
+class ExamListingScreen extends GetWidget<AspirantExamController> {
   static const routeName = "/exam-listing-screen";
 
-  const ExamListingScreen({Key? key}) : super(key: key);
+  // with AutomaticKeepAliveClientMixin<ExamListingScreen> {
+  final AspirantUserController _userController = Get.find();
 
-  @override
-  State<ExamListingScreen> createState() => _ExamListingScreenState();
-}
-
-class _ExamListingScreenState extends State<ExamListingScreen>
-    with AutomaticKeepAliveClientMixin<ExamListingScreen> {
-  int? _selectedIndex;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  ExamListingScreen({Key? key}) : super(key: key);
 
   final _searchTextController = TextEditingController();
-  bool isInit = false;
-
-  ExamProvider _examProvider() {
-    return Provider.of<ExamProvider>(context, listen: false);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!isInit) {
-      isInit = true;
-      _searchTextController.clear();
-      _refreshData();
-      _searchTextController.addListener(() {
-        _examProvider().filterList(query: _searchTextController.text);
-      });
-      _selectedIndex = _examProvider().currentFilterIndex;
-    }
-  }
 
   Widget _examCategory(int index) {
+    var selectedIndex = controller.currentFilterIndex.value;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: _selectedIndex == index ? Colors.red : Colors.white,
+        color: selectedIndex == index ? Colors.red : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: _selectedIndex == index ? Colors.red : Colors.grey,
+          color: selectedIndex == index ? Colors.red : Colors.grey,
         ),
       ),
       child: Center(
         child: Text(
-          Constants.examCategories[index] ??
-              "All",
+          Constants.examCategories[index] ?? "All",
           style: TextStyle(
-            color: _selectedIndex == index ? Colors.white : Colors.grey,
+            color: selectedIndex == index ? Colors.white : Colors.grey,
             fontSize: 14,
             fontWeight:
-                _selectedIndex == index ? FontWeight.w500 : FontWeight.normal,
+                selectedIndex == index ? FontWeight.w500 : FontWeight.normal,
           ),
         ),
       ),
@@ -78,7 +48,11 @@ class _ExamListingScreenState extends State<ExamListingScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
+    _searchTextController.clear();
+    _searchTextController.addListener(() {
+      controller.filterList(query: _searchTextController.text);
+    });
+    _refreshData();
     return BaseImageContainer(
         opacity: 0.3,
         child: Scaffold(
@@ -93,7 +67,7 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                       width: double.infinity,
                       margin: const EdgeInsets.only(bottom: 25),
                       padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).padding.top + 20,
+                          top: Get.mediaQuery.padding.top + 20,
                           left: 16,
                           right: 16),
                       decoration: const BoxDecoration(
@@ -105,26 +79,12 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Consumer<UserProvider>(
-                              child: const Text(
-                                'Hi Aspirant',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w200,
-                                    color: Colors.white),
-                              ),
-                              builder: (context, user, child) {
-                                if (user.aspirantDetails != null) {
-                                  return Text(
-                                    'Hi ${user.aspirantDetails?.name}',
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w200,
-                                        color: Colors.white),
-                                  );
-                                }
-                                return child!;
-                              },
+                            Text(
+                              'Hi ${_userController.aspirantDetails?.name ?? "Aspirant"}',
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w200,
+                                  color: Colors.white),
                             ),
                             const SizedBox(height: 4),
                             const Text(
@@ -187,158 +147,152 @@ class _ExamListingScreenState extends State<ExamListingScreen>
                 height: 16,
               ),
               SizedBox(
-                height: 38,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: Constants.examCategories.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        // Update the selected index when an item is tapped
-                        _searchTextController.clear();
-                        _examProvider().filterList(index: index, query: "");
-                        setState(() {
-                          _selectedIndex = _examProvider().currentFilterIndex;
-                        });
+                  height: 38,
+                  child: Obx(() {
+                    var categoryList =
+                        controller.examCategories.toList(growable: true);
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: categoryList.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            // Update the selected index when an item is tapped
+                            _searchTextController.clear();
+                            controller.filterList(
+                                index: categoryList[index], query: "");
+                          },
+                          child: _examCategory(categoryList[index]),
+                        );
                       },
-                      child: _examCategory(index),
                     );
-                  },
-                ),
-              ),
+                  })),
               const SizedBox(
                 height: 8,
               ),
-              Consumer<ExamProvider>(
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height / 2,
+              Obx(() {
+                if (controller.examRequest.value.isLoading) {
+                  return SizedBox(
+                    height: Get.mediaQuery.size.height / 2,
                     child: const Center(
                       child: CircularProgressIndicator(),
                     ),
-                  ),
-                  builder: (context, exams, child) {
-                    if (exams.examRequest.isLoading) {
-                      return child!;
-                    } else {
-                      var list = exams.currentList;
-                      if (list.isEmpty) {
-                        return Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: _refreshData,
-                            child: ListView(children: [
-                              SizedBox(
-                                height:
-                                    (MediaQuery.of(context).size.height - 230) /
-                                        2,
-                                child: Center(
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/svg/ic_no_results.svg'),
-                                        const SizedBox(height: 8),
-                                        const Text(
-                                          'No exams',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: sharpGrey),
-                                        )
-                                      ]),
-                                ),
-                              ),
-                            ]),
+                  );
+                } else {
+                  var list = controller.currentList.toList(growable: true);
+                  if (list.isEmpty) {
+                    return Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: ListView(children: [
+                          SizedBox(
+                            height: (Get.mediaQuery.size.height - 230) / 2,
+                            child: Center(
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                        'assets/svg/ic_no_results.svg'),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'No exams',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: sharpGrey),
+                                    )
+                                  ]),
+                            ),
                           ),
-                        );
-                      } else {
-                        return Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: _refreshData,
-                            child: ListView.builder(
-                                // physics: const ClampingScrollPhysics(),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                itemCount: list.length,
-                                itemBuilder: (context, index) {
-                                  return ExamListItem(
-                                    exam: list[index],
-                                    aspirant:
-                                        _examProvider().updatedAspirantData,
-                                    onNotify: (slug) {
-                                      showDialog<void>(
-                                          context: context,
-                                          builder: (BuildContext dContext) {
-                                            return ConfirmationDialog(
-                                                forSubscribe: true,
-                                                yes: () {
-                                                  if (exams.isNotifying) return;
-                                                  showProgressDialog(context);
-                                                  exams
-                                                      .notifyMe(slug)
-                                                      .then((value) {
-                                                    Navigator.of(context).pop();
-                                                    if (value is String) {
-                                                      showSnackBar(
-                                                          context, value);
-                                                    }
-                                                  }).onError(
-                                                          (error, stackTrace) {
-                                                    Navigator.of(context).pop();
-                                                    showSnackBar(context,
-                                                        'Something went wrong');
-                                                  });
-                                                });
-                                          });
-                                    },
-                                    onRemoveNotify: (slug) {
-                                      showDialog<void>(
-                                          context: context,
-                                          builder: (BuildContext dContext) {
-                                            return ConfirmationDialog(
-                                                forSubscribe: false,
-                                                yes: () {
-                                                  if (exams.isNotifying) return;
-                                                  showProgressDialog(context);
-                                                  exams
-                                                      .removeNotifyMe(slug)
-                                                      .then((value) {
-                                                    Navigator.of(context).pop();
-                                                    if (value is String) {
-                                                      showSnackBar(
-                                                          context, value);
-                                                    }
-                                                  }).onError(
-                                                          (error, stackTrace) {
-                                                    Navigator.of(context).pop();
-                                                    showSnackBar(context,
-                                                        'Something went wrong');
-                                                  });
-                                                });
-                                          });
-                                    },
-                                    onClick: () {
-                                      exams.setExam(list[index]);
-                                      Navigator.of(context)
-                                          .pushNamed(ExamScreen.routeName);
-                                    },
-                                  );
-                                }),
-                          ),
-                        );
-                      }
-                    }
-                  })
+                        ]),
+                      ),
+                    );
+                  } else {
+                    return Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: ListView.builder(
+                            // physics: const ClampingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            itemCount: list.length,
+                            itemBuilder: (context, index) {
+                              return ExamListItem(
+                                exam: list[index],
+                                aspirant: controller.updatedAspirantData,
+                                onNotify: (slug) {
+                                  showDialog<void>(
+                                      context: context,
+                                      builder: (BuildContext dContext) {
+                                        return ConfirmationDialog(
+                                            forSubscribe: true,
+                                            yes: () {
+                                              if (controller.isNotifying.value) {
+                                                return;
+                                              }
+                                              showGetProgressDialog();
+                                              controller
+                                                  .notifyMe(slug)
+                                                  .then((value) {
+                                                Get.back();
+                                                if (value is String) {
+                                                  showGetSnackBar(value);
+                                                }
+                                              }).onError((error, stackTrace) {
+                                                Get.back();
+                                                showGetSnackBar(
+                                                    'Something went wrong');
+                                              });
+                                            });
+                                      });
+                                },
+                                onRemoveNotify: (slug) {
+                                  showDialog<void>(
+                                      context: context,
+                                      builder: (BuildContext dContext) {
+                                        return ConfirmationDialog(
+                                            forSubscribe: false,
+                                            yes: () {
+                                              if (controller.isNotifying.value) {
+                                                return;
+                                              }
+                                              showGetProgressDialog();
+                                              controller
+                                                  .removeNotifyMe(slug)
+                                                  .then((value) {
+                                                Get.back();
+                                                if (value is String) {
+                                                  showGetSnackBar(value);
+                                                }
+                                              }).onError((error, stackTrace) {
+                                                Get.back();
+                                                showGetSnackBar(
+                                                    'Something went wrong');
+                                              });
+                                            });
+                                      });
+                                },
+                                onClick: () {
+                                  // exams.setExam(list[index]);
+                                  // Navigator.of(context)
+                                  //     .pushNamed(ExamScreen.routeName);
+                                },
+                              );
+                            }),
+                      ),
+                    );
+                  }
+                }
+              })
             ],
           ),
         ));
   }
 
-  @override
-  bool get wantKeepAlive => true;
+  // @override
+  // bool get wantKeepAlive => true;
 
   Future<void> _refreshData() async {
-    _examProvider().fetchExams(_selectedIndex ?? 0,
-        _examProvider().updatedAspirantData.subscribedChannels ?? []);
+    controller.fetchExams(controller.currentFilterIndex.value,
+        controller.updatedAspirantData.subscribedChannels ?? []);
   }
 }

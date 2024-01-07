@@ -2,6 +2,7 @@ import 'package:exam_list/network/http_requests.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:exam_list/responseModels/user/check_user_response.dart'
     as check_user_response;
@@ -31,10 +32,12 @@ class AuthUserController extends GetxController {
           checkState.value = 0;
         } else if (user.onBoarded == true) {
           checkState.value = 2;
+        } else {
+          checkState.value = 1;
         }
-        checkState.value = 1;
+      } else {
+        checkState.value = 0;
       }
-      checkState.value = 0;
     } catch (e) {
       checkState.value = error;
     }
@@ -97,6 +100,35 @@ class AuthUserController extends GetxController {
     }
     await _auth.signOut();
     return response.message ?? 'Something went Wrong';
+  }
+
+  Future<void> logoutUser() async {
+    await removeFcmDisableNotification();
+    await _auth.signOut();
+    await PreferencesData.clearOnLogOut();
+    // _isLoggedIn = false;
+  }
+
+  Future<void> removeFcmDisableNotification() async {
+    String fcmTokenToRemove = await PreferencesData.getFCMToken();
+    try {
+      if (fcmTokenToRemove != "") {
+        await HttpRequests.instance()?.httpPatchRequest(
+            ApiEndPoints.logoutUser, {'fcmTokenToRemove': fcmTokenToRemove});
+      } else {
+        return;
+      }
+    } catch (e) {
+      e.toString();
+    } finally {
+      FirebaseMessaging.instance.deleteToken().then((value) {
+        PreferencesData.checkFCMToken();
+      });
+      var subsList = await PreferencesData.getSubscriptions();
+      for (var topic in subsList) {
+        FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+      }
+    }
   }
 
 // void createUser(String name, String email, String password) async {
