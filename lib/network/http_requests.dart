@@ -59,6 +59,7 @@ class HttpRequests {
       if (error is SocketException) {
         return getErrorResponse(1, _emptyError);
       }
+      printDebug(error.toString());
       return getErrorResponse(0, _emptyError);
     }
   }

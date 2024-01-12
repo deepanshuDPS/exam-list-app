@@ -92,13 +92,13 @@ class MyApp extends StatelessWidget {
               name: UserLoginScreen.routeName, page: () => UserLoginScreen()),
           GetPage(
               name: UserEditProfileScreen.routeName,
-              page: () => const UserEditProfileScreen()),
+              page: () => UserEditProfileScreen()),
           GetPage(
               name: UserOnBoardingScreen.routeName,
-              page: () => const UserOnBoardingScreen()),
+              page: () => UserOnBoardingScreen()),
           GetPage(
               name: NotificationListingScreen.routeName,
-              page: () => const NotificationListingScreen()),
+              page: () => NotificationListingScreen()),
           GetPage(
               name: TermsConditionsScreen.routeName,
               page: () => const TermsConditionsScreen()),

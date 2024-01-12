@@ -1,4 +1,3 @@
-import 'package:exam_list/utils/extras_utils.dart';
 
 dynamic getErrorResponse(int errorCode, dynamic bodyContent) {
   if(bodyContent['message'] == '') {

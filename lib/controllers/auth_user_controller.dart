@@ -12,6 +12,8 @@ class AuthUserController extends GetxController {
   final Rx<check_user_response.Data?> _userDetailsData =
       Rx<check_user_response.Data?>(null);
 
+  final RxMap<String, dynamic> onBoardingData = RxMap();
+
   static int waiting = -1;
   static int error = -2;
 
@@ -44,6 +46,7 @@ class AuthUserController extends GetxController {
   }
 
   Future<dynamic> loginGuest(String mobile) async {
+    onBoardingData.clear();
     final customResponse = check_user_response.CheckUserResponse.fromJson(
         await HttpRequests.instance()?.httpPostRequest(
             ApiEndPoints.checkGuestUser, {'mobile': '+91$mobile'}));
@@ -89,6 +92,7 @@ class AuthUserController extends GetxController {
   }
 
   Future<dynamic> loginMobile(PhoneAuthCredential phoneAuthCredential) async {
+    onBoardingData.clear();
     await _auth.signInWithCredential(phoneAuthCredential);
     final response = check_user_response.CheckUserResponse.fromJson(
         await HttpRequests.instance()?.httpGetRequest(ApiEndPoints.checkUser));
@@ -102,7 +106,25 @@ class AuthUserController extends GetxController {
     return response.message ?? 'Something went Wrong';
   }
 
+  Future<dynamic> signUpAspirant() async {
+    var dataToSend = Map.of(onBoardingData);
+    // no need of this data in signUpAspirant
+    dataToSend.remove('selectedDate');
+    printDebug("hello:"+dataToSend.toString());
+    final response = check_user_response.CheckUserResponse.fromJson(
+        await HttpRequests.instance()
+            ?.httpPostRequest(ApiEndPoints.signUpAspirant, dataToSend));
+    if (response.status == true) {
+      PreferencesData.saveUserData(response.data!);
+      _userDetailsData.value = response.data!;
+      // _isLoggedIn = true;
+      return response.data?.onBoarded == true;
+    }
+    return response.message ?? 'Something went Wrong';
+  }
+
   Future<void> logoutUser() async {
+    onBoardingData.clear();
     await removeFcmDisableNotification();
     await _auth.signOut();
     await PreferencesData.clearOnLogOut();

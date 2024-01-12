@@ -24,7 +24,7 @@ class LaunchScreen extends GetWidget<AuthUserController> {
             if (_.checkState.value == 0) {
               return UserLoginScreen();
             } else if (_.checkState.value == 1) {
-              return const UserOnBoardingScreen();
+              return UserOnBoardingScreen();
             } else {
               return HomeScreen();
             }

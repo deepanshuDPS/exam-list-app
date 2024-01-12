@@ -4,6 +4,7 @@ import 'package:exam_list/exams/screens/exam_listing_screen.dart';
 import 'package:exam_list/user/screens/user_profile_options_screen.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/widgets/container_error.dart';
+import 'package:exam_list/widgets/keep_alive_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,10 +30,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     homeTabController.setTabs([
-      ExamListingScreen(),
+      KeepAliveWrapper(
+        child: ExamListingScreen(),
+      ),
       // const ExamListingScreen(),
       // const ResourcesScreen(),
-      UserProfileOptionsScreen(onRefresh: _refreshUser),
+      KeepAliveWrapper(
+          child: UserProfileOptionsScreen(onRefresh: _refreshUser)),
     ]);
 
     return Container(

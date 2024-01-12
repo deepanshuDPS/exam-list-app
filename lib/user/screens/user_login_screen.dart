@@ -31,7 +31,7 @@ class UserLoginScreen extends GetWidget<AuthUserController> {
     }
     String mobileNumber = _mobileController.text.trim();
 
-    if (kDebugMode && mobileNumber == '8800757476') {
+    if (kDebugMode && mobileNumber == '8800757476-') {
       _signInForGuest(mobileNumber);
       return;
     }

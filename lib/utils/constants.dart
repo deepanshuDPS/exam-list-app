@@ -1,6 +1,6 @@
 class Constants {
   static String baseURL =
-      'https://skilled-officially-squirrel.ngrok-free.app/v1/'; // 'http://192.168.29.174:8080/'; //
+      'http://192.168.29.174:8080/'; //  'https://skilled-officially-squirrel.ngrok-free.app/v1/'; //
 
   static Map<int, String> genders = {
     0: 'Others',

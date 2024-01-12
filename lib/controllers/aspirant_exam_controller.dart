@@ -5,6 +5,7 @@ import 'package:exam_list/responseModels/exam/exam_data.dart';
 import 'package:exam_list/responseModels/request_data.dart';
 import 'package:exam_list/responseModels/user/aspirant_data.dart';
 import 'package:exam_list/utils/constants.dart';
+import 'package:exam_list/utils/exam_utils.dart';
 import 'package:exam_list/utils/extras_utils.dart';
 import 'package:exam_list/utils/preferences_data.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,8 @@ import 'package:exam_list/responseModels/exam/exam_list_response.dart'
 import 'package:hive/hive.dart';
 import 'package:exam_list/responseModels/user/aspirant_profile_response.dart'
     as aspirant_profile_response;
+import 'package:exam_list/responseModels/exam/exam_pattern_list_response.dart'
+    as exam_pattern_list_response;
 
 class AspirantExamController extends GetxController {
   var currentFilterIndex = 0.obs;
@@ -174,5 +177,54 @@ class AspirantExamController extends GetxController {
       printDebug(e.toString());
       return null;
     }
+  }
+
+  // selected exam handling
+
+  late ExamData? _selectedExam;
+
+  ExamData? get selectedExam => _selectedExam;
+  final List<String> _htmlContents = [];
+  final List<String> _extraHtmlContents = [];
+  final Map<String, String> examToExamPattern = {};
+  final Rx<RequestData> examRequestData = RequestData().obs;
+
+  void setExam(ExamData exam) {
+    _selectedExam = exam;
+    getExamPatternsById();
+  }
+
+  Future<void> getExamPatternsById() async {
+    _htmlContents.clear();
+    _extraHtmlContents.clear();
+    examToExamPattern.clear();
+    notifyWithRequest(examRequestData, true);
+    var idsList = fetchAllExamIds(_selectedExam!);
+    String examIds;
+    if (idsList.length == 1) {
+      examIds = idsList[0];
+    } else {
+      examIds = idsList.join("-");
+    }
+    final response = exam_pattern_list_response.ExamPatternListResponse
+        .fromJson(await HttpRequests.instance()?.httpGetRequest(
+            ApiEndPoints.getExamPatterByID.replaceAll('{examIds}', examIds)));
+    if (response.status == true) {
+      response.data?.forEach((examPattern) {
+        examToExamPattern[examPattern.examId ?? "N/A"] =
+            examPattern.id ?? "N/A";
+        if (examPattern.htmlContent != null) {
+          _htmlContents.add(examPattern.htmlContent!);
+        }
+        if (examPattern.extraHtmlContent != null) {
+          _extraHtmlContents.add(examPattern.extraHtmlContent!);
+        }
+      });
+    }
+    notifyWithRequest(examRequestData, false);
+  }
+
+  ExamData? getAdNumberExam(String adNumber) {
+    return _allExams.firstWhere((element) => element.adNumber == adNumber);
   }
 }
