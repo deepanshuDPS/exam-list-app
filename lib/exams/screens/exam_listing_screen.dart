@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
+import 'exam_screen.dart';
+
 class ExamListingScreen extends GetWidget<AspirantExamController> {
   static const routeName = "/exam-listing-screen";
 
@@ -272,9 +274,8 @@ class ExamListingScreen extends GetWidget<AspirantExamController> {
                                       });
                                 },
                                 onClick: () {
-                                  // exams.setExam(list[index]);
-                                  // Navigator.of(context)
-                                  //     .pushNamed(ExamScreen.routeName);
+                                  controller.setExam(list[index]);
+                                  Get.toNamed(ExamScreen.routeName);
                                 },
                               );
                             }),

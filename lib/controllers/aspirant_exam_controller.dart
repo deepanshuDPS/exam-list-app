@@ -194,6 +194,10 @@ class AspirantExamController extends GetxController {
     getExamPatternsById();
   }
 
+  ExamData? get exam {
+    return _selectedExam;
+  }
+
   Future<void> getExamPatternsById() async {
     _htmlContents.clear();
     _extraHtmlContents.clear();
@@ -226,5 +230,33 @@ class AspirantExamController extends GetxController {
 
   ExamData? getAdNumberExam(String adNumber) {
     return _allExams.firstWhere((element) => element.adNumber == adNumber);
+  }
+
+  List<String> get htmlContents {
+    return [..._htmlContents];
+  }
+
+  List<String> get extraHtmlContents {
+    return [..._htmlContents];
+  }
+
+  Future<dynamic> doExamLive(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpPutRequest(ApiEndPoints.liveExam, {'adNumber': adNumber}));
+    if (response.status == true) {
+      await PreferencesData.setCurrentVersion();
+      return true;
+    }
+    return response.message;
+  }
+
+  Future<dynamic> deleteExam(String adNumber) async {
+    final response = NotifyMeResponse.fromJson(await HttpRequests.instance()
+        ?.httpDeleteRequest(ApiEndPoints.deleteExam, {'adNumber': adNumber}));
+    if (response.status == true) {
+      await PreferencesData.setCurrentVersion();
+      return true;
+    }
+    return response.message;
   }
 }

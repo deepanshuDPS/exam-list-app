@@ -1,6 +1,7 @@
 import 'package:exam_list/controllers/aspirant_exam_controller.dart';
 import 'package:exam_list/controllers/aspirant_user_controller.dart';
 import 'package:exam_list/controllers/auth_user_controller.dart';
+import 'package:exam_list/controllers/exam_tab_controller.dart';
 import 'package:exam_list/controllers/home_tab_controller.dart';
 import 'package:exam_list/controllers/info_controller.dart';
 import 'package:exam_list/home/screens/home_screen.dart';
@@ -83,11 +84,15 @@ class MyApp extends StatelessWidget {
             AspirantUserController(),
             permanent: true,
           );
+          Get.put<ExamTabController>(
+            ExamTabController(),
+            permanent: true,
+          );
         },
         getPages: [
           GetPage(name: '/', page: () => const LaunchScreen()),
           GetPage(name: HomeScreen.routeName, page: () => HomeScreen()),
-          GetPage(name: ExamScreen.routeName, page: () => const ExamScreen()),
+          GetPage(name: ExamScreen.routeName, page: () => ExamScreen()),
           GetPage(
               name: UserLoginScreen.routeName, page: () => UserLoginScreen()),
           GetPage(

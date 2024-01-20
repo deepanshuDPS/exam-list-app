@@ -12,12 +12,12 @@ class HomeScreen extends StatelessWidget {
   static const routeName = '/home-screen'; // Manages the tab index
 
   final AspirantUserController _userController = Get.find();
+  final HomeTabController _homeTabController = Get.find();
 
   void _refreshUser() {
     _userController.getAspirantUser();
   }
 
-  final HomeTabController homeTabController = Get.find();
 
   HomeScreen({Key? key}) : super(key: key) {
     checkAndRequestPermission();
@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    homeTabController.setTabs([
+    _homeTabController.setTabs([
       KeepAliveWrapper(
         child: ExamListingScreen(),
       ),
@@ -61,9 +61,9 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           bottomNavigationBar: _buildBottomNavigationBar(),
           body: TabBarView(
-            controller: homeTabController.controller,
+            controller: _homeTabController.controller,
             physics: const NeverScrollableScrollPhysics(),
-            children: homeTabController.tabScreens,
+            children: _homeTabController.tabScreens,
           ),
         );
       }),
@@ -96,14 +96,14 @@ class HomeScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.grey,
-            currentIndex: homeTabController.selectedIndex.value,
-            onTap: homeTabController.onItemSelected,
+            currentIndex: _homeTabController.selectedIndex.value,
+            onTap: _homeTabController.onItemSelected,
             showSelectedLabels: false,
             showUnselectedLabels: false,
             items: [
               BottomNavigationBarItem(
                 icon: _buildNavItemIcon(
-                    Icons.home, homeTabController.selectedIndex.value == 0),
+                    Icons.home, _homeTabController.selectedIndex.value == 0),
                 label: '',
               ),
               // BottomNavigationBarItem(
@@ -116,7 +116,7 @@ class HomeScreen extends StatelessWidget {
               // ),
               BottomNavigationBarItem(
                 icon: _buildNavItemIcon(
-                    Icons.person, homeTabController.selectedIndex.value == 1),
+                    Icons.person, _homeTabController.selectedIndex.value == 1),
                 label: '',
               ),
             ],

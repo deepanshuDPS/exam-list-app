@@ -1,4 +1,5 @@
 import 'package:exam_list/responseModels/exam/exam_data.dart';
+import 'package:exam_list/utils/extras_utils.dart';
 
 num getTotalCategoryPosts(num categoryId, num gender, ExamData exam) {
   num categoryPosts = 0;
@@ -48,18 +49,18 @@ num getTotalPosts(ExamData exam) {
 }
 
 String getExamFees(num categoryId, num gender, ExamData exam) {
-  String examFees = "";
+  String? examFees;
   var genderType = gender == 1 ? 1 : 2;
-
+  // TODO : make set for fees and eliminate 0 from fees
   if (exam.childExams.isNotEmpty) {
     for (var childExam in exam.childExams) {
       childExam.categoryFees?.forEach((element) {
         if (element.categoryIds?.contains(categoryId) == true &&
             element.gender?.contains(genderType) == true) {
-          if (examFees == "") {
+          if (examFees == null) {
             examFees = "₹ ${element.fee ?? 0}";
           } else {
-            examFees += "/${element.fee ?? 0}";
+            examFees = "${examFees!}/${element.fee ?? 0}";
           }
         }
       });
@@ -68,12 +69,12 @@ String getExamFees(num categoryId, num gender, ExamData exam) {
     exam.categoryFees?.forEach((element) {
       if (element.categoryIds?.contains(categoryId) == true &&
           element.gender?.contains(genderType) == true) {
-        examFees = "${examFees == "" ? '' : '/'}₹ ${element.fee ?? 0}";
+        examFees = "${examFees == null ? '₹ ' : '$examFees/'}${element.fee ?? 0}";
       }
     });
   }
 
-  return examFees.isNotEmpty ? examFees : "₹ 0";
+  return examFees != null ? examFees! : "₹ 0";
 }
 
 // fetch all notices whether exist or not
